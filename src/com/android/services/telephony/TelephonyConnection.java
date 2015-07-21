@@ -152,6 +152,8 @@ abstract class TelephonyConnection extends Connection implements Holdable, Commu
     private List<Uri> mParticipants;
     private boolean mIsAdhocConferenceCall;
 
+    private SuppServiceNotification mSsNotification = null;
+
     private final Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
@@ -203,8 +205,15 @@ abstract class TelephonyConnection extends Connection implements Holdable, Commu
                     Log.v(TelephonyConnection.this, "MSG_SUPP_SERVICE_NOTIFY on phoneId : "
                             + (phone != null ? Integer.toString(phone.getPhoneId())
                             : "null"));
-                    SuppServiceNotification mSsNotification = null;
+                    if (phone == null) {
+                        break;
+                    }
                     if (msg.obj != null && ((AsyncResult) msg.obj).result != null) {
+                        if (mOriginalConnection != null && ((SuppServiceNotification)((AsyncResult)
+                                msg.obj).result).history != null && !(mConnectionState ==
+                                Call.State.DIALING || mConnectionState == Call.State.ALERTING)) {
+                           return;
+                        }
                         mSsNotification =
                                 (SuppServiceNotification)((AsyncResult) msg.obj).result;
                         if (mOriginalConnection != null) {
