@@ -37,6 +37,8 @@ import android.os.HandlerExecutor;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.PersistableBundle;
+import android.os.RemoteException;
+import android.os.ServiceManager;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.provider.Telephony;
@@ -70,10 +72,13 @@ import com.android.phone.R;
 import com.android.telephony.Rlog;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+
+import org.codeaurora.internal.IExtTelephony;
 
 /**
  * Owns all data we have registered with Telecom including handling dynamic addition and
@@ -116,6 +121,15 @@ public class TelecomAccountRegistry {
             "android.telecom.extra.SUPPORTS_VIDEO_CALLING_FALLBACK";
 
     private Handler mHandler;
+
+    // Flag which decides whether SIM should power down due to APM,
+    private static final String APM_SIM_NOT_PWDN_PROPERTY = "persist.vendor.radio.apm_sim_not_pwdn";
+
+    private enum Count {
+        ZERO,
+        ONE,
+        TWO
+    }
 
     final class AccountEntry implements PstnPhoneCapabilitiesNotifier.Listener {
         private final Phone mPhone;
@@ -1537,13 +1551,43 @@ public class TelecomAccountRegistry {
 
         final boolean phoneAccountsEnabled = mContext.getResources().getBoolean(
                 R.bool.config_pstn_phone_accounts_enabled);
+        int activeCount = 0;
+        int activeSubscriptionId = SubscriptionManager.INVALID_SUBSCRIPTION_ID;
 
         synchronized (mAccountsLock) {
             try {
                 if (phoneAccountsEnabled) {
+                    // states we are interested in from what
+                    // IExtTelephony.getCurrentUiccCardProvisioningStatus()can return
+                    final int PROVISIONED = 1;
+                    final int INVALID_STATE = -1;
+
                     for (Phone phone : phones) {
+                        int provisionStatus = PROVISIONED;
                         int subscriptionId = phone.getSubId();
-                        Log.i(this, "setupAccounts: Phone with subscription id %d", subscriptionId);
+                        int slotId = phone.getPhoneId();
+
+                        if (mTelephonyManager.getPhoneCount() > 1) {
+                            IExtTelephony mExtTelephony = IExtTelephony.Stub
+                                    .asInterface(ServiceManager.getService("extphone"));
+                            try {
+                                //get current provision state of the SIM.
+                                provisionStatus =
+                                        mExtTelephony.getCurrentUiccCardProvisioningStatus(slotId);
+                            } catch (RemoteException ex) {
+                                provisionStatus = INVALID_STATE;
+                                Log.w(this, "Failed to get status , slotId: "+ slotId +" Exception: "
+                                        + ex);
+                            } catch (NullPointerException ex) {
+                                provisionStatus = INVALID_STATE;
+                                Log.w(this, "Failed to get status , slotId: "+ slotId +" Exception: "
+                                        + ex);
+                            }
+                        }
+
+                        Log.d(this, "Phone with subscription id: " + subscriptionId +
+                                " slotId: " + slotId + " provisionStatus: " + provisionStatus);
+
                         // setupAccounts can be called multiple times during service changes.
                         // Don't add an account if the Icc has not been set yet.
                         if (!SubscriptionManager.isValidSubscriptionId(subscriptionId)
