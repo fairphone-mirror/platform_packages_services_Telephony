@@ -2,6 +2,8 @@ package com.android.phone;
 
 import android.app.ActionBar;
 import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.preference.Preference;
@@ -185,6 +187,17 @@ public class GsmUmtsAdditionalCallOptions extends TimeConsumingPreferenceActivit
             mInitIndex = indexOfStartInit;
             doPreferenceInit(indexOfStartInit);
         }
+    }
+
+    private boolean isUtEnabledToDisableClir() {
+        boolean skipClir = false;
+        CarrierConfigManager configManager = (CarrierConfigManager)
+            getSystemService(Context.CARRIER_CONFIG_SERVICE);
+        PersistableBundle pb = configManager.getConfigForSubId(mPhone.getSubId());
+        if (pb != null) {
+            skipClir = pb.getBoolean("config_disable_clir_over_ut");
+        }
+        return mPhone.isUtEnabled() && skipClir;
     }
 
     @Override
