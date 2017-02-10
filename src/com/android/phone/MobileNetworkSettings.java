@@ -720,6 +720,51 @@ public class MobileNetworkSettings extends PreferenceActivity
             }
         }
 
+        /**
+         * Disable the network mode selection if we are using 2G and another
+         * SIM is using a network >2G.
+         *
+         * This is a hackish way to handle the device hardware limitation
+         * (only one SIM card connected to a >2G network at once), the user
+         * should be informed of the limitation and still be offered to
+         * register their preference.
+         *
+         * Since 2G is the simplest network type defined in {@link Phone}, we
+         * can simplify the guard from "another SIM is connected to >2G" to
+         * "another SIM connected to !=2G".
+         *
+         * Whether a subscription should be forced to use 2G is out-of-scope
+         * as we are only called to change preferred networks, not to set them
+         * in the first place. In other words, what we do here is maintaining
+         * the sane states defined somewhere else.
+         *
+         * TODO: Expose a proper UI to handle preferred network type for MSIM
+         */
+        boolean canChangeNetworkMode = true;
+        if (settingsNetworkMode == Phone.NT_MODE_GSM_ONLY) {
+            for (Phone otherPhone: PhoneFactory.getPhones()) {
+                if (mPhone == otherPhone) {
+                    // Ignore the current phone
+                    continue;
+                }
+
+                final int otherPhoneSubId = otherPhone.getSubId();
+                final int otherPhoneNetworkMode = android.provider.Settings.Global.getInt(
+                        otherPhone.getContext().getContentResolver(),
+                        android.provider.Settings.Global.PREFERRED_NETWORK_MODE
+                                + otherPhoneSubId,
+                        preferredNetworkMode);
+
+                if (otherPhoneNetworkMode != Phone.NT_MODE_GSM_ONLY) {
+                    canChangeNetworkMode = false;
+
+                    if (DBG) log("updateBody:"
+                            + " settingsNetworkMode=" + settingsNetworkMode
+                            + " otherPhoneNetworkMode=" + otherPhoneNetworkMode);
+                }
+            }
+        }
+
         // Get the networkMode from Settings.System and displays it
         mButtonDataRoam.setChecked(mPhone.getDataRoamingEnabled());
         mButtonEnabledNetworks.setValue(Integer.toString(settingsNetworkMode));
@@ -761,7 +806,7 @@ public class MobileNetworkSettings extends PreferenceActivity
             }
         }
         mButtonPreferredNetworkMode.setEnabled(hasActiveSubscriptions);
-        mButtonEnabledNetworks.setEnabled(hasActiveSubscriptions);
+        mButtonEnabledNetworks.setEnabled(hasActiveSubscriptions && canChangeNetworkMode);
         mButton4glte.setTitle(enhanced4glteModeTitleId);
         mButton4glte.setEnabled(hasActiveSubscriptions && canChange4glte);
         mLteDataServicePref.setEnabled(hasActiveSubscriptions);
