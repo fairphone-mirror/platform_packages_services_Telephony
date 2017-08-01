@@ -1502,4 +1502,18 @@
     <string name="change_pin_system_error">Unable to set PIN</string>
     <string name="ut_not_support">UT is not available</string>
     <string name="ct_ut_not_support_close_4glte">UT is not available, please turn off Enhanced 4G LTE Mode in Settings</string>
+
+    <!-- Special Carrier App notification -->
+    <!-- [CHAR LIMIT=25] Button to disable a special carrier app. -->
+    <string name="special_carrier_app_disable">Disable</string>
+    <!-- [CHAR LIMIT=25] Button to enable special carrier app. -->
+    <string name="special_carrier_app_enable">Enable</string>
+    <!-- Generic carrier name in case the carrier name is not available. -->
+    <string name="special_carrier_app_generic_carrier_name">Your operator</string>
+    <!-- [CHAR_LIMIT=24] Arguments: <Card slot number> -->
+    <string name="special_carrier_app_for_uicc">Operator app for SIM <xliff:g id="slot" example="1">%1$s</xliff:g></string>
+    <!-- [CHAR_LIMIT=40] Arguments: <Operator name> -->
+    <string name="special_carrier_app_summary"><xliff:g id="operator" example="Your operator">%1$s</xliff:g> provides a special app.</string>
+    <!-- Arguments: <Operator name> <Card slot number> -->
+    <string name="special_carrier_app_summary_extended"><xliff:g id="operator" example="Your operator">%1$s</xliff:g> provides a special app for SIM <xliff:g id="slot" example="1">%2$s</xliff:g>. Do you want to enable it?</string>
 </resources>
