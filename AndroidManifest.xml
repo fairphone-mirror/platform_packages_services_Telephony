@@ -604,5 +604,6 @@
                 <action android:name="android.telephony.data.DataService" />
             </intent-filter>
         </service>
+        <service android:name=".SpecialCarrierAppIntentService" />
     </application>
 </manifest>
