@@ -585,4 +585,10 @@
     <string name="change_pin_confirm_pins_dont_match" msgid="4795052654904027909">"Les codes ne correspondent pas."</string>
     <string name="change_pin_succeeded" msgid="2022852286442211151">"Le code de votre boîte vocale a été mis à jour."</string>
     <string name="change_pin_system_error" msgid="8308462387154257840">"Impossible de définir le code"</string>
+    <string name="special_carrier_app_disable">"Désactiver"</string>
+    <string name="special_carrier_app_enable">"Activer"</string>
+    <string name="special_carrier_app_generic_carrier_name">"Votre opérateur"</string>
+    <string name="special_carrier_app_for_uicc">"Application opérateur"</string>
+    <string name="special_carrier_app_summary">"%1$s vous propose une application."</string>
+    <string name="special_carrier_app_summary_extended">"%1$s vous propose une application. Voulez-vous l'activer ?"</string>
 </resources>
