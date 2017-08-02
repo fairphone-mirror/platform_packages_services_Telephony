@@ -141,7 +141,7 @@ public class SpecialCarrierAppIntentService extends IntentService {
         final Notification notification =
                 new NotificationCompat.Builder(getApplicationContext(), channelId)
                 .setDeleteIntent(getPendingDismissIntent(getApplicationContext(), appInfo))
-                .setContentTitle(getString(R.string.special_carrier_app_for_uicc, slotNumberToDisplay))
+                .setContentTitle(getString(R.string.special_carrier_app_for_uicc))
                 .setContentText(getString(R.string.special_carrier_app_summary, appInfo.mCarrierName))
                 .setSmallIcon(com.android.internal.R.drawable.ic_sim_card_multi_48px_clr)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(
