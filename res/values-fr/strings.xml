@@ -747,4 +747,10 @@
     <string name="supp_service_forwarded_call" msgid="4509980341645679803">"Appel transféré."</string>
     <string name="supp_service_conference_call" msgid="4448616364004466832">"Connexion en cours à la conférence téléphonique."</string>
     <string name="supp_service_held_call_released" msgid="2030677825038709779">"L\'appel en attente a été interrompu."</string>
+    <string name="special_carrier_app_disable">"Désactiver"</string>
+    <string name="special_carrier_app_enable">"Activer"</string>
+    <string name="special_carrier_app_generic_carrier_name">"Votre opérateur"</string>
+    <string name="special_carrier_app_for_uicc">"Application opérateur"</string>
+    <string name="special_carrier_app_summary">"%1$s vous propose une application."</string>
+    <string name="special_carrier_app_summary_extended">"%1$s vous propose une application. Voulez-vous l'activer ?"</string>
 </resources>
