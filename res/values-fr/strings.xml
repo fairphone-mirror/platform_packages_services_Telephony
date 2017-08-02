@@ -787,4 +787,10 @@
     <string name="supp_service_over_ut_precautions_dual_sim" msgid="5166866975550910474">"Pour utiliser <xliff:g id="SUPP_SERVICE">%1$s</xliff:g>, assurez-vous que les données mobiles sont activées pour la carte SIM <xliff:g id="SIM_NUMBER">%2$d</xliff:g>. Vous pouvez modifier cette option dans les paramètres de réseau mobile."</string>
     <string name="supp_service_over_ut_precautions_roaming_dual_sim" msgid="6627654855191817965">"Pour utiliser <xliff:g id="SUPP_SERVICE">%1$s</xliff:g>, assurez-vous que les données mobiles et l\'itinérance des données sont activées pour la carte SIM <xliff:g id="SIM_NUMBER">%2$d</xliff:g>. Vous pouvez modifier cette option dans les paramètres de réseau mobile."</string>
     <string name="supp_service_over_ut_precautions_dialog_dismiss" msgid="5934541487903081652">"Ignorer"</string>
+    <string name="special_carrier_app_disable">"Désactiver"</string>
+    <string name="special_carrier_app_enable">"Activer"</string>
+    <string name="special_carrier_app_generic_carrier_name">"Votre opérateur"</string>
+    <string name="special_carrier_app_for_uicc">"Application opérateur"</string>
+    <string name="special_carrier_app_summary">"%1$s vous propose une application."</string>
+    <string name="special_carrier_app_summary_extended">"%1$s vous propose une application. Voulez-vous l'activer ?"</string>
 </resources>
