@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="special_carrier_app_summary">"Orange vous propose l’application Apps Orange."</string>
+    <string name="special_carrier_app_summary_extended">"Orange vous propose l’application Apps Orange. Apps Orange offre un accès rapide à un catalogue d’applications Orange et partenaires. Voulez-vous l’activer ?"</string>
+</resources>
