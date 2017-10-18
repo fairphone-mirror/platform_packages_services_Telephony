@@ -46,6 +46,7 @@ import android.telephony.DisconnectCause;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.ServiceState;
 import android.telephony.ServiceState.RilRadioTechnology;
+import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 import android.telephony.ims.ImsCallProfile;
@@ -2935,9 +2936,20 @@ abstract class TelephonyConnection extends Connection implements Holdable, Commu
                     ? R.string.status_hint_label_incoming_wifi_call
                     : R.string.status_hint_label_wifi_call;
 
+            String displaySubId = "";
+            if (TelephonyManager.getDefault().getPhoneCount() > 1) {
+                final int phoneId = getPhone().getPhoneId();
+                SubscriptionInfo sub = SubscriptionManager.from(getPhone().getContext())
+                    .getActiveSubscriptionInfoForSimSlotIndex(phoneId);
+                if (sub != null) {
+                    displaySubId = sub.getDisplayName().toString();
+                    displaySubId  = " " + displaySubId;
+                }
+            }
+
             Context context = getPhone().getContext();
             setTelephonyStatusHints(new StatusHints(
-                    getResourceString(labelId),
+                    getResourceString(labelId) + displaySubId,
                     Icon.createWithResource(
                             context, R.drawable.ic_signal_wifi_4_bar_24dp),
                     null /* extras */));
