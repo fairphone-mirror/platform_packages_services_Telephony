@@ -29,6 +29,7 @@ android_app {
         "libprotobuf-java-lite",
         "app-compat-annotations",
         "unsupportedappusage",
+        "ims-ext-common",
         "org.apache.http.legacy",
     ],
 

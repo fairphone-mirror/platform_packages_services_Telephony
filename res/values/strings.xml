@@ -2207,4 +2207,5 @@
     <string name="labelCommonMore">Call settings</string>
     <string name="labelCommonMore_with_label">Call settings (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)</string>
     <string name="sum_common_call_settings">Additional call settings</string>
+    <string name="ims_settings">IMS Settings</string>
 </resources>
