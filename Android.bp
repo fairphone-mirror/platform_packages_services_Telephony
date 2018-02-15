@@ -39,6 +39,7 @@ android_app {
         "androidx.legacy_legacy-preference-v14",
         "android-support-annotations",
         "com.android.phone.common-lib",
+        "ims-ext-common",
         "guava",
         "PlatformProperties",
         "modules-utils-os",
