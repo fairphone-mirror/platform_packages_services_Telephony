@@ -7,6 +7,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Icon;
 import android.os.Bundle;
+import android.os.RemoteException;
+import android.os.ServiceManager;
 import android.os.UserManager;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
@@ -26,6 +28,8 @@ import com.android.phone.PhoneUtils;
 import com.android.phone.R;
 import com.android.phone.SubscriptionInfoHelper;
 
+import org.codeaurora.internal.IExtTelephony;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -41,6 +45,8 @@ public class PhoneAccountSettingsFragment extends PreferenceFragment
             "phone_accounts_accounts_list_category_key";
 
     private static final String ALL_CALLING_ACCOUNTS_KEY = "phone_accounts_all_calling_accounts";
+
+    private static final String BUTTON_SMART_DIVERT_KEY = "button_smart_divert";
 
     private static final String MAKE_AND_RECEIVE_CALLS_CATEGORY_KEY =
             "make_and_receive_calls_settings_category_key";
@@ -60,6 +66,8 @@ public class PhoneAccountSettingsFragment extends PreferenceFragment
     private static final int ACCOUNT_ORDERING_START_VALUE = 100;
 
     private static final String LOG_TAG = PhoneAccountSettingsFragment.class.getSimpleName();
+
+    private boolean isXdivertAvailable = false;
 
     private TelecomManager mTelecomManager;
     private TelephonyManager mTelephonyManager;
@@ -92,6 +100,20 @@ public class PhoneAccountSettingsFragment extends PreferenceFragment
         mTelecomManager = getActivity().getSystemService(TelecomManager.class);
         mTelephonyManager = TelephonyManager.from(getActivity());
         mSubscriptionManager = SubscriptionManager.from(getActivity());
+
+        IExtTelephony extTelephony =
+                IExtTelephony.Stub.asInterface(ServiceManager.getService("extphone"));
+
+        try {
+            if (extTelephony != null) {
+                isXdivertAvailable = extTelephony.isVendorApkAvailable("com.qti.xdivert");
+            } else {
+                Log.d(LOG_TAG, "xdivert not available");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -141,6 +163,16 @@ public class PhoneAccountSettingsFragment extends PreferenceFragment
 
         updateAccounts();
         updateMakeCallsOptions();
+
+        if (!isXdivertAvailable || TelephonyManager.getDefault().getMultiSimConfiguration() !=
+                 TelephonyManager.MultiSimVariants.DSDS) {
+            Preference mSmartDivertPref = getPreferenceScreen()
+                .findPreference(BUTTON_SMART_DIVERT_KEY);
+            if (mAccountList != null && mSmartDivertPref != null) {
+                Log.d(LOG_TAG, "Remove smart divert preference: ");
+                mAccountList.removePreference(mSmartDivertPref);
+            }
+        }
 
         SubscriptionManager.from(getActivity()).addOnSubscriptionsChangedListener(
                 mOnSubscriptionsChangeListener);
