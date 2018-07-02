@@ -1553,6 +1553,7 @@ public class TelecomAccountRegistry {
                 R.bool.config_pstn_phone_accounts_enabled);
         int activeCount = 0;
         int activeSubscriptionId = SubscriptionManager.INVALID_SUBSCRIPTION_ID;
+        boolean isAnyProvisionInfoPending = false;
 
         synchronized (mAccountsLock) {
             try {
@@ -1561,6 +1562,7 @@ public class TelecomAccountRegistry {
                     // IExtTelephony.getCurrentUiccCardProvisioningStatus()can return
                     final int PROVISIONED = 1;
                     final int INVALID_STATE = -1;
+                    final int CARD_NOT_PRESENT = -2;
 
                     for (Phone phone : phones) {
                         int provisionStatus = PROVISIONED;
@@ -1583,6 +1585,13 @@ public class TelecomAccountRegistry {
                                 Log.w(this, "Failed to get status , slotId: "+ slotId +" Exception: "
                                         + ex);
                             }
+                        }
+
+                        // In SSR case, UiccCard's would be disposed hence the provision state received as
+                        // CARD_NOT_PRESENT but valid subId present in SubscriptionInfo record.
+                        if (provisionStatus == INVALID_STATE || ((provisionStatus == CARD_NOT_PRESENT)
+                                && mSubscriptionManager.isActiveSubId(subscriptionId))) {
+                            isAnyProvisionInfoPending = true;
                         }
 
                         Log.d(this, "Phone with subscription id: " + subscriptionId +
