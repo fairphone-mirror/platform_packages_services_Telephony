@@ -80,6 +80,7 @@ public class ConferenceParticipantConnection extends Connection {
         mEndpoint = participant.getEndpoint();
 
         setCapabilitiesAndProperties(isRemotelyHosted);
+        updateState(participant.getState());
     }
 
     /**
