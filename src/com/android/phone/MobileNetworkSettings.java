@@ -52,6 +52,7 @@ import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 import android.telephony.CarrierConfigManager;
 import android.telephony.PhoneStateListener;
+import android.telephony.ServiceState;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
@@ -722,7 +723,7 @@ public class MobileNetworkSettings extends PreferenceActivity
 
         /**
          * Disable the network mode selection if we are using 2G and another
-         * SIM is using a network >2G.
+         * active and network registered SIM is using a network >2G.
          *
          * This is a hackish way to handle the device hardware limitation
          * (only one SIM card connected to a >2G network at once), the user
@@ -754,8 +755,12 @@ public class MobileNetworkSettings extends PreferenceActivity
                         android.provider.Settings.Global.PREFERRED_NETWORK_MODE
                                 + otherPhoneSubId,
                         preferredNetworkMode);
+                final int otherPhoneServiceState = otherPhone.getServiceState().getState();
 
-                if (otherPhoneNetworkMode != Phone.NT_MODE_GSM_ONLY) {
+                if (DBG) log("updateBody: otherPhoneServiceState=" + otherPhoneServiceState);
+
+                if (otherPhoneNetworkMode != Phone.NT_MODE_GSM_ONLY &&
+                    otherPhoneServiceState == ServiceState.STATE_IN_SERVICE) {
                     canChangeNetworkMode = false;
 
                     if (DBG) log("updateBody:"
