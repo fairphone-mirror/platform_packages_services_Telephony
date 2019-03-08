@@ -52,6 +52,8 @@ public class CdmaCallOptions extends TimeConsumingPreferenceActivity {
     private UtCallback mUtCallback;
     private ImsMmTelManager mMmTelManager;
 
+    private boolean mCommon = false;
+
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -63,8 +65,6 @@ public class CdmaCallOptions extends TimeConsumingPreferenceActivity {
         addPreferencesFromResource(R.xml.cdma_call_privacy);
 
         SubscriptionInfoHelper subInfoHelper = new SubscriptionInfoHelper(this, getIntent());
-        subInfoHelper.setActionBarTitle(
-                getActionBar(), getResources(), R.string.labelCdmaMore_with_label);
 
         CdmaVoicePrivacySwitchPreference buttonVoicePrivacy =
                 (CdmaVoicePrivacySwitchPreference) findPreference(BUTTON_VP_KEY);
@@ -77,6 +77,10 @@ public class CdmaCallOptions extends TimeConsumingPreferenceActivity {
             subId = SubscriptionManager.getDefaultSubscriptionId();
         }
         carrierConfig = PhoneGlobals.getInstance().getCarrierConfigForSubId(subId);
+        mCommon = carrierConfig.getBoolean("config_common_callsettings_support_bool");
+        subInfoHelper.setActionBarTitle(
+                getActionBar(), getResources(),
+                mCommon ? R.string.labelCommonMore_with_label : R.string.labelCdmaMore_with_label);
         if (subInfoHelper.getPhone().getPhoneType() != PhoneConstants.PHONE_TYPE_CDMA
                 || carrierConfig.getBoolean(CarrierConfigManager.KEY_VOICE_PRIVACY_DISABLE_UI_BOOL)) {
             buttonVoicePrivacy.setEnabled(false);

@@ -931,4 +931,7 @@
     <string name="send_from_work_profile_cancel" msgid="177746511030381711">"取消"</string>
     <string name="send_from_work_profile_action_str" msgid="6892775562934243337">"切换到工作资料"</string>
     <string name="install_messages_on_work_profile_action_str" msgid="3773440996395152903">"安装工作消息应用"</string>
+    <string name="labelCommonMore" msgid="5930842194056092107">"通话设置"</string>
+    <string name="labelCommonMore_with_label" msgid="2674012918829238902">"通话设置（<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>）"</string>
+    <string name="sum_common_settings" msgid="284753265979035550">"其他通话设置"</string>
 </resources>
