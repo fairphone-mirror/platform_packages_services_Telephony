@@ -919,4 +919,7 @@
     <string name="call_quality_notification_bluetooth_details" msgid="8348950331707346711">"您的蓝牙信号较弱。请尝试切换为扬声器模式。"</string>
     <string name="call_quality_notification_name" msgid="3476828289553948830">"通话质量通知"</string>
     <string name="notification_channel_sip_account" msgid="1261816025156179637">"已弃用的 SIP 帐号"</string>
+    <string name="labelCommonMore" msgid="5930842194056092107">"通话设置"</string>
+    <string name="labelCommonMore_with_label" msgid="2674012918829238902">"通话设置（<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>）"</string>
+    <string name="sum_common_settings" msgid="284753265979035550">"其他通话设置"</string>
 </resources>

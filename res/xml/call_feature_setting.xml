@@ -71,4 +71,10 @@
         android:summary="@string/sum_cdma_call_settings"
         android:persistent="false" />
 
+    <PreferenceScreen
+        android:key="button_common_more_expand_key"
+        android:title="@string/labelCommonMore"
+        android:summary="@string/sum_common_call_settings"
+        android:persistent="false" />
+
 </PreferenceScreen>

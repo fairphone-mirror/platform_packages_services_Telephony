@@ -2204,4 +2204,7 @@
 \n\nEmergency calls are only possible in areas with cellular coverage.</string>
     <!-- Option to hide the popup dialog if it is not necessary for the user. [CHAR LIMIT=40] -->
     <string name="do_not_show_again">Do not show again</string>
+    <string name="labelCommonMore">Call settings</string>
+    <string name="labelCommonMore_with_label">Call settings (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)</string>
+    <string name="sum_common_call_settings">Additional call settings</string>
 </resources>
