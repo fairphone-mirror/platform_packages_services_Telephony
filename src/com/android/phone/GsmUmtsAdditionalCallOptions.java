@@ -107,7 +107,13 @@ public class GsmUmtsAdditionalCallOptions extends TimeConsumingPreferenceActivit
         if (mPreferences.size() != 0) {
             if (icicle == null) {
                 if (DBG) Log.d(LOG_TAG, "start to init ");
-                doPreferenceInit(mInitIndex);
+                // doPreferenceInit(mInitIndex);
+                if (isUtEnabledToDisableClir()) {
+                    mCLIRButton.setSummary(R.string.sum_default_caller_id);
+                    mCWButton.init(this, false, mPhone);
+                } else {
+                    mCLIRButton.init(this, false, mPhone);
+                }
             } else {
                 if (DBG) Log.d(LOG_TAG, "restore stored states");
                 mInitIndex = mPreferences.size();
