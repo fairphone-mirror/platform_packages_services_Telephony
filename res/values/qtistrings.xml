@@ -31,9 +31,6 @@
 
 <!-- The xml contains Qti specific resource strings neede for any value added features. -->
 <resources>
-    <!-- IMS settings related strings -->
-    <!-- Title displayed IMS account settings in the sip settings category. [CHAR LIMIT=NONE] -->
-    <string name="ims_settings">IMS Settings</string>
     <!-- Label text for PIN entry widget on SIM Network Subset Depersonalization panel -->
     <string name="PERSOSUBSTATE_SIM_NETWORK_SUBSET_ENTRY">SIM network subset unlock PIN</string>
     <!-- Label text for PIN entry widget on SIM Corporate Depersonalization panel -->
