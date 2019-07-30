@@ -154,6 +154,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <protected-broadcast android:name= "org.codeaurora.telephony.VOWIFI_ENABLED" />
+    <protected-broadcast android:name= "com.android.internal.telephony.CARRIER_VVM_PACKAGE_REMOVED" />
 
     <permission android:name="com.android.phone.permission.ACCESS_LAST_KNOWN_CELL_ID"
                 android:label="Access last known cell identity."
