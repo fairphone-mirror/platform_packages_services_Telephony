@@ -310,7 +310,7 @@
     <string name="throttle_status_subtext" msgid="1110276415078236687">"<xliff:g id="USED_0">%1$s</xliff:g> (<xliff:g id="USED_1">%2$d</xliff:g>٪) de periodo máximo de <xliff:g id="USED_2">%3$s</xliff:g>.\nPróx periodo en <xliff:g id="USED_3">%4$d</xliff:g> días (<xliff:g id="USED_4">%5$s</xliff:g>)"</string>
     <string name="throttle_data_usage_subtext" msgid="3185429653996709840">"<xliff:g id="USED_0">%1$s</xliff:g> (<xliff:g id="USED_1">%2$d</xliff:g>٪) de periodo máx de <xliff:g id="USED_2">%3$s</xliff:g>"</string>
     <string name="throttle_data_rate_reduced_subtext" msgid="8369839346277847725">"Máx de <xliff:g id="USED_0">%1$s</xliff:g> superado.\nFrec datos reducida a <xliff:g id="USED_1">%2$d</xliff:g> Kb/s"</string>
-    <string name="throttle_time_frame_subtext" msgid="6462089615392402127">"<xliff:g id="USED_0">%1$d</xliff:g>٪ del ciclo transcurrido.\nPróx periodo en <xliff:g id="USED_1">%2$d</xliff:g> días (<xliff:g id="USED_2">%3$s</xliff:g>)"</string>
+    <string name="throttle_time_frame_subtext" msgid="6462089615392402127">"(<xliff:g id="USED_0">%1$d</xliff:g>٪) del ciclo transcurrido.\nPróx periodo en <xliff:g id="USED_1">%2$d</xliff:g> días (<xliff:g id="USED_2">%3$s</xliff:g>)"</string>
     <string name="throttle_rate_subtext" msgid="7221971817325779535">"Frec datos se reduce a <xliff:g id="USED">%1$d</xliff:g> Kb/s si se supera límite uso datos"</string>
     <string name="throttle_help_subtext" msgid="2817114897095534807">"Más información sobre política de uso de datos móviles de tu operador"</string>
     <string name="cell_broadcast_sms" msgid="4053449797289031063">"SMS de difusión móvil"</string>
@@ -636,7 +636,7 @@
     <string name="progress_dialog_exiting_ecm" msgid="9159080081676927217">"Saliendo del modo de devolución de llamada de emergencia"</string>
     <string name="alert_dialog_yes" msgid="3532525979632841417">"Sí"</string>
     <string name="alert_dialog_no" msgid="1075632654085988420">"No"</string>
-    <string name="alert_dialog_dismiss" msgid="1336356286354517054">"Cerrar"</string>
+    <string name="alert_dialog_dismiss" msgid="1336356286354517054">"Descartar"</string>
     <string name="phone_in_ecm_call_notification_text_without_data_restriction_hint" msgid="3747860785153531225">"El teléfono está en modo de devolución de llamada de emergencia"</string>
     <string name="phone_in_ecm_notification_complete_time_without_data_restriction_hint" msgid="3690292264812050858">"Hasta las <xliff:g id="COMPLETETIME">%s</xliff:g>"</string>
     <plurals name="alert_dialog_exit_ecm_without_data_restriction_hint" formatted="false" msgid="6477733043040328640">
@@ -912,7 +912,14 @@
     <string name="phone_info_label" product="default" msgid="1784175881556791433">"Información sobre el teléfono"</string>
     <string name="carrier_provisioning" msgid="2668065041869578376">"Información de servicios del operador"</string>
     <string name="trigger_carrier_provisioning" msgid="1301829588620638234">"Activar servicios del operador"</string>
+    <!-- Smart Divert Settings -->
+    <!-- Title for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_title">Smart-Divert</string>
+    <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_summary">Configuración de CFNRc</string>
     <string name="mobile_data_setting_title">Datos moviles</string>
     <string name="mobile_data_setting_description">Los datos moviles estan habilitados por defecto en este dispositivo.\nEsto podria resultar en cargos, dependiendo de su tarifa.\nSi elige desactivar los datos moviles, puede volver a activarlos en cualquier momento en la configuracion del dispositivo.</string>
     <string name="mobile_data_setting">Habilitar los datos moviles</string>
+    <string name="labelCFVoice">Voz</string>
+    <string name="call_forward_option">Opciones de desvío de llamadas</string>
 </resources>

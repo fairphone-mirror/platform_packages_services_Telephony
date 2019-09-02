@@ -310,7 +310,7 @@
     <string name="throttle_status_subtext" msgid="1110276415078236687">"<xliff:g id="USED_0">%1$s</xliff:g> (<xliff:g id="USED_1">%2$d</xliff:g>٪) del <xliff:g id="USED_2">%3$s</xliff:g> max periodo\nIl periodo succ. inizia tra <xliff:g id="USED_3">%4$d</xliff:g> gg (<xliff:g id="USED_4">%5$s</xliff:g>)"</string>
     <string name="throttle_data_usage_subtext" msgid="3185429653996709840">"<xliff:g id="USED_0">%1$s</xliff:g> (<xliff:g id="USED_1">%2$d</xliff:g>٪) del <xliff:g id="USED_2">%3$s</xliff:g> max periodo"</string>
     <string name="throttle_data_rate_reduced_subtext" msgid="8369839346277847725">"<xliff:g id="USED_0">%1$s</xliff:g> max superato\nVelocità dati ridotta a <xliff:g id="USED_1">%2$d</xliff:g> Kb/s"</string>
-    <string name="throttle_time_frame_subtext" msgid="6462089615392402127">"<xliff:g id="USED_0">%1$d</xliff:g>٪ del ciclo trascorso\nIl periodo succ. inizia tra <xliff:g id="USED_1">%2$d</xliff:g> gg (<xliff:g id="USED_2">%3$s</xliff:g>)"</string>
+    <string name="throttle_time_frame_subtext" msgid="6462089615392402127">"(<xliff:g id="USED_0">%1$d</xliff:g>٪) del ciclo trascorso\nIl periodo succ. inizia tra <xliff:g id="USED_1">%2$d</xliff:g> gg (<xliff:g id="USED_2">%3$s</xliff:g>)"</string>
     <string name="throttle_rate_subtext" msgid="7221971817325779535">"Velocità dati ridotta a <xliff:g id="USED">%1$d</xliff:g> Kb/s se limite utilizzo dati superato"</string>
     <string name="throttle_help_subtext" msgid="2817114897095534807">"Informazioni sulle norme di utilizzo dati della rete cellulare del gestore"</string>
     <string name="cell_broadcast_sms" msgid="4053449797289031063">"SMS cell broadcast"</string>
@@ -912,7 +912,14 @@
     <string name="phone_info_label" product="default" msgid="1784175881556791433">"Info telefono"</string>
     <string name="carrier_provisioning" msgid="2668065041869578376">"Informazioni sul provisioning operatore"</string>
     <string name="trigger_carrier_provisioning" msgid="1301829588620638234">"Attiva provisioning operatore"</string>
+    <!-- Smart Divert Settings -->
+    <!-- Title for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_title">Smart-Divert</string>
+    <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_summary">Impostazioni CFNRc</string>
     <string name="mobile_data_setting_title">Dati mobili</string>
     <string name="mobile_data_setting_description">I dati mobili sono abilitati di default su questo dispositivo.\nQuesto potrebbe comportare dei costi, a seconda della tariffa.\nSe si sceglie di disattivare i dati mobili, questi possono essere riattivati in qualsiasi momento nelle impostazioni del dispositivo.</string>
     <string name="mobile_data_setting">Abilitare i dati mobili</string>
+    <string name="labelCFVoice">Voce</string>
+    <string name="call_forward_option">Opzioni deviazione chiamate</string>
 </resources>
