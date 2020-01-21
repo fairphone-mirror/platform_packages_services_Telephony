@@ -2198,4 +2198,10 @@
     <!-- Telephony notification channel name for a channel containing SIP accounts removed
      notificatios -->
     <string name="notification_channel_sip_account">Deprecated SIP accounts</string>
+    <!-- Instruction text to notify user that emergency calls may not be possible when voice is enabled over wifi. [CHAR LIMIT=NONE] -->
+    <string name="limited_service_alert_dialog_description"><b>Emergency calls via WiFi Calling</b>\nEmergency calls are not possible via WiFi Calling.
+\n\nThe device switches automatically to a cellular network (2G/3G) to place an emergency call.
+\n\nEmergency calls are only possible in areas with cellular coverage.</string>
+    <!-- Option to hide the popup dialog if it is not necessary for the user. [CHAR LIMIT=40] -->
+    <string name="do_not_show_again">Do not show again</string>
 </resources>
