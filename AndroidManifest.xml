@@ -167,6 +167,8 @@
     <!-- Needed to register for UWB state changes for satellite communication -->
     <uses-permission android:name="android.permission.UWB_PRIVILEGED"/>
 
+    <protected-broadcast android:name= "org.codeaurora.telephony.VOWIFI_ENABLED" />
+
     <permission android:name="com.android.phone.permission.ACCESS_LAST_KNOWN_CELL_ID"
                 android:label="Access last known cell identity."
                 android:protectionLevel="signature"/>
@@ -502,6 +504,17 @@
                 <action android:name="com.android.phone.action.ACTION_SHOW_ECM_EXIT_DIALOG" />
                 <action android:name="android.telephony.action.SHOW_NOTICE_ECM_BLOCK_OTHERS" />
                 <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="LimitedServiceActivity"
+            android:autoRemoveFromRecents="true"
+            android:launchMode="singleTask"
+            android:exported="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter android:priority="1000">
+                <action android:name = "org.codeaurora.telephony.VOWIFI_ENABLED" />
             </intent-filter>
         </activity>
 
