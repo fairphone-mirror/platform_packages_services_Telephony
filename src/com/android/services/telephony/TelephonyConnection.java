@@ -1616,6 +1616,7 @@ abstract class TelephonyConnection extends Connection implements Holdable, Commu
             mWasImsConnection = true;
         } else {
             extrasToRemove.add(QtiImsExtUtils.QTI_IMS_PHONE_ID_EXTRA_KEY);
+            extrasToRemove.add(QtiImsExtUtils.EXTRA_TIR_OVERWRITE_ALLOWED);
         }
         if (originalConnection instanceof ImsPhoneConnection) {
             maybeConfigureDeviceToDeviceCommunication();
