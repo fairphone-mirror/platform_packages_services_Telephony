@@ -912,4 +912,7 @@
     <string name="phone_info_label" product="default" msgid="1784175881556791433">"Telefooninformatie"</string>
     <string name="carrier_provisioning" msgid="2668065041869578376">"Gegevens voor providerregistratie"</string>
     <string name="trigger_carrier_provisioning" msgid="1301829588620638234">"Providerregistratie activeren"</string>
+    <string name="mobile_data_setting_title">Mobiele gegevens</string>
+    <string name="mobile_data_setting_description">Mobiele gegevens zijn standaard ingeschakeld op dit apparaat.\nDit kan leiden tot kosten, afhankelijk van uw tarief.\nAls u ervoor kiest om mobiele data uit te schakelen, kan deze op elk moment weer worden ingeschakeld in de instellingen van het apparaat.</string>
+    <string name="mobile_data_setting">Mobiele gegevens inschakelen</string>
 </resources>

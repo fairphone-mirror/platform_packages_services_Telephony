@@ -37,6 +37,8 @@ android_app {
         "com.android.phone.common-lib",
         "guava",
         "PlatformProperties",
+        "setup-wizard-lib",
+        "setup-wizard-lib-gingerbread-compat",
     ],
 
     srcs: [
