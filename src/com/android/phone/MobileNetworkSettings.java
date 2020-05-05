@@ -421,6 +421,7 @@ public class MobileNetworkSettings extends Activity  {
         private MyHandler mHandler;
         private boolean mOkClicked;
         private boolean mExpandAdvancedFields;
+        private boolean canPreferenceChange;
 
         // We assume the the value returned by mTabHost.getCurrentTab() == slotId
         private TabHost mTabHost;
@@ -434,6 +435,7 @@ public class MobileNetworkSettings extends Activity  {
         private boolean mIsGlobalCdma;
         private boolean mOnlyAutoSelectInHomeNW;
         private boolean mUnavailable;
+        private boolean mCanChangeNetworkMode = true;
 
         private class PhoneCallStateListener extends PhoneStateListener {
             /*
@@ -1016,7 +1018,13 @@ public class MobileNetworkSettings extends Activity  {
         private void updateBody() {
             final Activity activity = getActivity();
             final PreferenceScreen prefSet = getPreferenceScreen();
+            final int phoneSubId = mSubId;
             final boolean hasActiveSubscriptions = hasActiveSubscriptions();
+            Context context = activity.getApplicationContext();
+            int network_mode = android.provider.Settings.Global.getInt(
+                        context.getContentResolver(),
+                        android.provider.Settings.Global.PREFERRED_NETWORK_MODE + phoneSubId,
+                        preferredNetworkMode);
 
             if (activity == null || activity.isDestroyed()) {
                 Log.e(LOG_TAG, "updateBody with no valid activity.");
@@ -1029,6 +1037,23 @@ public class MobileNetworkSettings extends Activity  {
             }
 
             prefSet.removeAll();
+
+            if (phoneSubId != SubscriptionManager.getDefaultDataSubscriptionId()) {
+                if (network_mode == TelephonyManager.NETWORK_MODE_LTE_GSM_WCDMA) {
+                    android.provider.Settings.Global.putInt(
+                                context.getContentResolver(),
+                                android.provider.Settings.Global.PREFERRED_NETWORK_MODE + phoneSubId,
+                                TelephonyManager.NETWORK_MODE_GSM_ONLY);
+                }
+            } else if (phoneSubId == SubscriptionManager.getDefaultDataSubscriptionId() && !canPreferenceChange) {
+                if (network_mode == TelephonyManager.NETWORK_MODE_GSM_ONLY) {
+                    android.provider.Settings.Global.putInt(
+                                context.getContentResolver(),
+                                android.provider.Settings.Global.PREFERRED_NETWORK_MODE + phoneSubId,
+                                TelephonyManager.NETWORK_MODE_LTE_GSM_WCDMA);
+                }
+                canPreferenceChange = false;
+            }
 
             updateBodyBasicFields(activity, prefSet, mSubId, hasActiveSubscriptions);
 
@@ -1156,6 +1181,8 @@ public class MobileNetworkSettings extends Activity  {
                 prefSet.findPreference(BUTTON_CDMA_SUBSCRIPTION_KEY)
                         .setOnPreferenceChangeListener(this);
             }
+
+            mCanChangeNetworkMode = !(settingsNetworkMode == TelephonyManager.NETWORK_MODE_GSM_ONLY && phoneSubId != SubscriptionManager.getDefaultDataSubscriptionId());
 
             // Get the networkMode from Settings.System and displays it
             mButtonEnabledNetworks.setValue(Integer.toString(settingsNetworkMode));
@@ -1443,6 +1470,7 @@ public class MobileNetworkSettings extends Activity  {
                             .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             } else if (preference == mButtonEnabledNetworks) {
+                canPreferenceChange = true;
                 mButtonEnabledNetworks.setValue((String) objValue);
                 int buttonNetworkMode;
                 buttonNetworkMode = Integer.parseInt((String) objValue);
@@ -2019,7 +2047,7 @@ public class MobileNetworkSettings extends Activity  {
             // both buttons are shown to the user as "Preferred network type" and the options change
             // based on what looks like World mode.
             if (mButtonEnabledNetworks != null) {
-                mButtonEnabledNetworks.setEnabled(enabled);
+                mButtonEnabledNetworks.setEnabled(enabled && mCanChangeNetworkMode);
             }
             if (mButtonPreferredNetworkMode != null) {
                 mButtonPreferredNetworkMode.setEnabled(enabled);
