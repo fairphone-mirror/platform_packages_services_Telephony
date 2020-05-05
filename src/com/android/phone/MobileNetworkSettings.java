@@ -318,6 +318,7 @@ public class MobileNetworkSettings extends Activity  {
         private MyHandler mHandler;
         private boolean mOkClicked;
         private boolean mExpandAdvancedFields;
+        private boolean canPreferenceChange;
 
         // We assume the the value returned by mTabHost.getCurrentTab() == slotId
         private TabHost mTabHost;
@@ -933,6 +934,11 @@ public class MobileNetworkSettings extends Activity  {
             final PreferenceScreen prefSet = getPreferenceScreen();
             final int phoneSubId = mPhone.getSubId();
             final boolean hasActiveSubscriptions = hasActiveSubscriptions();
+            Context context = activity.getApplicationContext();
+            int network_mode = android.provider.Settings.Global.getInt(
+                        context.getContentResolver(),
+                        android.provider.Settings.Global.PREFERRED_NETWORK_MODE + phoneSubId,
+                        preferredNetworkMode);
 
             if (activity == null || activity.isDestroyed()) {
                 Log.e(LOG_TAG, "updateBody with no valid activity.");
@@ -946,6 +952,23 @@ public class MobileNetworkSettings extends Activity  {
 
             prefSet.removeAll();
 
+          if(phoneSubId != SubscriptionManager.getDefaultDataSubscriptionId()) {
+              if(network_mode == Phone.NT_MODE_LTE_GSM_WCDMA) {
+                        android.provider.Settings.Global.putInt(
+                            context.getContentResolver(),
+                            android.provider.Settings.Global.PREFERRED_NETWORK_MODE + phoneSubId,
+                            Phone.NT_MODE_GSM_ONLY);
+              }
+          }
+          else if(phoneSubId == SubscriptionManager.getDefaultDataSubscriptionId() && !canPreferenceChange){
+                    if(network_mode == Phone.NT_MODE_GSM_ONLY) {
+                        android.provider.Settings.Global.putInt(
+                            context.getContentResolver(),
+                            android.provider.Settings.Global.PREFERRED_NETWORK_MODE + phoneSubId,
+                            Phone.NT_MODE_LTE_GSM_WCDMA);
+                    }
+            canPreferenceChange = false;
+            }
             updateBodyBasicFields(activity, prefSet, phoneSubId, hasActiveSubscriptions);
 
             if (mExpandAdvancedFields) {
@@ -1152,6 +1175,11 @@ public class MobileNetworkSettings extends Activity  {
                         .setOnPreferenceChangeListener(this);
             }
 
+            boolean canChangeNetworkMode = true;
+            if ((settingsNetworkMode == Phone.NT_MODE_GSM_ONLY) && (phoneSubId != SubscriptionManager.getDefaultDataSubscriptionId())) {
+              canChangeNetworkMode = false;
+            }
+
             // Get the networkMode from Settings.System and displays it
             mButtonEnabledNetworks.setValue(Integer.toString(settingsNetworkMode));
             mButtonPreferredNetworkMode.setValue(Integer.toString(settingsNetworkMode));
@@ -1177,7 +1205,7 @@ public class MobileNetworkSettings extends Activity  {
                     R.string.enhanced_4g_lte_mode_title;
 
             mButtonPreferredNetworkMode.setEnabled(hasActiveSubscriptions);
-            mButtonEnabledNetworks.setEnabled(hasActiveSubscriptions);
+            mButtonEnabledNetworks.setEnabled(hasActiveSubscriptions && canChangeNetworkMode);
             mButton4glte.setTitle(enhanced4glteModeTitleId);
             mLteDataServicePref.setEnabled(hasActiveSubscriptions);
             Preference ps;
@@ -1289,6 +1317,7 @@ public class MobileNetworkSettings extends Activity  {
                             .obtainMessage(MyHandler.MESSAGE_SET_PREFERRED_NETWORK_TYPE));
                 }
             } else if (preference == mButtonEnabledNetworks) {
+                canPreferenceChange = true;
                 mButtonEnabledNetworks.setValue((String) objValue);
                 int buttonNetworkMode;
                 buttonNetworkMode = Integer.parseInt((String) objValue);
