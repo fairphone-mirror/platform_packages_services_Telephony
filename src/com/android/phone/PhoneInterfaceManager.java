@@ -8664,4 +8664,17 @@ public class PhoneInterfaceManager extends ITelephony.Stub {
     public boolean canConnectTo5GInDsdsMode() {
         return mApp.getResources().getBoolean(R.bool.config_5g_connection_in_dsds_mode);
     }
+
+    public void setTransmitPower(int key, int value) {
+        try {
+            Phone phone = PhoneFactory.getDefaultPhone();
+            if (phone != null) {
+                loge("[SW_SAR] phone get successful");
+                phone.getUnitTestMode();
+                phone.setTransmitPower(key, value);
+            }
+        } catch (IllegalStateException e) {
+            loge("[SW_SAR] error to get phone");
+        }
+    }
 }
