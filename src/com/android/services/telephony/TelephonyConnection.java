@@ -91,6 +91,7 @@ import com.android.phone.callcomposer.CallComposerPictureManager;
 import com.android.phone.callcomposer.CallComposerPictureTransfer;
 import com.android.telephony.Rlog;
 
+import org.codeaurora.ims.QtiCallConstants;
 import org.codeaurora.ims.utils.QtiImsExtUtils;
 
 import java.util.ArrayList;
@@ -1617,6 +1618,7 @@ abstract class TelephonyConnection extends Connection implements Holdable, Commu
         } else {
             extrasToRemove.add(QtiImsExtUtils.QTI_IMS_PHONE_ID_EXTRA_KEY);
             extrasToRemove.add(QtiImsExtUtils.EXTRA_TIR_OVERWRITE_ALLOWED);
+            extrasToRemove.add(QtiCallConstants.ORIENTATION_MODE_EXTRA_KEY);
         }
         if (originalConnection instanceof ImsPhoneConnection) {
             maybeConfigureDeviceToDeviceCommunication();
