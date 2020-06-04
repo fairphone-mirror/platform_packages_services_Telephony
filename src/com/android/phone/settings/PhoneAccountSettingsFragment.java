@@ -207,6 +207,16 @@ public class PhoneAccountSettingsFragment extends PreferenceFragment
             mUseSipCalling.setValueIndex(optionsValueIndex);
             mUseSipCalling.setSummary(mUseSipCalling.getEntry());
 
+            List<PhoneAccountHandle> allSims = getCallingAccounts(true, true);
+            if (needRemoveSIPCallingMenu(allSims)) {
+                Log.i(LOG_TAG, "removing SIP calling menu");
+                PreferenceCategory SIPSettings =
+                        (PreferenceCategory)
+                                getPreferenceScreen()
+                                        .findPreference(SIP_SETTINGS_CATEGORY_PREF_KEY);
+                SIPSettings.removePreference(mUseSipCalling);
+            }
+
             mSipReceiveCallsPreference = (SwitchPreference)
                     getPreferenceScreen().findPreference(SIP_RECEIVE_CALLS_PREF_KEY);
             mSipReceiveCallsPreference.setEnabled(SipUtil.isPhoneIdle(getActivity()));
@@ -562,6 +572,30 @@ public class PhoneAccountSettingsFragment extends PreferenceFragment
         final UserManager userManager = (UserManager) getActivity()
                 .getSystemService(Context.USER_SERVICE);
         return userManager.isPrimaryUser();
+    }
+
+    private boolean needRemoveSIPCallingMenu(List<PhoneAccountHandle> simAccounts) {
+        if (mTelephonyManager == null) {
+            return false;
+        }
+        boolean needRemoveSIP = false;
+        for (PhoneAccountHandle handle : simAccounts) {
+            PhoneAccount account = mTelecomManager.getPhoneAccount(handle);
+            if (account == null) {
+                continue;
+            }
+            String simOperator =
+                    mTelephonyManager.getSimOperatorNumeric(
+                            mTelephonyManager.getSubIdForPhoneAccount(account));
+            if (simOperator == null || simOperator.length() < 5) {
+                continue;
+            }
+            String numeric = simOperator.substring(0, 5);
+            if ("23415".equals(numeric)) {
+                needRemoveSIP = true;
+            }
+        }
+        return needRemoveSIP;
     }
 
     private void updateMakeCallsOptions() {
