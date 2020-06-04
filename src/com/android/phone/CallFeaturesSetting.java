@@ -58,11 +58,14 @@ import com.android.ims.ImsException;
 import com.android.ims.ImsManager;
 import com.android.internal.telephony.Phone;
 import com.android.internal.telephony.PhoneConstants;
+import com.android.internal.telephony.uicc.IccRecords;
+import com.android.internal.telephony.uicc.UiccController;
 import com.android.phone.settings.PhoneAccountSettingsFragment;
 import com.android.phone.settings.SuppServicesUiUtil;
 import com.android.phone.settings.VoicemailSettingsActivity;
 import com.android.phone.settings.fdn.FdnSetting;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.codeaurora.ims.QtiCallConstants;
@@ -110,17 +113,66 @@ public class CallFeaturesSetting extends PreferenceActivity
     private static final String BUTTON_VP_KEY = "button_voice_privacy_key";
     private static final String BUTTON_IMS_SETTINGS_KEY = "ims_settings_key";
 
+    // TODO: Move these lists to a shared/common library.
+    private static final List<String> NUMERICS_BOUYGUES = createList("20820", "20821", "20888");
+    private static final List<String> NUMERICS_ORANGE =
+            createList("20801", "20802", "20891", "21403");
+    private static final List<String> NUMERICS_PROXIMUS = createList("20601");
+    private static final List<String> NUMERICS_SFR = createList("20829");
+    private static final List<String> NUMERICS_SKY_UK = createList("23457");
+    private static final List<String> NUMERICS_SWISSCOM = createList("22801");
+    private static final List<String> NUMERICS_TELE2 = createList("24007");
+    // TODO: 23591 and 23415 are Vodafone UK and appear in different lists. Check if that is
+    // intended.
+    private static final List<String> NUMERICS_VODAFONE_WITH_VOWIFI =
+            createList("26801", "20205", "20404", "26202", "26209", "23415");
+    private static final List<String> NUMERICS_VODAFONE_WITHOUT_VOWIFI =
+            createList("22210", "23591", "27201", "21401");
+
+    private static final List<String> DISABLE_IMS_NUMERICS =
+            joinLists(
+                    NUMERICS_BOUYGUES,
+                    NUMERICS_ORANGE,
+                    NUMERICS_SWISSCOM,
+                    NUMERICS_VODAFONE_WITH_VOWIFI,
+                    NUMERICS_VODAFONE_WITHOUT_VOWIFI);
+
+    private static final List<String> HIDE_VOWIFI_MENU_NUMERICS =
+            joinLists(
+                    NUMERICS_ORANGE,
+                    NUMERICS_SFR,
+                    NUMERICS_SKY_UK,
+                    NUMERICS_BOUYGUES,
+                    NUMERICS_TELE2,
+                    NUMERICS_PROXIMUS,
+                    NUMERICS_VODAFONE_WITHOUT_VOWIFI);
+
     private Phone mPhone;
     private ImsManager mImsMgr;
     private SubscriptionInfoHelper mSubscriptionInfoHelper;
     private TelecomManager mTelecomManager;
     private TelephonyCallback mTelephonyCallback;
+    private UiccController mUiccController;
 
     private SwitchPreference mButtonAutoRetry;
     private PreferenceScreen mVoicemailSettingsScreen;
     private SwitchPreference mEnableVideoCalling;
     private Preference mButtonWifiCalling;
     private PreferenceScreen mImsSettingsScreen;
+
+    @SafeVarargs
+    private static <T> List<T> createList(T... items) {
+        return new ArrayList<>(List.of(items));
+    }
+
+    @SafeVarargs
+    private static <T> List<T> joinLists(List<T>... lists) {
+        List<T> result = new ArrayList<>();
+        for (List<T> list : lists) {
+            result.addAll(list);
+        }
+        return result;
+    }
 
     /*
      * Click Listeners, handle click based on objects attached to UI.
@@ -277,6 +329,7 @@ public class CallFeaturesSetting extends PreferenceActivity
                 getActionBar(), getResourcesForSubId(), R.string.call_settings_with_label);
         mTelecomManager = getSystemService(TelecomManager.class);
         mTelephonyCallback = new CallFeaturesTelephonyCallback();
+        mUiccController = UiccController.getInstance();
     }
 
     private void updateImsManager(Phone phone) {
@@ -404,6 +457,10 @@ public class CallFeaturesSetting extends PreferenceActivity
         Preference gsmOptions = prefSet.findPreference(BUTTON_GSM_UMTS_OPTIONS);
         Preference fdnButton = prefSet.findPreference(BUTTON_FDN_KEY);
         fdnButton.setIntent(mSubscriptionInfoHelper.getIntent(FdnSetting.class));
+        Preference callingAccountsButton = prefSet.findPreference(PHONE_ACCOUNT_SETTINGS_KEY);
+        if (callingAccountsButton != null) {
+            prefSet.removePreference(callingAccountsButton);
+        }
         if (carrierConfig.getBoolean(CarrierConfigManager.KEY_WORLD_PHONE_BOOL)) {
             if (carrierConfig.getBoolean("config_common_callsettings_support_bool")) {
                 prefSet.removePreference(cdmaOptions);
@@ -413,7 +470,11 @@ public class CallFeaturesSetting extends PreferenceActivity
                             isCdmaPhone ? CdmaCallOptions.class : GsmUmtsCallOptions.class));
             } else {
                 prefSet.removePreference(commonOptions);
-                cdmaOptions.setIntent(mSubscriptionInfoHelper.getIntent(CdmaCallOptions.class));
+                if (mPhone.getPhoneType() == PhoneConstants.PHONE_TYPE_CDMA) {
+                    cdmaOptions.setIntent(mSubscriptionInfoHelper.getIntent(CdmaCallOptions.class));
+                } else {
+                    prefSet.removePreference(cdmaOptions);
+                }
                 gsmOptions.setIntent(mSubscriptionInfoHelper.getIntent(GsmUmtsCallOptions.class));
             }
         } else {
@@ -525,6 +586,9 @@ public class CallFeaturesSetting extends PreferenceActivity
             prefSet.removePreference(mEnableVideoCalling);
         }
 
+        // Always remove IMS settings. They are not required on networks where FP3 supports IMS.
+        prefSet.removePreference(mImsSettingsScreen);
+
         final PhoneAccountHandle simCallManager = mTelecomManager.getSimCallManagerForSubscription(
                 mPhone.getSubId());
         if (simCallManager != null) {
@@ -576,6 +640,9 @@ public class CallFeaturesSetting extends PreferenceActivity
             }
             prefSet.addPreference(mButtonWifiCalling);
         }
+        if (needRemoveVoWifiMenu(mPhone)) {
+            prefSet.removePreference(mButtonWifiCalling);
+        }
 
         try {
             if (mImsMgr.getImsServiceState() != ImsFeature.STATE_READY) {
@@ -589,6 +656,57 @@ public class CallFeaturesSetting extends PreferenceActivity
             prefSet.removePreference(mButtonWifiCalling);
             prefSet.removePreference(mEnableVideoCalling);
         }
+    }
+
+    private static String getCurrentOperatorNumeric(Phone phone) {
+        TelephonyManager telephonyManager = TelephonyManager.from(phone.getContext());
+        String simOperator = telephonyManager.getSimOperatorNumericForPhone(phone.getPhoneId());
+        if (simOperator != null && simOperator.length() >= 5) {
+            return simOperator.substring(0, 5);
+        }
+        return null;
+    }
+
+    private String getCurrentGid(Phone phone) {
+        final boolean hasSubscription =
+                SubscriptionManager.from(phone.getContext())
+                        .getActiveSubscriptionInfo(phone.getSubId()) != null;
+        if (mUiccController == null || !hasSubscription) {
+            return null;
+        }
+        final IccRecords iccRecods =
+                mUiccController.getIccRecords(
+                        SubscriptionManager.getPhoneId(phone.getSubId()),
+                        UiccController.APP_FAM_3GPP);
+        if (iccRecods == null) {
+            return null;
+        }
+        return iccRecods.getGid1();
+    }
+
+    private boolean needRemoveVoWifiMenu(Phone phone) {
+        // Gather numeric (MCC/MNC) and group id
+        final String numeric = getCurrentOperatorNumeric(phone);
+        final String gid = getCurrentGid(phone);
+        Log.i("needRemoveVoWifiMenu", "mccmnc = " + numeric + ", gid = " + gid);
+
+        // Various cases that are covered via MCC/MNC check
+        if (HIDE_VOWIFI_MENU_NUMERICS.contains(numeric)) {
+            return true;
+        }
+
+        // Special cases that require GID to match
+        // Tele2 Sverige AB
+        if ("24007".equals(numeric) && gid != null && gid.startsWith("0C")) {
+            return true;
+        }
+        // UK networks with overlapping MCC/MNCs, check GID as well
+        if (("23430".equals(numeric) || "23438".equals(numeric))
+                && gid != null
+                && gid.startsWith("28")) {
+            return true;
+        }
+        return false;
     }
 
     /**
