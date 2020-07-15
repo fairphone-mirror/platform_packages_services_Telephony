@@ -166,6 +166,7 @@ public class TelephonyConnectionService extends ConnectionService {
     /** Set to true when there is an emergency call pending which will potential trigger a dial.
      * This must be set to false when the call is dialed. */
     private volatile boolean mIsEmergencyCallPending;
+    private AnswerAndReleaseHandler mAnswerAndReleaseHandler = null;
 
     // Contains one TelephonyConnection that has placed a call and a memory of which Phones it has
     // already tried to connect with. There should be only one TelephonyConnection trying to place a
@@ -205,6 +206,15 @@ public class TelephonyConnectionService extends ConnectionService {
         int getSimStateForSlotIdx(int slotId);
         int getPhoneId(int subId);
     }
+
+    private AnswerAndReleaseHandler.ListenerBase mAnswerAndReleaseListener =
+            new AnswerAndReleaseHandler.ListenerBase() {
+        @Override
+        public void onAnswered() {
+            mAnswerAndReleaseHandler.removeListener(this);
+            mAnswerAndReleaseHandler = null;
+        }
+    };
 
     private SubscriptionManagerProxy mSubscriptionManagerProxy = new SubscriptionManagerProxy() {
         @Override
@@ -573,6 +583,39 @@ public class TelephonyConnectionService extends ConnectionService {
                 connection.getCallerDisplayNamePresentation());
         conference.setParticipants(connection.getParticipants());
         return conference;
+    }
+
+    @Override
+    public void doAnswer(String callId, int videoState) {
+        if (mAnswerAndReleaseHandler != null) {
+            Log.i(this, "doAnswer: duplicate answer request.");
+            return;
+        }
+
+        Connection answerAndReleaseConnection = shallDisconnectOtherCalls();
+        boolean isAnswerAndReleaseConnection = answerAndReleaseConnection != null;
+        Log.i(this, "isAnswerAndReleaseConnection: " + isAnswerAndReleaseConnection);
+        if (!isAnswerAndReleaseConnection) {
+            super.doAnswer(callId, videoState);
+            return;
+        }
+
+        mAnswerAndReleaseHandler =
+                new AnswerAndReleaseHandler(answerAndReleaseConnection, videoState);
+        mAnswerAndReleaseHandler.addListener(mAnswerAndReleaseListener);
+        mAnswerAndReleaseHandler.checkAndAnswer(getAllConnections(), getAllConferences());
+    }
+
+    private Connection shallDisconnectOtherCalls() {
+        for (Connection current : getAllConnections()) {
+            if (current.getState() == Connection.STATE_RINGING &&
+                    current.getExtras() != null &&
+                    current.getExtras().getBoolean(
+                        Connection.EXTRA_ANSWERING_DROPS_FG_CALL, false)) {
+                return current;
+            }
+        }
+        return null;
     }
 
     @Override
