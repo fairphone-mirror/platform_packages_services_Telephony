@@ -376,6 +376,7 @@ public class PhoneAccountSettingsFragment extends PreferenceFragment
                 mAccountList.addPreference(mAllCallingAccounts);
             } else {
                 mAccountList.removePreference(mAllCallingAccounts);
+                mMakeAndReceiveCallsCategory.removePreference(mDefaultOutgoingAccount);
             }
 
             if (isXdivertAvailable) {
