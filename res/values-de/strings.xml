@@ -919,4 +919,8 @@
     <string name="call_quality_notification_bluetooth_details" msgid="8348950331707346711">"Das Bluetooth-Signal ist schwach. Verwende die Freisprechfunktion."</string>
     <string name="call_quality_notification_name" msgid="3476828289553948830">"Benachrichtigung zu Anrufqualität"</string>
     <string name="notification_channel_sip_account" msgid="1261816025156179637">"Eingestellte SIP-Konten"</string>
+    <!-- Instruction text to notify user that emergency calls may not be possible when voice is enabled over wifi. [CHAR LIMIT=NONE] -->
+    <string name="limited_service_alert_dialog_description"><b>Notruf über WiFi Calling</b>\nNotrufe können nicht über WiFi Calling abgesetzt werden.\n\nDas Endgerät wechselt bei einem Notruf automatisch auf ein vorhandenes Mobilfunknetz (2G/3G).\n\nNotrufe sind daher nur bei vorhandener Mobilfunkabdeckung möglich.</string>
+    <!-- Option to hide the popup dialog if it is not necessary for the user. [CHAR LIMIT=40] -->
+    <string name="do_not_show_again">Nicht mehr anzeigen</string>
 </resources>
