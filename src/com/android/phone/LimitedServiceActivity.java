@@ -76,6 +76,7 @@ public class LimitedServiceActivity extends FragmentActivity {
         private int mPhoneId;
         private TelephonyManager mTelephonyManager;
         private Handler mHandler;
+        private String mType;
 
         public static LimitedServiceAlertDialogFragment newInstance(int phoneId) {
             LimitedServiceAlertDialogFragment frag = new LimitedServiceAlertDialogFragment();
@@ -90,6 +91,8 @@ public class LimitedServiceActivity extends FragmentActivity {
         public Dialog onCreateDialog(Bundle bundle) {
             mPhoneId = getArguments().getInt(KEY_PHONE_ID);
             mPhone = PhoneFactory.getPhone(mPhoneId);
+            mType = mPhone.getContext().getResources().getString(
+                com.android.internal.R.string.config_show_notification_emergency_dialog_type);
             mTelephonyManager = getContext().getSystemService(TelephonyManager.class).
                     createForSubscriptionId(mPhone.getSubId());
             mHandler = new Handler() {
@@ -142,7 +145,11 @@ public class LimitedServiceActivity extends FragmentActivity {
                 ImsMmTelManager imsMmTelMgr = ImsMmTelManager.
                         createForSubscriptionId(subIds[0]);
                 Log.i(TAG, "Disabling WFC setting");
-                imsMmTelMgr.setVoWiFiSettingEnabled(false);
+                if (!"vodafone".equals(mType)) {
+                    imsMmTelMgr.setVoWiFiSettingEnabled(false);
+                } else {
+                    Log.i(TAG, "Disallowing disabling WFC settings for Vodafone.");
+                }
             }
             cleanUp();
         }
@@ -157,7 +164,7 @@ public class LimitedServiceActivity extends FragmentActivity {
                     + " do not show preference:" + preferences.getBoolean
                     (Phone.KEY_DO_NOT_SHOW_LIMITED_SERVICE_ALERT +
                     PhoneFactory.getPhone(mPhoneId).getSubId(), false));
-            if (isChecked) {
+            if (isChecked && !"vodafone".equals(mType)) {
                 NotificationManager sNotificationManager = (NotificationManager) getContext().
                         getSystemService(NOTIFICATION_SERVICE);
                 sNotificationManager.cancel(CarrierServiceStateTracker.EMERGENCY_NOTIFICATION_TAG,
