@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- IMS settings related strings -->
+    <!-- Title displayed IMS account settings in the sip settings category. [CHAR LIMIT=NONE] -->
+    <string name="ims_settings">"IMS அமைப்புகள்"</string>
+
+	<!-- Call auto reject settings -->
+    <string name="auto_reject_toggle_title">"அழைப்புகளை தானாக நிராகரிக்கவும்."</string>
+    <string name="auto_reject_toggle_summary">"டி.டி.எஸ்ஸில் அதிக முன்னுரிமை மற்றும் தரவு அழைப்புகள் இருக்கும்போது செயலற்ற சிம் கார்டுகளில் அழைப்புகளை தானாக நிராகரிக்கவும்"</string>
+</resources>

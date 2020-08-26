@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- IMS settings related strings -->
+    <!-- Title displayed IMS account settings in the sip settings category. [CHAR LIMIT=NONE] -->
+    <string name="ims_settings">"IMS параметрлері"</string>
+
+	<!-- Call auto reject settings -->
+    <string name="auto_reject_toggle_title">"Қоңырауларды автоматты түрде қабылдамаңыз."</string>
+    <string name="auto_reject_toggle_summary">"Қатерлі SIM карталардағы қоңырауларды автоматты түрде автоматты түрде бас тарту және DDS-те деректер қоңыраулары болған кезде бас тарту"</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- IMS settings related strings -->
+    <!-- Title displayed IMS account settings in the sip settings category. [CHAR LIMIT=NONE] -->
+    <string name="ims_settings">"IMS 설정"</string>
+
+	<!-- Call auto reject settings -->
+    <string name="auto_reject_toggle_title">"자동으로 통화를 거부합니다."</string>
+    <string name="auto_reject_toggle_summary">"DDS에 높은 우선 순위 및 데이터 호출이있는 경우 유휴 SIM 카드의 호출을 자동으로 거부합니다."</string>
+</resources>

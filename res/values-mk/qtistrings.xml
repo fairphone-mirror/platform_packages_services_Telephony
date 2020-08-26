@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- IMS settings related strings -->
+    <!-- Title displayed IMS account settings in the sip settings category. [CHAR LIMIT=NONE] -->
+    <string name="ims_settings">"IMS поставки"</string>
+
+	<!-- Call auto reject settings -->
+    <string name="auto_reject_toggle_title">"Одбијте ги повиците автоматски."</string>
+    <string name="auto_reject_toggle_summary">"Автоматски одбивајте повици на неактивни СИМ-картички кога има повисок приоритет и податочни повици на DDS"</string>
+</resources>

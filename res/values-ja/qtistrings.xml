@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- IMS settings related strings -->
+    <!-- Title displayed IMS account settings in the sip settings category. [CHAR LIMIT=NONE] -->
+    <string name="ims_settings">"IMS設定"</string>
+
+	<!-- Call auto reject settings -->
+    <string name="auto_reject_toggle_title">"通話を自動的に拒否します。"</string>
+    <string name="auto_reject_toggle_summary">"DDSに優先度の高いデータ呼び出しがある場合、アイドル状態のSIMカードでの呼び出しを自動的に拒否します"</string>
+</resources>

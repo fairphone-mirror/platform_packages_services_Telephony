@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- IMS settings related strings -->
+    <!-- Title displayed IMS account settings in the sip settings category. [CHAR LIMIT=NONE] -->
+    <string name="ims_settings">"IMS тохиргоо"</string>
+
+	<!-- Call auto reject settings -->
+    <string name="auto_reject_toggle_title">"Дуудлагаас автоматаар татгалзах."</string>
+    <string name="auto_reject_toggle_summary">"DDS дээр өндөр ач холбогдол өгч, дата дуудлага хийх үед сул байгаа SIM карт дээрх дуудлагаас автоматаар татгалзах"</string>
+</resources>

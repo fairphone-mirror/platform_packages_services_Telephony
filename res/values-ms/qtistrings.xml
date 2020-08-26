@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- IMS settings related strings -->
+    <!-- Title displayed IMS account settings in the sip settings category. [CHAR LIMIT=NONE] -->
+    <string name="ims_settings">"Pengaturan IMS"</string>
+
+	<!-- Call auto reject settings -->
+    <string name="auto_reject_toggle_title">"Tolak panggilan secara otomatis."</string>
+    <string name="auto_reject_toggle_summary">"Secara otomatis menolak panggilan pada kartu SIM idle ketika ada prioritas tinggi dan panggilan data pada DDS"</string>
+</resources>

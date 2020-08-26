@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- IMS settings related strings -->
+    <!-- Title displayed IMS account settings in the sip settings category. [CHAR LIMIT=NONE] -->
+    <string name="ims_settings">"आयएमएस सेटिंग्ज"</string>
+
+	<!-- Call auto reject settings -->
+    <string name="auto_reject_toggle_title">"स्वयंचलितपणे कॉल नाकारा."</string>
+    <string name="auto_reject_toggle_summary">"जेव्हा डीडीएस वर उच्च प्राधान्य आणि डेटा कॉल असतात तेव्हा निष्क्रिय सिम कार्डवरील कॉल स्वयंचलितपणे नाकारा"</string>
+</resources>

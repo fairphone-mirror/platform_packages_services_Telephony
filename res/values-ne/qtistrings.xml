@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- IMS settings related strings -->
+    <!-- Title displayed IMS account settings in the sip settings category. [CHAR LIMIT=NONE] -->
+    <string name="ims_settings">"IMS सेटिंग्स"</string>
+
+	<!-- Call auto reject settings -->
+    <string name="auto_reject_toggle_title">"कलहरू स्वचालित रूपमा अस्वीकार गर्नुहोस्।"</string>
+    <string name="auto_reject_toggle_summary">"स्वचालित रूपमा सिम कार्डमा कलहरू अस्वीकार गर्नुहोस् जब त्यहाँ उच्च प्राथमिकता र डेटा कल हुन्छ डीडीएसमा"</string>
+</resources>

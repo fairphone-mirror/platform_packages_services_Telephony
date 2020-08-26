@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- IMS settings related strings -->
+    <!-- Title displayed IMS account settings in the sip settings category. [CHAR LIMIT=NONE] -->
+    <string name="ims_settings">"إعدادات IMS"</string>
+
+	<!-- Call auto reject settings -->
+    <string name="auto_reject_toggle_title">"رفض المكالمات تلقائيا."</string>
+    <string name="auto_reject_toggle_summary">"عندما تكون هناك مكالمات ذات أولوية عالية والبيانات على DDS ، ارفض المكالمات على بطاقات SIM الخاملة تلقائيًا"</string>
+</resources>

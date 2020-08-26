@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- IMS settings related strings -->
+    <!-- Title displayed IMS account settings in the sip settings category. [CHAR LIMIT=NONE] -->
+    <string name="ims_settings">"Paramètres IMS"</string>
+    <!-- VT call quality settings. -->
+    <string name="ims_vt_call_quality_title">"Qualité des appels VT"</string>
+    <string name="ims_vt_call_quality_low">"Faible"</string>
+    <string name="ims_vt_call_quality_high">"Haute"</string>
+    <string name="ims_vt_call_quality_unknown">"Inconnue"</string>
+    <string name="ims_vt_call_quality_set_failed">"Échec de la définition de la qualité vidéo"</string>
+    <!-- Call Deflect settings -->
+    <string name="qti_ims_call_deflect_title">"Numéro de renvoi d'appel"</string>
+    <string name="qti_ims_number_not_set">"Pas encore défini"</string>
+    <!-- IMS to CS Retry setting title.  [CHAR LIMIT=30] -->
+    <string name="ims_to_cs_retry_title">"Réessayer CS"</string>
+    <!-- IMS to CS Retry setting summary.  [CHAR LIMIT=80] -->
+    <string name="ims_to_cs_retry_summary">"Réessayer automatiquement avec des communications vocales régulières (recommandé)"</string>
+	<!-- Call auto reject settings -->
+    <string name="auto_reject_toggle_title">"Rejetez les appels automatiquement."</string>
+    <string name="auto_reject_toggle_summary">"Rejetez automatiquement les appels sur les cartes SIM inactives lorsqu'il y a des appels de haute priorité et de données sur DDS"</string>
+</resources>

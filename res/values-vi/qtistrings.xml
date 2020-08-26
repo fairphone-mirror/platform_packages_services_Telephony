@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- IMS settings related strings -->
+    <!-- Title displayed IMS account settings in the sip settings category. [CHAR LIMIT=NONE] -->
+    <string name="ims_settings">"Cài đặt IMS"</string>
+
+	<!-- Call auto reject settings -->
+    <string name="auto_reject_toggle_title">"Tự động từ chối cuộc gọi."</string>
+    <string name="auto_reject_toggle_summary">"Tự động từ chối cuộc gọi trên thẻ SIM không hoạt động khi có các cuộc gọi dữ liệu và ưu tiên cao trên DDS"</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- IMS settings related strings -->
+    <!-- Title displayed IMS account settings in the sip settings category. [CHAR LIMIT=NONE] -->
+    <string name="ims_settings">"Impostazioni IMS"</string>
+
+	<!-- Call auto reject settings -->
+    <string name="auto_reject_toggle_title">"Rifiuta automaticamente le chiamate."</string>
+    <string name="auto_reject_toggle_summary">"Rifiuta automaticamente le chiamate su schede SIM inattive quando sono presenti chiamate dati e ad alta priorità su DDS"</string>
+</resources>

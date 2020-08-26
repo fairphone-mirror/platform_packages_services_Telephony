@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- IMS settings related strings -->
+    <!-- Title displayed IMS account settings in the sip settings category. [CHAR LIMIT=NONE] -->
+    <string name="ims_settings">"IMS iestatījumi"</string>
+
+	<!-- Call auto reject settings -->
+    <string name="auto_reject_toggle_title">"Automātiski noraidīt zvanus."</string>
+    <string name="auto_reject_toggle_summary">"Automātiski noraidīt zvanus uz dīkstāves SIM kartēm, ja DDS ir augstas prioritātes un datu zvani"</string>
+</resources>
