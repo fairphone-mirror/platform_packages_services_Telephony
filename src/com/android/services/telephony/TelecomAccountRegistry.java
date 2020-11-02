@@ -135,7 +135,6 @@ public class TelecomAccountRegistry {
     final class AccountEntry implements PstnPhoneCapabilitiesNotifier.Listener {
         private final Phone mPhone;
         private PhoneAccount mAccount;
-        private final PstnIncomingCallNotifier mIncomingCallNotifier;
         private final PstnPhoneCapabilitiesNotifier mPhoneCapabilitiesNotifier;
         private boolean mIsEmergency;
         private boolean mIsRttCapable;
@@ -167,7 +166,6 @@ public class TelecomAccountRegistry {
             mAccount = registerPstnPhoneAccount(isEmergency, isTest);
             Log.i(this, "Registered phoneAccount: %s with handle: %s",
                     mAccount, mAccount.getAccountHandle());
-            mIncomingCallNotifier = new PstnIncomingCallNotifier((Phone) mPhone);
             mPhoneCapabilitiesNotifier = new PstnPhoneCapabilitiesNotifier((Phone) mPhone,
                     this);
             mImsManagerConnector = ImsManager.getConnector(
@@ -231,12 +229,15 @@ public class TelecomAccountRegistry {
         }
 
         void teardown() {
-            mIncomingCallNotifier.teardown();
             mPhoneCapabilitiesNotifier.teardown();
             if (mMmTelManager != null && mMmtelCapabilityCallback != null) {
                 mMmTelManager.unregisterMmTelCapabilityCallback(mMmtelCapabilityCallback);
             }
             mImsManagerConnector.disconnect();
+        }
+
+        private boolean isMatched(SubscriptionInfo subInfo) {
+            return mPhone.getSubId() == subInfo.getSubscriptionId();
         }
 
         private void registerMmTelCapabilityCallback() {
@@ -1083,6 +1084,10 @@ public class TelecomAccountRegistry {
                             ImsRegistrationImplBase.REGISTRATION_TECH_CROSS_SIM,
                     MmTelFeature.MmTelCapabilities.CAPABILITY_TYPE_VOICE);
         }
+
+        private boolean isSubAccount() {
+            return !(mIsTestAccount || mIsEmergency);
+        }
     }
 
     private OnSubscriptionsChangedListener mOnSubscriptionsChangedListener =
@@ -1095,10 +1100,37 @@ public class TelecomAccountRegistry {
             }
             mSubscriptionListenerState = LISTENER_STATE_REGISTERED;
 
-            // Any time the SubscriptionInfo changes rerun the setup
-            Log.i(this, "TelecomAccountRegistry: onSubscriptionsChanged - update accounts");
-            tearDownAccounts();
-            setupAccounts();
+            List<SubscriptionInfo> subList =
+                    mSubscriptionManager.getActiveSubscriptionInfoList();
+
+            boolean isTearingDownNeeded = subList == null;
+            if (!isTearingDownNeeded) {
+                int subAccountCnt = subList.size();
+                synchronized (mAccountsLock) {
+                    subAccountCnt = mAccounts.stream()
+                            .filter(entry -> entry.isSubAccount())
+                            .collect(java.util.stream.Collectors.toList()).size();
+                }
+                isTearingDownNeeded |= subAccountCnt != subList.size();
+                if (!isTearingDownNeeded) {
+                    // Check if it is needed to be torn down for SUB refresh.
+                    for (SubscriptionInfo subInfo : subList) {
+                        isTearingDownNeeded |= !isAccountMatched(subInfo);
+                    }
+                }
+            }
+            if (isTearingDownNeeded) {
+                Log.i(this, "TelecomAccountRegistry: onSubscriptionsChanged - update accounts");
+                tearDownAccounts();
+                setupAccounts();
+            } else {
+                Log.i(this, "TelecomAccountRegistry: onSubscriptionsChanged - reregister accounts");
+                synchronized (mAccountsLock) {
+                    for (AccountEntry entry : mAccounts) {
+                        entry.reRegisterPstnPhoneAccount();
+                    }
+                }
+            }
         }
 
         @Override
@@ -1217,6 +1249,7 @@ public class TelecomAccountRegistry {
             }
         }
     };
+    private PstnIncomingCallNotifier[] mPstnIncomingCallNotifiers;
 
     TelecomAccountRegistry(Context context) {
         mContext = context;
@@ -1232,6 +1265,8 @@ public class TelecomAccountRegistry {
                 2, /* multiplier */
                 mHandlerThread.getLooper(),
                 mRegisterOnSubscriptionsChangedListenerRunnable);
+        mPstnIncomingCallNotifiers =
+                new PstnIncomingCallNotifier[mTelephonyManager.getActiveModemCount()];
     }
 
     /**
@@ -1471,6 +1506,10 @@ public class TelecomAccountRegistry {
         mContext.registerReceiver(mLocaleChangeReceiver, localeChangeFilter);
 
         registerContentObservers();
+        // register for Pstn incoming call notifiers
+        for (int i = 0; i < mTelephonyManager.getActiveModemCount(); i++) {
+            mPstnIncomingCallNotifiers[i] = new PstnIncomingCallNotifier(PhoneFactory.getPhone(i));
+        }
     }
 
     private void registerContentObservers() {
@@ -1745,6 +1784,17 @@ public class TelecomAccountRegistry {
         // Invalidate the TelephonyManager cache which maps phone account handles to sub ids since
         // all the phone account handles are being recreated at this point.
         PropertyInvalidatedCache.invalidateCache(TelephonyManager.CACHE_KEY_PHONE_ACCOUNT_TO_SUBID);
+    }
+
+    private boolean isAccountMatched(SubscriptionInfo info) {
+        synchronized (mAccountsLock) {
+            for (AccountEntry entry : mAccounts) {
+                if (entry.isMatched(info)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
