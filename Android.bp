@@ -15,6 +15,8 @@
 // Build the Phone app which includes the emergency dialer. See Contacts
 // for the 'other' dialer.
 
+
+
 android_app {
     name: "TeleService",
 
@@ -26,6 +28,8 @@ android_app {
         "unsupportedappusage",
         "telephony-ext",
         "ims-ext-common",
+        "qcrilhook",
+        "sysrilcmd",
     ],
 
     static_libs: [
