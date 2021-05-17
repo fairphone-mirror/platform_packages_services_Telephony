@@ -210,6 +210,7 @@ public class PhoneGlobals extends ContextWrapper {
     private final SipReceiver mSipReceiver = new SipReceiver();
 
     private final SetSarReceiver mSarReceiver = new SetSarReceiver();
+    private final CustomizeNVReceiver mCustNVReceiver = new CustomizeNVReceiver();//Add by shaopan.tang 2021-04-28 [FP4-89]Customize SIP/XCAP UserAgent string
 
     private final CarrierVvmPackageInstalledReceiver mCarrierVvmPackageInstalledReceiver =
             new CarrierVvmPackageInstalledReceiver();
@@ -513,6 +514,13 @@ public class PhoneGlobals extends ContextWrapper {
         IntentFilter sarIntentFilter = new IntentFilter(Intent.ACTION_BOOT_COMPLETED);
         sarIntentFilter.addAction(WifiManager.WIFI_AP_STATE_CHANGED_ACTION);
         registerReceiver(mSarReceiver, sarIntentFilter);
+
+        //[FEATURE]-Add-Begin by shaopan.tang 2021-04-28 [FP4-89]Customize SIP/XCAP UserAgent string
+        mCustNVReceiver.init(this);
+        IntentFilter CustNVIntentFilter = new IntentFilter(Intent.ACTION_BOOT_COMPLETED);
+        CustNVIntentFilter.addAction(TelephonyIntents.ACTION_SIM_STATE_CHANGED);
+        registerReceiver(mCustNVReceiver, CustNVIntentFilter);
+        //[FEATURE]-Add-End by shaopan.tang
 
         IntentFilter filter = new IntentFilter(AudioManager.STREAM_DEVICES_CHANGED_ACTION);
         filter.addAction(AudioManager.ACTION_SPEAKERPHONE_STATE_CHANGED);
