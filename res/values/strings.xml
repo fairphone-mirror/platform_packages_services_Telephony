@@ -2282,4 +2282,7 @@
     <string name="c_iwlan_exit_notification_positive_button">OPEN SETTINGS</string>
     <string name="c_iwlan_exit_notification_negative_button">DISMISS</string>
     <string name="c_iwlan_channel_name">C_IWLAN</string>
+    <string name="mobile_data_title">Mobile data</string>
+    <string name="mobile_data_content">Mobile data is enabled by default on this device.\nThis could result in charges,depending on your tariff.\nIf you chose to disable mobile data it can be enabled again at any time in the device settings.</string>
+    <string name="mobile_data_next_button">Next</string>
 </resources>
