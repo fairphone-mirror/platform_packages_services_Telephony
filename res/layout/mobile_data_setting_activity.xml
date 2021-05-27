@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/img_mobile"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/ic_data" />
+
+    <TextView
+        android:id="@+id/tv_mobile_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/img_mobile"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+        android:text="@string/mobile_data_title"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/tv_mobile_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_mobile_title"
+        android:padding="10dp"
+        android:text="@string/mobile_data_content" />
+
+    <ImageView
+        android:id="@+id/img_mobile_background"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/data" />
+
+    <CheckBox
+        android:id="@+id/ck_mobile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="100dp"
+        android:text="数据流量" />
+    
+    <Button
+        android:id="@+id/btn_next"
+        android:layout_width="80dp"
+        android:layout_height="36dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="24dp"
+        android:textSize="18sp"
+        android:textColor="@color/incall_call_banner_text_color"
+        android:text="@string/mobile_data_next_button"
+        android:background="@drawable/mobile_next_selector"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        />
+    
+</RelativeLayout>
