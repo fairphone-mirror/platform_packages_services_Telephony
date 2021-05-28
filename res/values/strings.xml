@@ -2216,4 +2216,7 @@
 \n\nEmergency calls are only possible in areas with cellular coverage.</string>
     <!-- Option to hide the popup dialog if it is not necessary for the user. [CHAR LIMIT=40] -->
     <string name="do_not_show_again">Do not show again</string>
+    <string name="mobile_data_title">Mobile data</string>
+    <string name="mobile_data_content">Mobile data is enabled by default on this device.\nThis could result in charges,depending on your tariff.\nIf you chose to disable mobile data it can be enabled again at any time in the device settings.</string>
+    <string name="mobile_data_next_button">Next</string>
 </resources>
