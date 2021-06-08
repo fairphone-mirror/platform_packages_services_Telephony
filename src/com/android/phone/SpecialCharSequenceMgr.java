@@ -232,19 +232,13 @@ public class SpecialCharSequenceMgr {
         // TODO: The string constants here should be removed in favor
         // of some call to a static the MmiCode class that determines
         // if a dialstring is an MMI code.
-        if ((input.startsWith("**04") || input.startsWith("**05"))
-                && input.endsWith("#")) {
+        if (input.startsWith("**04") && input.endsWith("#")) {
             UserManager userManager = (UserManager) pukInputActivity
                        .getSystemService(Context.USER_SERVICE);
             if (userManager.isSystemUser()) {
                 PhoneGlobals app = PhoneGlobals.getInstance();
                 Phone phone;
-                int subId;
-                if (input.startsWith("**04")) {
-                    subId = getNextSubIdForState(IccCardConstants.State.PIN_REQUIRED, context);
-                } else {
-                    subId = getNextSubIdForState(IccCardConstants.State.PUK_REQUIRED, context);
-                }
+                int subId = getNextSubIdForState(IccCardConstants.State.PIN_REQUIRED, context);
                 if (SubscriptionManager.isValidSubscriptionId(subId)) {
                     log("get phone with subId: " + subId);
                     phone = PhoneGlobals.getPhone(subId);
@@ -252,17 +246,7 @@ public class SpecialCharSequenceMgr {
                     log("get default phone");
                     phone = PhoneGlobals.getPhone();
                 }
-                boolean isMMIHandled = phone.handlePinMmi(input);
-
-                // if the PUK code is recognized then indicate to the
-                // phone app that an attempt to unPUK the device was
-                // made with this activity.  The PUK code may still
-                // fail though, but we won't know until the MMI code
-                // returns a result.
-                if (isMMIHandled && input.startsWith("**05")) {
-                    app.setPukEntryActivity(pukInputActivity);
-                }
-                return isMMIHandled;
+                return phone.handlePinMmi(input);
             } else {
                 AlertDialog dialog = new AlertDialog.Builder(context)
                         .setMessage(R.string.pin_puk_system_user_only)
