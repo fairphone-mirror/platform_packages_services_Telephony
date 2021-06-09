@@ -248,6 +248,14 @@
                 android:exported="true"
                 android:readPermission="android.permission.READ_CONTACTS"
                 android:writePermission="android.permission.WRITE_CONTACTS" />
+        
+        <!-- Mobile Data Setting Page -->
+        <activity android:name="MobileDataSettingActivity">
+            <intent-filter>
+                <action android:name="com.android.internal.telephony.MOBILE_DATA_SETTING" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <!-- Dialer UI that only allows emergency calls -->
         <activity android:name="EmergencyDialer"
@@ -711,5 +719,7 @@
             android:writePermission="android.permission.MODIFY_PHONE_STATE"/>
 
         <uses-library android:name="ims-ext-common"/>
+        <uses-library android:name="com.qualcomm.sysrilcmd"/>
+        <uses-library android:name="com.qualcomm.qcrilhook"/>
     </application>
 </manifest>

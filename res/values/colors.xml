@@ -71,4 +71,6 @@
     <color name="emergency_call_icon_color">#3c4043</color>
     <color name="emergency_dialpad_fab_tint_color">@null</color>
     <color name="white_70_percent">#b3ffffff</color>
+    <color name="mobile_next_selected_on">#0f58b7</color>
+    <color name="mobile_next_selected_off">#1a73E8</color>
 </resources>

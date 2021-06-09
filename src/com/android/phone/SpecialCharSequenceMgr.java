@@ -231,8 +231,8 @@ public class SpecialCharSequenceMgr {
                                           Activity pukInputActivity) {
         // TODO: The string constants here should be removed in favor
         // of some call to a static the MmiCode class that determines
-        // if a dialstring is an MMI code.
-        if ((input.startsWith("**04") || input.startsWith("**05"))
+        // if a dialstring is an MMI code.|| input.startsWith("**05")
+        if ((input.startsWith("**04") )
                 && input.endsWith("#")) {
             UserManager userManager = (UserManager) pukInputActivity
                        .getSystemService(Context.USER_SERVICE);

@@ -56,6 +56,7 @@ import android.util.LocalLog;
 import android.util.Log;
 import android.widget.Toast;
 
+
 import com.android.internal.telephony.CallManager;
 import com.android.internal.telephony.IccCardConstants;
 import com.android.internal.telephony.MmiCode;
@@ -81,6 +82,11 @@ import java.io.PrintWriter;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
+
+import com.qualcomm.sysrilcmd.SysRilCmd;
+import com.qualcomm.qcrilhook.QcRilHookCallback;
+import android.bluetooth.BluetoothHeadset;
+import android.net.wifi.WifiManager;
 
 /**
  * Global state for the telephony subsystem when running in the primary
@@ -203,10 +209,30 @@ public class PhoneGlobals extends ContextWrapper {
     // Broadcast receiver for SIP based intents (see onCreate())
     private final SipReceiver mSipReceiver = new SipReceiver();
 
+    private final SetSarReceiver mSarReceiver = new SetSarReceiver();
+    private final CustomizeNVReceiver mCustNVReceiver = new CustomizeNVReceiver();//Add by shaopan.tang 2021-04-28 [FP4-89]Customize SIP/XCAP UserAgent string
+
     private final CarrierVvmPackageInstalledReceiver mCarrierVvmPackageInstalledReceiver =
             new CarrierVvmPackageInstalledReceiver();
 
     private final SettingsObserver mSettingsObserver;
+
+    private SysRilCmd mSysRil;
+    private boolean mRilHookReady = false;
+    private QcRilHookCallback mQcrilHookCb = new QcRilHookCallback() {
+        public void onQcRilHookReady() {
+            Log.d(LOG_TAG," onQcRilHookReady");
+            mRilHookReady = true;
+            try {
+                mSysRil.setTransmitMaxPower(0, 0x80);
+            } catch (Exception e) {}
+        }
+        @Override
+        public void onQcRilHookDisconnected() {
+            Log.d(LOG_TAG," onQcRilHookDisconnected");
+            mRilHookReady = false;
+        }
+    };
 
     private static class EventSimStateChangedBag {
         final int mPhoneId;
@@ -476,6 +502,136 @@ public class PhoneGlobals extends ContextWrapper {
                     SettingsConstants.HAC_KEY + "=" + (hac == SettingsConstants.HAC_ENABLED
                             ? SettingsConstants.HAC_VAL_ON : SettingsConstants.HAC_VAL_OFF));
         }
+
+
+        mSysRil = new SysRilCmd(this.getApplicationContext(), mQcrilHookCb);
+        Log.d(LOG_TAG, "SysRilCmd lib init successful");
+
+        mSarReceiver.init(this);
+        IntentFilter sarIntentFilter = new IntentFilter(Intent.ACTION_BOOT_COMPLETED);
+        sarIntentFilter.addAction(WifiManager.WIFI_AP_STATE_CHANGED_ACTION);
+        registerReceiver(mSarReceiver, sarIntentFilter);
+
+        //[FEATURE]-Add-Begin by shaopan.tang 2021-04-28 [FP4-89]Customize SIP/XCAP UserAgent string
+        mCustNVReceiver.init(this);
+        IntentFilter CustNVIntentFilter = new IntentFilter(Intent.ACTION_BOOT_COMPLETED);
+        CustNVIntentFilter.addAction(TelephonyIntents.ACTION_SIM_STATE_CHANGED);
+        registerReceiver(mCustNVReceiver, CustNVIntentFilter);
+        //[FEATURE]-Add-End by shaopan.tang
+
+        IntentFilter filter = new IntentFilter(AudioManager.STREAM_DEVICES_CHANGED_ACTION);
+        filter.addAction(AudioManager.ACTION_SPEAKERPHONE_STATE_CHANGED);
+        filter.addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED);
+        filter.addAction(AudioManager.ACTION_HEADSET_PLUG);
+
+        registerReceiver(new BroadcastReceiver() {
+
+            private boolean voiceInCall = false;
+            private boolean earpieceOn = false;
+            private boolean speakerOn = false;
+            private boolean bluetoothOn = false;
+            private boolean headsetOn = false;
+
+            private void enableEarPiece() {
+                if (!speakerOn && !bluetoothOn && !headsetOn) {
+                    if (voiceInCall && earpieceOn == false) {
+                        Log.d(LOG_TAG, "Switching to earpiece : HEAD ON");
+                        earpieceOn = true;
+                        improveSar();
+                    }
+                }
+            }
+
+            private void disableEarPiece() {
+                if (earpieceOn == true) {
+                    Log.d(LOG_TAG, "Switching from earpiece : HEAD OFF");
+                    earpieceOn = false;
+                    reduceSar();
+                }
+            }
+
+            private void improveSar() {
+                if (mRilHookReady) {
+                    try {
+                        mSysRil.setTransmitMaxPower(0, 0x80);
+                    } catch (Exception e) {}
+                }
+            }
+
+            private void reduceSar() {
+                if (mRilHookReady) {
+                    try {
+                        mSysRil.setTransmitMaxPower(1, 0x80);
+                    } catch (Exception e) {}
+                }
+            }
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                int voiceStreamActive = audioManager.getMode();
+                Log.d(LOG_TAG, "voiceStreamActive = " + voiceStreamActive);
+                if (voiceStreamActive != AudioManager.MODE_IN_CALL
+                        && voiceStreamActive != AudioManager.MODE_IN_COMMUNICATION) {
+                    Log.d(LOG_TAG, "there is no voice call ongoing");
+                    voiceInCall = false;
+                } else {
+                    Log.d(LOG_TAG, "voice in call");
+                    voiceInCall = true;
+                }
+
+                String action = intent.getAction();
+                Log.d(LOG_TAG, "receive intent " + intent);
+
+                if (action.equals(AudioManager.STREAM_DEVICES_CHANGED_ACTION)) {
+                    int newDevice = intent.getIntExtra(AudioManager.EXTRA_VOLUME_STREAM_DEVICES, -1);
+                    int oldDevice = intent.getIntExtra(AudioManager.EXTRA_PREV_VOLUME_STREAM_DEVICES, -1);
+                    Log.d(LOG_TAG, "New device = " + newDevice);
+                    Log.d(LOG_TAG, "Old device = " + oldDevice);
+
+                    if (newDevice == AudioManager.DEVICE_OUT_EARPIECE) {
+                        enableEarPiece();
+                    } else if (oldDevice == AudioManager.DEVICE_OUT_EARPIECE) {
+                        disableEarPiece();
+                    }
+                } else if (action.equals(AudioManager.ACTION_SPEAKERPHONE_STATE_CHANGED)) {
+                    if (audioManager.isSpeakerphoneOn()) {
+                        Log.d(LOG_TAG, "speaker on");
+                        speakerOn = true;
+                        disableEarPiece();
+                    } else {
+                        Log.d(LOG_TAG, "speaker off");
+                        speakerOn = false;
+                        enableEarPiece();
+                    }
+                } else if (action.equals(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED)) {
+                    int connectState = intent.getIntExtra(BluetoothHeadset.EXTRA_STATE, -1);
+                    if (connectState == BluetoothHeadset.STATE_AUDIO_CONNECTED) {
+                        Log.d(LOG_TAG, "bluetooth SCO connected");
+                        bluetoothOn = true;
+                        speakerOn = false;
+                        disableEarPiece();
+                    } else if (connectState == BluetoothHeadset.STATE_AUDIO_DISCONNECTED) {
+                        Log.d(LOG_TAG, "bluetooth SCO disconnected");
+                        bluetoothOn = false;
+                        enableEarPiece();
+                    }
+                } else if (action.equals(AudioManager.ACTION_HEADSET_PLUG)) {
+                    boolean isPluggedIn = intent.getIntExtra("state", 0) == 1;
+                    if (isPluggedIn) {
+                        Log.d(LOG_TAG, "headset on");
+                        headsetOn = true;
+                        speakerOn = false;
+                        disableEarPiece();
+                    } else {
+                        Log.d(LOG_TAG, "headset off");
+                        headsetOn = false;
+                        enableEarPiece();
+                    }
+                }
+            }
+
+        }, filter);
     }
 
     /**
