@@ -912,4 +912,7 @@
     <string name="phone_info_label" product="default" msgid="1784175881556791433">"Info telefono"</string>
     <string name="carrier_provisioning" msgid="2668065041869578376">"Informazioni sul provisioning operatore"</string>
     <string name="trigger_carrier_provisioning" msgid="1301829588620638234">"Attiva provisioning operatore"</string>
+    <string name="mobile_data_setting_title">Dati mobili</string>
+    <string name="mobile_data_setting_description">I dati mobili sono abilitati di default su questo dispositivo.\nQuesto potrebbe comportare dei costi, a seconda della tariffa.\nSe si sceglie di disattivare i dati mobili, questi possono essere riattivati in qualsiasi momento nelle impostazioni del dispositivo.</string>
+    <string name="mobile_data_setting">Abilitare i dati mobili</string>
 </resources>

@@ -912,4 +912,7 @@
     <string name="phone_info_label" product="default" msgid="1784175881556791433">"Informations sur le téléphone"</string>
     <string name="carrier_provisioning" msgid="2668065041869578376">"Informations de gestion des comptes opérateur"</string>
     <string name="trigger_carrier_provisioning" msgid="1301829588620638234">"Déclencher la gestion des comptes opérateur"</string>
+    <string name="mobile_data_setting_title">Données mobiles</string>
+    <string name="mobile_data_setting_description">Les données mobiles sont activées par défaut sur cet appareil.\nCela peut entraîner des frais, en fonction de votre forfait téléphonique.\nSi vous avez choisi de désactiver les données mobiles, elles peuvent être réactivées à tout moment dans les paramètres de l\'appareil.</string>
+    <string name="mobile_data_setting">Activer les données mobiles</string>
 </resources>
