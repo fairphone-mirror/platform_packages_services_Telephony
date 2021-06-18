@@ -215,6 +215,8 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private static final String DSDLOCKED_CARRIERID = "persist.radio.dsd.locked";
     private static final String DSDLOCKED_PHONEID = "persist.radio.locked.PHONEID";
     private static final String BOOT_CARRIERID = "persist.radio.boot.CID";
+    private static final String PROP_OPERATOR = "persist.radio.sim.operator";
+    private static final String PROP_COUNTRY = "persist.radio.sim.country";
     private static final String KEY_CID = "cid", KEY_MCC = "mcc", KEY_MNC = "mnc";
     private PersistableBundle[] mConfigFromDSDLocked;
     private static final int EVENT_DSD_BEGIN = 22; // same as last event EVENT_FETCH_DEFAULT_FOR_NO_SIM_CONFIG_TIMEOUT
@@ -1675,7 +1677,8 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                     int phoneid_esim = 1; // ESIM always in slot2
                     int state_esim = TelephonyManager.SIM_STATE_UNKNOWN;
                     int simcount = TelephonyDevController.getInstance().getSimCount();
-                    final List<UiccCardInfo> infos = TelephonyManager.from(mContext).getUiccCardsInfo();
+                    TelephonyManager teleManager = TelephonyManager.from(mContext);
+                    final List<UiccCardInfo> infos = teleManager.getUiccCardsInfo();
 
                     for (UiccCardInfo info : infos) {
                         if (info.isEuicc()) {
@@ -1688,7 +1691,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
                             if (eID != null) {
                                 phoneid_esim = info.getSlotIndex();
-                                state_esim = TelephonyManager.from(mContext).getSimState(phoneid_esim);
+                                state_esim = teleManager.getSimState(phoneid_esim);
                                 logd("euicc phoneid: " + phoneid_esim + " state: " + state_esim);
                             }
                         }
@@ -1698,6 +1701,12 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                             && phoneId == phoneid_esim) // ESIM is primary card
                             || (state_esim != TelephonyManager.SIM_STATE_READY
                             && phoneId != phoneid_esim)) {
+                        String operator = teleManager.getSimOperatorNameForPhone(phoneId);
+                        String country = teleManager.getSimCountryIsoForPhone(phoneId);
+                        logd("current country: " + country + " operator: " + operator);
+                        SystemProperties.set(PROP_OPERATOR, operator);
+                        SystemProperties.set(PROP_COUNTRY, country);
+
                         if (inDSDFlowFileList(phoneId, R.xml.dsd_locked_list, "dsd_locked")) {
                             m_update_dsd_locked_config = true;
                             m_dsd_locked = true;
