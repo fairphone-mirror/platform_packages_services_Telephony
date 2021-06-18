@@ -1669,9 +1669,11 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                 // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
                 // check DSD locked list & boot cid list when icc ready
                 // follow the original process if DSD locked
-                if (!m_dsd_locked) {
+                if (!m_dsd_locked
+                        && simState == IccCardConstants.INTENT_VALUE_ICC_LOADED) {
                     String eID = null;
-                    int phoneid_esim = -1;
+                    int phoneid_esim = 1; // ESIM always in slot2
+                    int state_esim = TelephonyManager.SIM_STATE_UNKNOWN;
                     int simcount = TelephonyDevController.getInstance().getSimCount();
                     final List<UiccCardInfo> infos = TelephonyManager.from(mContext).getUiccCardsInfo();
 
@@ -1686,16 +1688,16 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
                             if (eID != null) {
                                 phoneid_esim = info.getSlotIndex();
-                                logd("euicc phoneid: " + phoneid_esim);
+                                state_esim = TelephonyManager.from(mContext).getSimState(phoneid_esim);
+                                logd("euicc phoneid: " + phoneid_esim + " state: " + state_esim);
                             }
                         }
                     }
 
-                    /*
-                    if ((phoneid_esim != -1 && phoneId == phoneid_esim) // ESIM enabled
-                            || (phoneid_esim == -1 // physical SIM cards
-                            && (simcount == 1 || (simcount > 1 && phoneId == 0)))) {*/
-                    if (simcount == 1 || (simcount > 1 && phoneId == 0)) {
+                    if ((state_esim == TelephonyManager.SIM_STATE_READY
+                            && phoneId == phoneid_esim) // ESIM is primary card
+                            || (state_esim != TelephonyManager.SIM_STATE_READY
+                            && phoneId != phoneid_esim)) {
                         if (inDSDFlowFileList(phoneId, R.xml.dsd_locked_list, "dsd_locked")) {
                             m_update_dsd_locked_config = true;
                             m_dsd_locked = true;
