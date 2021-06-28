@@ -218,7 +218,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private static final String PROP_OPERATOR = "persist.radio.sim.operator";
     private static final String PROP_COUNTRY = "persist.radio.sim.country";
     private static final String KEY_CID = "cid", KEY_MCC = "mcc", KEY_MNC = "mnc";
-    private PersistableBundle[] mConfigFromDSDLocked;
+    private PersistableBundle mConfigFromDSDLocked = null;
     private static final int EVENT_DSD_BEGIN = 22; // same as last event EVENT_FETCH_DEFAULT_FOR_NO_SIM_CONFIG_TIMEOUT
     private static final int EVENT_DSD_REBOOT = EVENT_DSD_BEGIN + 1;
     private EuiccManager mEuiccManager;
@@ -362,20 +362,31 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                                             resultData.getParcelable(KEY_CONFIG_BUNDLE);
 
                                     // modify by T2M.dengxiangyu for FP4-61 2021-04-14 begin
-                                    // save as dsd_locked_carrier_config.xml if cid in dsd locked list
-                                    logd("update dsd locked: " + m_update_dsd_locked_config);
-                                    if (m_update_dsd_locked_config && phoneId == m_phoneid_dsd_locked) {
-                                        saveConfigToXml(mPlatformCarrierConfigPackage, DSDLOCKED_ADDITION, phoneId,
-                                                carrierId, config);
-                                        mConfigFromDSDLocked[phoneId] = config;
-                                        updateSettingsProvider(phoneId, config);
-                                        updateModemSettings(phoneId, config);
-                                    }
+                                    if (SubscriptionManager.getSimStateForSlotIndex(phoneId)
+                                            != TelephonyManager.SIM_STATE_LOADED) {
+                                        loge("Skip EVENT_CONNECTED_TO_DEFAULT because SIM"
+                                                + phoneId + " records are not loaded.");
+                                    } else {
+                                        // save as dsd_locked_carrier_config.xml if cid in dsd locked list
+                                        logd("update dsd locked: " + m_update_dsd_locked_config);
+                                        if (m_update_dsd_locked_config && phoneId == m_phoneid_dsd_locked) {
+                                            saveConfigToXml(mPlatformCarrierConfigPackage, DSDLOCKED_ADDITION, phoneId,
+                                                    carrierId, config);
+                                            mConfigFromDSDLocked = new PersistableBundle(config);
+                                            int numPhones = TelephonyManager.from(mContext).getSupportedModemCount();
+                                            for (int i = 0; i < numPhones; i++) {
+                                                updateSettingsProvider(i, config);
+                                                updateModemSettings(i, config);
+                                            }
+                                        }
 
-                                    if (!m_dsd_locked || m_phoneid_dsd_locked != phoneId) {
-                                        saveConfigToXml(mPlatformCarrierConfigPackage, "", phoneId,
-                                                carrierId, config);
-                                        mConfigFromDefaultApp[phoneId] = config;
+                                        if (!m_dsd_locked) {
+                                            saveConfigToXml(mPlatformCarrierConfigPackage, "", phoneId,
+                                                    carrierId, config);
+                                            mConfigFromDefaultApp[phoneId] = config;
+                                            updateSettingsProvider(phoneId, config);
+                                            updateModemSettings(phoneId, config);
+                                        }
                                     }
                                     // modify by T2M.dengxiangyu for FP4-61 2021-04-14 end
 
@@ -621,6 +632,13 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                 }
 
                 case EVENT_FETCH_DEFAULT_FOR_NO_SIM_CONFIG_DONE: {
+                    // add by T2M.dengxiangyu for FP4-61 2021-06-25 begin
+                    if (m_reboot) {
+                        sendEmptyMessageDelayed(EVENT_DSD_REBOOT, 5000);
+                        Toast.makeText(mContext, "DSD rebooting", Toast.LENGTH_SHORT).show();
+                    }
+                    // add by T2M.dengxiangyu for FP4-61 2021-06-25 end
+
                     broadcastConfigChangedIntent(phoneId, false);
                     break;
                 }
@@ -671,8 +689,16 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                                     }
                                     PersistableBundle config =
                                             resultData.getParcelable(KEY_CONFIG_BUNDLE);
-                                    saveNoSimConfigToXml(mPlatformCarrierConfigPackage, config);
-                                    mNoSimConfig = config;
+
+                                    // modify by T2M.dengxiangyu for FP4-61 2021-06-25 begin
+                                    if (!m_dsd_locked) {
+                                        saveNoSimConfigToXml(mPlatformCarrierConfigPackage, config);
+                                        mNoSimConfig = config;
+                                        updateSettingsProvider(phoneId, config);
+                                        updateModemSettings(phoneId, config);
+                                    }
+                                    // modify by T2M.dengxiangyu for FP4-61 2021-06-25 end
+
                                     sendMessage(
                                             obtainMessage(
                                                     EVENT_FETCH_DEFAULT_FOR_NO_SIM_CONFIG_DONE,
@@ -758,7 +784,6 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         mSysRil = new SysRilCmd(context, null);
         m_dsd_locked = SystemProperties.getBoolean(DSDLOCKED_CARRIERID, false);
         m_phoneid_dsd_locked = SystemProperties.getInt(DSDLOCKED_PHONEID, -1);
-        mConfigFromDSDLocked = new PersistableBundle[numPhones];
         logd("init CarrierConfigLoader, get dsd_locked = " + m_dsd_locked
                 + ", phoneid_locked = " + m_phoneid_dsd_locked);
 
@@ -767,7 +792,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
             if (config != null) {
                 logd("Loaded carrier config DSD locked from XML. phoneId = "
                         + m_phoneid_dsd_locked);
-                mConfigFromDSDLocked[m_phoneid_dsd_locked] = config;
+                mConfigFromDSDLocked = new PersistableBundle(config);
                 //notifySubscriptionInfoUpdater(m_phoneid_dsd_locked);
             } else {
                 // No cached config, so fetch it from a carrier app.
@@ -827,10 +852,10 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
         // add by T2M.dengxiangyu for FP4-61 2021-04-14, notify carrier config DSD locked begin
         logd("notify carrierconfig[" + phoneId + "]");
-        if (mConfigFromDSDLocked[phoneId] != null) {
+        if (mConfigFromDSDLocked != null) {
             logd("notify DSD locked carrierconfig");
             configPackagename = mPlatformCarrierConfigPackage;
-            configToSend = mConfigFromDSDLocked[phoneId];
+            configToSend = mConfigFromDSDLocked;
         }
         // add by T2M.dengxiangyu for FP4-61 2021-04-14 end
 
@@ -1021,6 +1046,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
      */
     private void saveConfigToXml(String packageName, @NonNull String extraString, int phoneId,
             CarrierIdentifier carrierId, PersistableBundle config, boolean isNoSimConfig) {
+        logd("saved config phoneid: " + phoneId + " extra: " + extraString + " no sim: " + isNoSimConfig);
         if (packageName == null) {
             loge("Cannot save config with null packageName");
             return;
@@ -1051,6 +1077,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         // Downside is for genuinely empty bundle, will bind and load
         // on every power on.
         if (config == null || config.isEmpty()) {
+            loge("config is empty");
             return;
         }
 
@@ -1353,7 +1380,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         if (bluetooth_on) btAdapter.enable();
         else btAdapter.disable();
 
-        if (imsManager != null) {
+        if (imsManager != null && subIds != null && subIds.length > 0) {
             imsManager.setEnhanced4gLteModeSetting(enhancedLteDefault);
             imsManager.setVtSetting(vtEnabledByUser);
 
@@ -1370,45 +1397,30 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         }
     }
 
+    // TODO
+    // updateModemSettings() did not remember by DB, so reset after every changing SIM ???
     private void updateModemSettings(int phoneId, PersistableBundle config) {
         Phone phone = PhoneFactory.getPhone(phoneId);
-        int[] subIds = SubscriptionManager.getSubId(phoneId);
 
         String vm_number = config.getString(CarrierConfigManager.KEY_DEFAULT_VM_NUMBER_STRING, "");
         byte geaAlgorithm = (byte)config.getInt(CarrierConfigManager.KEY_GEA_ALGORITHM_INT, 0xFF);
         byte wbAmr = (byte)config.getInt(CarrierConfigManager.KEY_WB_AMR_INT, 0xFF);
         boolean volteRoaming = config.getBoolean(CarrierConfigManager.KEY_VOLTE_ROAMING_BOOL, false);
         String[] ecc_list = config.getStringArray(CarrierConfigManager.KEY_ECC_NUMBER_LIST);
-        String[] cbChannels = config.getStringArray(CarrierConfigManager.KEY_CELL_BROADCAST_CHANNELS);
         logd("update modem"
                 + " vm_number: " + vm_number
                 + " GEA: " + geaAlgorithm
                 + " WB ARM: " + wbAmr
                 + " volte roaming: " + volteRoaming);
 
+        // TODO
+        // should move to updateSettingsProvider() and remember by DB
         if (!vm_number.isEmpty()) {
             phone.setVoiceMailNumber(
                     phone.getVoiceMailAlphaTag().toString(),
                     vm_number,
                     null);
         }
-
-        /*
-        // disable CB if cbChannels == null
-        if (cbChannels != null) {
-            mContext.enforceCallingOrSelfPermission(
-                    android.Manifest.permission.RECEIVE_EMERGENCY_BROADCAST, null);
-            SmsManager manager;
-            manager = SmsManager.getSmsManagerForSubscriptionId(subIds[0]);
-            for (String channel : cbChannels) {
-                logd("add cell broadcast channel: " + channel);
-                manager.enableCellBroadcastRange(
-                        Integer.valueOf(channel), Integer.valueOf(channel), SmsCbMessage.MESSAGE_FORMAT_3GPP);
-                //phone.getIccSmsInterfaceManager().enableCellBroadcast(
-                //        Integer.valueOf(channel), SmsCbMessage.MESSAGE_FORMAT_3GPP);
-            }
-        }
-        */
 
         if (geaAlgorithm != 0xFF) {
             try {
@@ -1450,7 +1462,8 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                 logd("set ecc list: " + ecc_num_str + " by phone: " + phoneId);
                 try {
                     mSysRil.setStringValByPhone(ISysRilCmd.RIL_SUB_CMD_STRING_ECC_NUM_LIST, ecc_num_str, phoneId);
-                    m_reboot = true; // effect after reboot
+                    // TODO temporary modification
+                    //m_reboot = true; // effect after reboot
                 } catch (Exception e) {
                     loge("failed to set ecc_list:");
                     //loge(e.getMessage());
@@ -1544,7 +1557,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
             }
 
             // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
-            config = mConfigFromDSDLocked[phoneId];
+            config = mConfigFromDSDLocked;
             if (config != null) {
                 logd("return DSD locked carrierconfig");
                 retConfig.putAll(config);
@@ -1572,7 +1585,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
             // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
             if (m_dsd_locked) {
-                PersistableBundle config = mConfigFromDSDLocked[m_phoneid_dsd_locked];
+                PersistableBundle config = mConfigFromDSDLocked;
                 if (config != null) {
                     logd("if no sim, append DSD locked carrierconfig");
                     retConfig.putAll(config);
