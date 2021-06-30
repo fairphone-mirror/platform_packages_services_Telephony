@@ -225,6 +225,24 @@ public class MobileDataPreference extends DialogPreference {
         }
     }
 
+   private void switchLte(int subId) {
+     if (DBG) Log.d(TAG, "activateLte" + subId);
+     int preferredNetworkMode = 0;
+     int NETWORK_GSM =1;
+     int NETWORK_LTE =9;
+     int network_mode = android.provider.Settings.Global.getInt(
+                        getContext().getContentResolver(),
+                        android.provider.Settings.Global.PREFERRED_NETWORK_MODE + subId,
+                        preferredNetworkMode);
+     if(network_mode == NETWORK_GSM) {
+          if (DBG) Log.d(TAG, "activateLte network_mode = " + network_mode);
+                        android.provider.Settings.Global.putInt(
+                            getContext().getContentResolver(),
+                            android.provider.Settings.Global.PREFERRED_NETWORK_MODE + subId,
+                            NETWORK_LTE);
+              }
+    }
+
     @Override
     public void onClick(DialogInterface dialog, int which) {
         if (which != DialogInterface.BUTTON_POSITIVE) {
@@ -233,6 +251,7 @@ public class MobileDataPreference extends DialogPreference {
         if (mMultiSimDialog) {
             mSubscriptionManager.setDefaultDataSubId(mSubId);
             setMobileDataEnabled(true);
+            switchLte(mSubId);
             disableDataForOtherSubscriptions(mSubId);
         } else {
             // TODO: extend to modify policy enabled flag.

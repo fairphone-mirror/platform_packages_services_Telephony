@@ -318,7 +318,6 @@ public class MobileNetworkSettings extends Activity  {
         private MyHandler mHandler;
         private boolean mOkClicked;
         private boolean mExpandAdvancedFields;
-        private boolean canPreferenceChange;
 
         // We assume the the value returned by mTabHost.getCurrentTab() == slotId
         private TabHost mTabHost;
@@ -960,15 +959,6 @@ public class MobileNetworkSettings extends Activity  {
                             Phone.NT_MODE_GSM_ONLY);
               }
           }
-          else if(phoneSubId == SubscriptionManager.getDefaultDataSubscriptionId() && !canPreferenceChange){
-                    if(network_mode == Phone.NT_MODE_GSM_ONLY) {
-                        android.provider.Settings.Global.putInt(
-                            context.getContentResolver(),
-                            android.provider.Settings.Global.PREFERRED_NETWORK_MODE + phoneSubId,
-                            Phone.NT_MODE_LTE_GSM_WCDMA);
-                    }
-            canPreferenceChange = false;
-            }
             updateBodyBasicFields(activity, prefSet, phoneSubId, hasActiveSubscriptions);
 
             if (mExpandAdvancedFields) {
@@ -1317,7 +1307,6 @@ public class MobileNetworkSettings extends Activity  {
                             .obtainMessage(MyHandler.MESSAGE_SET_PREFERRED_NETWORK_TYPE));
                 }
             } else if (preference == mButtonEnabledNetworks) {
-                canPreferenceChange = true;
                 mButtonEnabledNetworks.setValue((String) objValue);
                 int buttonNetworkMode;
                 buttonNetworkMode = Integer.parseInt((String) objValue);
