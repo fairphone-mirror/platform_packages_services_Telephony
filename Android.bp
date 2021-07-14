@@ -39,6 +39,7 @@ android_app {
         "androidx.legacy_legacy-preference-v14",
         "android-support-annotations",
         "com.android.phone.common-lib",
+        "SettingsLib",
         "guava",
         "PlatformProperties",
     ],
@@ -67,10 +68,12 @@ android_app {
         "--extra-packages com.android.services.telephony.sip",
     ],
 
-    platform_apis: true,
-
     certificate: "platform",
     privileged: true,
+
+     defaults: [
+         "framework-wifi-vendor-hide-access-defaults",
+     ],
 
     optimize: {
         proguard_flags_files: [

@@ -83,6 +83,17 @@ import com.android.internal.util.IndentingPrintWriter;
 import com.qualcomm.sysrilcmd.SysRilCmd;
 import com.qualcomm.sysrilcmd.ISysRilCmd;
 
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiEnterpriseConfig;
+import android.net.wifi.WifiEnterpriseConfig.Eap;
+import android.net.wifi.WifiManager;
+import android.security.Credentials;
+
+import android.net.wifi.WifiConfiguration.KeyMgmt;
+import com.android.settingslib.wifi.AccessPoint;
+
+import com.android.settingslib.wifi.WifiTracker;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -105,6 +116,11 @@ import java.util.Set;
  */
 public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private static final String LOG_TAG = "CarrierConfigLoader";
+    private final String KEYSTORE_SPACE = "keystore://";
+    private final String PSK = "PSK";
+    private final String WEP = "WEP";
+    private final String EAP = "EAP";
+    private final String AP_STATE_PUBLIC = "Public";
 
     // Package name for platform carrier config app, bundled with system image.
     private final String mPlatformCarrierConfigPackage;
@@ -205,6 +221,10 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     // requested the dump.
     private static final String DUMP_ARG_REQUESTING_PACKAGE = "--requesting-package";
 
+    private boolean isSIMInserted = false;
+    private boolean isSIM1Inserted = false;
+    private boolean isSIM2Inserted = false;
+
     // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
     private boolean m_dsd_locked = false;
     private int m_phoneid_dsd_locked = -1;
@@ -222,7 +242,11 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private static final int EVENT_DSD_BEGIN = 22; // same as last event EVENT_FETCH_DEFAULT_FOR_NO_SIM_CONFIG_TIMEOUT
     private static final int EVENT_DSD_REBOOT = EVENT_DSD_BEGIN + 1;
     private EuiccManager mEuiccManager;
+    private WifiManager mWifiManager;
     private SysRilCmd mSysRil;
+
+    List<WifiConfiguration> mConfigList = null;
+    private int highestPriority = 0;
     // add by T2M.dengxiangyu for FP4-61 2021-04-14 end
 
     // Handler to process various events.
@@ -378,6 +402,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                                                 updateSettingsProvider(i, config);
                                                 updateModemSettings(i, config);
                                             }
+                                            loadPredefineNetworks(config);
                                         }
 
                                         if (!m_dsd_locked) {
@@ -386,6 +411,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                                             mConfigFromDefaultApp[phoneId] = config;
                                             updateSettingsProvider(phoneId, config);
                                             updateModemSettings(phoneId, config);
+                                            loadPredefineNetworks(config);
                                         }
                                     }
                                     // modify by T2M.dengxiangyu for FP4-61 2021-04-14 end
@@ -696,6 +722,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                                         mNoSimConfig = config;
                                         updateSettingsProvider(phoneId, config);
                                         updateModemSettings(phoneId, config);
+                                        loadPredefineNetworks(config);
                                     }
                                     // modify by T2M.dengxiangyu for FP4-61 2021-06-25 end
 
@@ -781,6 +808,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
         // get status of DSD locked and saved carrier id
         mEuiccManager = mContext.getSystemService(EuiccManager.class);
+        mWifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
         mSysRil = new SysRilCmd(context, null);
         m_dsd_locked = SystemProperties.getBoolean(DSDLOCKED_CARRIERID, false);
         m_phoneid_dsd_locked = SystemProperties.getInt(DSDLOCKED_PHONEID, -1);
@@ -1395,6 +1423,396 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
             imsManager.setWfcSetting(wfcEnabledByUser);
             imsManager.setWfcRoamingSetting(voWifiRoamingEnabled);
         }
+    }
+
+    private boolean isAlreadyLoadedEapApWithoutEapMethod(String ssid, int selSlot) {
+        if (mConfigList != null && !mConfigList.isEmpty()) {
+            for (WifiConfiguration config : mConfigList) {
+                if (config.SSID.trim().equals('"'+ssid.trim()+'"')
+                        && config.allowedKeyManagement.get(KeyMgmt.WPA_EAP)) {
+                    if (TctWifiUtil.getIsPresetAP(config)) {
+                        if (selSlot != TctWifiUtil.getSimSlot(config)) {
+                            logd("you have changed the sim slot,reload");
+                            mWifiManager.forget(config.networkId, null);
+                            mConfigList = mWifiManager.getConfiguredNetworks();
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public void loadPredefineNetworks(PersistableBundle config) {
+        if (WifiTracker.sVerboseLogging) {
+            //logd("loadPredefineNetworks mPreConfigNum: " + mPreConfigNum);
+            String simMcc = SystemProperties.get("gsm.sim.operator.numeric", "");
+            logd("loadPredefineNetworks simMcc:" + simMcc);
+        }
+
+        int preConfigNum = config.getInt(CarrierConfigManager.KEY_WIFI_NETWORK_EXIST, 0);
+        if (preConfigNum == 0) {
+            logd("There is not any configured AP");
+            return;
+        }
+
+        boolean isDeleteAp = config.getBoolean(CarrierConfigManager.KEY_WIFI_PRECONFIG_AP_DELETE, false);
+
+        synchronized(this) {
+            mConfigList = mWifiManager.getConfiguredNetworks();
+            getCurrentSimcardState();
+            deletePredefineNetworks(isDeleteAp);
+            addPredefineNetworks(preConfigNum, isDeleteAp, config);
+        }
+    }
+
+    /**
+     * method to judge whether sim card 1 or sim card 2 has been plugged in
+     */
+    public void getCurrentSimcardState() {
+        isSIM1Inserted = TelephonyManager.from(mContext).getSimState(0) == TelephonyManager.SIM_STATE_READY;
+        int simSum = TelephonyManager.from(mContext).getSimCount();
+        if (simSum == 2) {
+            isSIM2Inserted = TelephonyManager.from(mContext).getSimState(1) == TelephonyManager.SIM_STATE_READY;
+        }
+        isSIMInserted = isSIM1Inserted || isSIM2Inserted;
+        logd("isSIM1Inserted is " + isSIM1Inserted + " ,isSIM2Inserted is " + isSIM2Inserted);
+    }
+
+    private int getHighestPriority() {
+        int priority = 0;
+        if (mConfigList != null && !mConfigList.isEmpty()) {
+            for (WifiConfiguration config : mConfigList) {
+                if (!TctWifiUtil.getIsPresetAP(config) && (config.priority > priority)) {
+                    priority = config.priority;
+                }
+            }
+        }
+        logd("highest priority is " + priority);
+        return priority;
+    }
+
+    /**
+     * delete unused networks when wifi is on or sim card status changed
+     * usually, this action will be executed when one sim card has been plugged out
+     */
+    private void deletePredefineNetworks(boolean isDeleteAp) {
+        if (mConfigList == null || mConfigList.isEmpty()) {
+            logd("config is null, there's no any configured networks");
+            return;
+        }
+
+        boolean hasDeleteNetwork = false;
+
+        for (WifiConfiguration config : mConfigList) {
+            if (!TctWifiUtil.getIsPresetAP(config)) {
+                // it is not define ap, no need to delete, return!
+                logd("it is not define ap, no need to delete, return!");
+                continue;
+            }
+
+            String oldIdentity = config.enterpriseConfig.getIdentity();
+            if (WifiTracker.sVerboseLogging) {
+                logd("deletePredefineNetworks oldIdentity: " + oldIdentity);
+            }
+            if (isDeleteAp || (oldIdentity != null && !oldIdentity.isEmpty())) {
+                logd("config.SSID " + config.SSID);
+                //logd("config.imsi " + config.imsi);
+                logd("config.networkId " + config.networkId);
+                int slot = TctWifiUtil.getSimSlot(config);
+                logd("config simSlot " + slot);
+                // if (config.simSlot.equals("\"1\"")) {
+                //     slot = 1;
+                // }
+                int subId = TctWifiUtil.getSubId(slot);
+
+                String eapMethod = TctWifiUtil.getEapMethodStr(config.enterpriseConfig.getEapMethod());
+
+                if (!eapMethod.isEmpty()) {
+                    logd("telephonyEx.getSubscriberId() " + TelephonyManager.from(mContext).getSubscriberId(subId));
+                    String sTemp = TctWifiUtil.makeNAI(TelephonyManager.from(mContext).getSimOperator(subId), TelephonyManager.from(mContext).getSubscriberId(subId), eapMethod);
+                    logd("makeNAI:" + sTemp);
+                    if (sTemp.contains("error") && isSIMInserted) {
+                        continue;
+                    }
+
+                    if ((null == oldIdentity) || (oldIdentity != null && oldIdentity.isEmpty())) {
+                        continue;
+                    }
+
+                    if (!sTemp.equals(oldIdentity)
+                            || (!isSIM1Inserted && (slot == 0)) || (!isSIM2Inserted && (slot == 1))) {
+                        logd("this config is invalid for current sim card, so remove it");
+                        mWifiManager.removeNetwork(config.networkId);
+                        mWifiManager.saveConfiguration();
+                        hasDeleteNetwork = true;
+                        continue;
+                    }
+                    logd("user doesn't change or remove usim card");
+                }
+            }
+        }
+
+        if (hasDeleteNetwork) {
+            mConfigList = mWifiManager.getConfiguredNetworks();
+        }
+    }
+
+    /**
+     * add networks from customization file when wifi is on or sim card status changed
+     * usually, this action will be executed when one sim card has been plugged in or wifi has been on
+     */
+    private void addPredefineNetworks(int preConfigNum, boolean isDeleteAp, PersistableBundle config) {
+        logd("def_Settings_wifi_network_exist= " + preConfigNum + " isDeleteAp = "+isDeleteAp);
+        if(isDeleteAp && !isSIMInserted){
+            logd("The not is vzw simcard!");
+            return;
+        }
+        //load predefined networks from plf file and save wifi configuration
+        //currently, support at most 3 pre-config ap
+        for (int index = 0 ; index < preConfigNum ; index ++) {
+            addPreconfigNetwork(index + 1, config);
+        }
+    }
+
+    private void addPreconfigNetwork(int witchAp, PersistableBundle preConfig) {
+        String ssid = "";
+        String password = "";
+        String security = "";
+        String identity = "";
+        String eapMethod = "";
+
+        String mccCode = "";
+
+        String phase2 = "";
+        String caCert = "";
+        String userCert = "";
+        String anonymous = "";
+        int ssidPriority = 0;
+        String state = "";
+        if (witchAp == 1) {
+            //ssid = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_network_ssid);
+            ssid = preConfig.getString(CarrierConfigManager.KEY_WIFI_NETWORK_SSID, "");
+            //password = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_password);
+            //security = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_security_mode);
+            security = preConfig.getString(CarrierConfigManager.KEY_WIFI_SECURITY_MODE, "");
+            //identity = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_identity);
+            //eapMethod = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_method);
+            eapMethod = preConfig.getString(CarrierConfigManager.KEY_WIFI_EAP_METHOD, "");
+
+            //mccCode = mContext.getResources().getString(com.android.settings.R.string.def_Settings_preloaded_eap_sim_mcc_mnc);
+            //phase2 = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_phrase2_authentication);
+            //caCert = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_ca_certification);
+            //userCert = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_user_certificate);
+            //anonymous = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_anonymous_identity);
+            //ssidPriority = mContext.getResources().getInteger(com.android.settings.R.integer.def_Settings_wifi_priority);
+            //state = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_network_status);
+        } else if (witchAp == 2) {
+            //ssid = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_network_ssid_2);
+            ssid = preConfig.getString(CarrierConfigManager.KEY_WIFI_NETWORK_SSID_2, "");
+            //password = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_password_2);
+            //security = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_security_mode_2);
+            security = preConfig.getString(CarrierConfigManager.KEY_WIFI_SECURITY_MODE_2, "");
+            //identity = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_identity_2);
+            //eapMethod = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_method_2);
+            eapMethod = preConfig.getString(CarrierConfigManager.KEY_WIFI_EAP_METHOD_2, "");
+
+            //mccCode = mContext.getResources().getString(com.android.settings.R.string.def_Settings_preloaded_eap_sim_mcc_mnc_2);
+            //phase2 = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_phrase2_authentication_2);
+            //caCert = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_ca_certification_2);
+            //userCert = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_user_certificate_2);
+            //anonymous = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_anonymous_identity_2);
+            //ssidPriority = mContext.getResources().getInteger(com.android.settings.R.integer.def_Settings_wifi_priority_2);
+            //state = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_network_status_2);
+        } else if (witchAp == 3) {
+            //ssid = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_network_ssid_3);
+            ssid = preConfig.getString(CarrierConfigManager.KEY_WIFI_NETWORK_SSID_3, "");
+            //password = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_password_3);
+            //security = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_security_mode_3);
+            security = preConfig.getString(CarrierConfigManager.KEY_WIFI_SECURITY_MODE_3, "");
+            //identity = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_identity_3);
+            //eapMethod = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_method_3);
+            eapMethod = preConfig.getString(CarrierConfigManager.KEY_WIFI_EAP_METHOD_3, "");  
+
+            //mccCode = mContext.getResources().getString(com.android.settings.R.string.def_Settings_preloaded_eap_sim_mcc_mnc_3);
+            //phase2 = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_phrase2_authentication_3);
+            //caCert = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_ca_certification_3);
+            //userCert = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_user_certificate_3);
+            //anonymous = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_anonymous_identity_3);
+            //ssidPriority = mContext.getResources().getInteger(com.android.settings.R.integer.def_Settings_wifi_priority_3);
+            //state = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_network_status_3);
+        }
+
+        logd("witchAp:" + witchAp);
+        logd("pre ssid:" + ssid);
+        logd("pre password:" + password);
+        logd("pre eap method:" + eapMethod);
+        logd("pre mccCode:" + mccCode);
+        logd("pre security:" + security);
+        logd("pre state:" + state);
+        logd("pre ssidPriority:" + ssidPriority);
+
+        int selSlot = -1;
+        if (security.equals("EAP") && (eapMethod.equals("SIM") || eapMethod.equals("AKA"))) {
+            // For EAP or AKA authentication, if there's no sim card inserted, no need to load
+            if (!isSIMInserted) {
+                return;
+            }
+
+           /* selSlot = getMatchedSimSlot(mccCode);
+            if (-1 == selSlot) {
+                logd(" current inserted SIM not equal to preloaded SIM on MCC_MNC or no sim card inserted");
+                return;
+            }
+
+            logd("selSlot::" + selSlot);
+            //if (isAlreadyLoadedEapAp(ssid, eapMethod, selSlot)) {
+            if (isAlreadyLoadedEapApWithoutEapMethod(ssid, selSlot)) {
+                logd(" current preloaded ap is alread existing");
+                return;
+            }*/
+        }
+
+        WifiConfiguration config = new WifiConfiguration();
+        config.SSID = AccessPoint.convertToQuotedString(ssid);
+        TctWifiUtil.setIsPresetAP(config, true);
+
+        if (!TextUtils.isEmpty(security) && (security.equals(PSK))) {
+            config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+            if (!TextUtils.isEmpty(password)) {
+                if (password.matches("[0-9A-Fa-f]{64}")) {
+                    config.preSharedKey = password;
+                } else {
+                    config.preSharedKey = '"' + password + '"';
+                }
+            }
+        } else if (!TextUtils.isEmpty(security) && (security.equals(WEP))) {
+            config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+            config.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
+            config.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.SHARED);
+            if (!TextUtils.isEmpty(password)) {
+                int length = password.length();
+                // WEP-40, WEP-104, and 256-bit WEP (WEP-232?)
+                if ((length == 10 || length == 26 || length == 58) && password.matches("[0-9A-Fa-f]*")) {
+                    config.wepKeys[0] = password;
+                } else {
+                    config.wepKeys[0] = '"' + password + '"';
+                }
+            }
+        } else if (!TextUtils.isEmpty(security) && (security.equals(EAP))) {
+            config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_EAP);
+            config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.IEEE8021X);
+            if (password.length() != 0) {
+                config.enterpriseConfig.setPassword(password);
+            }
+
+            int eapMethodIndex = TctWifiUtil.getEapMethodIndex(eapMethod);
+            if (eapMethodIndex != -1) {
+                config.enterpriseConfig.setEapMethod(eapMethodIndex);
+            }
+
+            int phase2MethodIndex = TctWifiUtil.getPhase2MethodIndex(phase2);
+            if (phase2MethodIndex != -1) {
+                config.enterpriseConfig.setPhase2Method(phase2MethodIndex);
+            }
+
+            config.enterpriseConfig.setIdentity(identity);
+
+            config.enterpriseConfig.setCaCertificateAlias((caCert.equals("")) ? "" :
+                    KEYSTORE_SPACE + Credentials.CA_CERTIFICATE + caCert);
+            config.enterpriseConfig.setClientCertificateAlias((userCert.equals("")) ? "" :
+                    KEYSTORE_SPACE + Credentials.USER_CERTIFICATE + userCert);
+            config.enterpriseConfig.setClientCertificateAlias((userCert.equals("")) ? "" :
+                    KEYSTORE_SPACE + Credentials.USER_PRIVATE_KEY + userCert);
+            config.enterpriseConfig.setAnonymousIdentity(anonymous);
+
+            if ("SIM".equals(eapMethod) || "AKA".equals(eapMethod)) {
+                config = setEapConfig(config, eapMethod, selSlot);
+            }
+        } else {
+            logd("OPEN");
+            config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+        }
+
+        if (!state.equals(AP_STATE_PUBLIC)) {
+            config.hiddenSSID = true;
+        } else {
+            config.hiddenSSID = false;
+        }
+
+        TctWifiUtil.setIsPresetAP(config, true);
+
+        //config.defineSsidPriority = ssidPriority;
+        highestPriority = getHighestPriority();
+        config.priority = highestPriority + ssidPriority;
+
+        WifiManager.ActionListener mSaveListener = new WifiManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                logd(" mWifiManager.save(config, null); is successed !!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            }
+            @Override
+            public void onFailure(int reason) {
+                logd(" mWifiManager.save(config, null); is failuer XXXXXXXXXXXXXXXXXXXXXXXXXXX");
+            }
+        };
+        mWifiManager.save(config, mSaveListener);
+    }
+
+    /*return value: -1,no sim card match
+     *              0,sim1 match
+     *              1,sim2,match
+     *              2:sim1&sim2 are using the same mccmnc and all match. 2 don't used,just backup
+     * single phone:simcc will show like 46000
+     * dual phone:simcc format:sim1 only:"46000",sim2 only:",46002" dual sim : "46000,46002"
+     *
+     * */
+    private int getMatchedSimSlot(String definedMccCode) {
+
+        logd("current preloaded MccCode is: " + definedMccCode);
+        if (isSIMInserted) {
+            //get mcc code from phone when sim card is inserted
+            String simMcc = SystemProperties.get("gsm.sim.operator.numeric", "");
+            logd("simMcc:" + simMcc);
+            String simMccSplit[] = simMcc.split(",");
+
+            if (simMccSplit == null || simMccSplit.length == 0) {
+                logd("simMccSplit length equal 0");
+                return -1;
+            }
+
+            if (isSIM1Inserted && TctWifiUtil.checkSimMccMatch(simMccSplit[0], definedMccCode)) {
+                return 0;
+            }
+
+            if (isSIM2Inserted && simMccSplit.length == 2
+                    && TctWifiUtil.checkSimMccMatch(simMccSplit[1], definedMccCode)) {
+                return 1;
+            }
+
+        }
+
+        return -1;
+    }
+
+    /* config:the wifi config
+     * eapType:sim or aka
+     * slot:the config slot,0 slot 1,1->slot2
+     * */
+    private WifiConfiguration setEapConfig(WifiConfiguration config, String eapType, int selSlot) {
+        if (selSlot == 0 || selSlot == 1) {
+            //int subId = TctWifiUtil.getSubId(selSlot);
+            //config.imsi = makeNAI(mTm.getSimOperator(subId), mTm.getSubscriberId(subId), eapType);
+            TctWifiUtil.setSimSlot(config, selSlot);
+            //config.simSlot = "\"" + String.valueOf(selSlot) + "\"";
+        } else {
+            logd("exception selSlot found,selSlot::" + selSlot);
+        }
+
+        return config;
     }
 
     // TODO
