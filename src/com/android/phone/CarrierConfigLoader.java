@@ -1889,6 +1889,17 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
             }
         }
     }
+
+    private String spaceReplace(String strOld){
+        String[] split = strOld.trim().split(" ");
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < split.length - 1; i++) {
+            stringBuilder.append(split[i]).append("_");
+        }
+        stringBuilder.append(split[split.length - 1]);
+        String strNew = stringBuilder.toString();
+        return strNew;
+    }
     // add by T2M.dengxiangyu for FP4-61 2021-04-14 end
 
     /** Builds a canonical file name for a config file. */
@@ -2135,7 +2146,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                         String operator = teleManager.getSimOperatorNameForPhone(phoneId);
                         String country = teleManager.getSimCountryIsoForPhone(phoneId);
                         logd("current country: " + country + " operator: " + operator);
-                        SystemProperties.set(PROP_OPERATOR, operator.toLowerCase());
+                        SystemProperties.set(PROP_OPERATOR, spaceReplace(operator).toLowerCase());
                         SystemProperties.set(PROP_COUNTRY, country.toLowerCase());
 
                         if (inDSDFlowFileList(phoneId, R.xml.dsd_locked_list, "dsd_locked")) {
