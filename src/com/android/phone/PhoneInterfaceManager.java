@@ -8360,7 +8360,7 @@ public class PhoneInterfaceManager extends ITelephony.Stub {
             Log.d(LOG_TAG, "isMvnoMatched# IccRecords is null");
             return false;
         }
-        return ApnSettingUtils.mvnoMatches(iccRecords, mvnoType, mvnoMatchData);
+        return ApnSettingUtils.mvnoMatches(iccRecords, mvnoType, mvnoMatchData, subId);
     }
 
     @Override
