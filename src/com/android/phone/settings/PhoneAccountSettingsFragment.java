@@ -469,12 +469,14 @@ public class PhoneAccountSettingsFragment extends PreferenceFragment
                 } else {
                     mAccountList.removePreference(mAllCallingAccounts);
                 }
-                if (isXdivertAvailable) {
+                /* add by T2M.zhangrenjie for FP4-1958 begin */
+                /*if (isXdivertAvailable) {
                     if (mSmartDivertPref != null) {
                         Log.d(LOG_TAG, "Add smart divert preference");
                         mAccountList.addPreference(mSmartDivertPref);
                     }
-                }
+                }*/
+                /* add by T2M.zhangrenjie for FP4-1958 end */
             } else {
                 getPreferenceScreen().removePreference(mAccountList);
                 mMakeAndReceiveCallsCategory.removePreference(mDefaultOutgoingAccount);
