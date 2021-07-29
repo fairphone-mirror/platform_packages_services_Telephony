@@ -810,6 +810,12 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         mEuiccManager = mContext.getSystemService(EuiccManager.class);
         mWifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
         mSysRil = new SysRilCmd(context, null);
+        try {
+            loge("set sms CB enabled in the beginning");
+            mSysRil.setInt8Val(ISysRilCmd.RIL_SUB_CMD_INT8_SMSCB_ENABLED, (byte) 1);
+        } catch (Exception e) {
+            loge("failed to set sms CB enabled in the beginning");
+        }
         m_dsd_locked = SystemProperties.getBoolean(DSDLOCKED_CARRIERID, false);
         m_phoneid_dsd_locked = SystemProperties.getInt(DSDLOCKED_PHONEID, -1);
         logd("init CarrierConfigLoader, get dsd_locked = " + m_dsd_locked
@@ -1815,24 +1821,24 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         return config;
     }
 
-    // TODO
-    // updateModemSettings() did not remember by DB, so reset after every changing SIM ???
     private void updateModemSettings(int phoneId, PersistableBundle config) {
         Phone phone = PhoneFactory.getPhone(phoneId);
 
         String vm_number = config.getString(CarrierConfigManager.KEY_DEFAULT_VM_NUMBER_STRING, "");
-        byte geaAlgorithm = (byte)config.getInt(CarrierConfigManager.KEY_GEA_ALGORITHM_INT, 0xFF);
-        byte wbAmr = (byte)config.getInt(CarrierConfigManager.KEY_WB_AMR_INT, 0xFF);
+        int geaAlgorithm = config.getInt(CarrierConfigManager.KEY_GEA_ALGORITHM_INT, 0xFF);
+        int wbAmr = config.getInt(CarrierConfigManager.KEY_WB_AMR_INT, 0xFF);
         boolean volteRoaming = config.getBoolean(CarrierConfigManager.KEY_VOLTE_ROAMING_BOOL, false);
+        boolean smsCBEnabled = config.getBoolean(CarrierConfigManager.KEY_SMS_CELL_BROADCAST_ENABLED, false);
         String[] ecc_list = config.getStringArray(CarrierConfigManager.KEY_ECC_NUMBER_LIST);
-        logd("update modem"
+
+        logd("update modem[" + phoneId + "]"
                 + " vm_number: " + vm_number
                 + " GEA: " + geaAlgorithm
                 + " WB ARM: " + wbAmr
-                + " volte roaming: " + volteRoaming);
+                + " volte roaming: " + volteRoaming
+                + " sms CB enabled: " + smsCBEnabled
+                + " ECC list: " + Arrays.toString(ecc_list));
 
-        // TODO
-        // should move to updateSettingsProvider() and remember by DB
         if (!vm_number.isEmpty()) {
             phone.setVoiceMailNumber(
                     phone.getVoiceMailAlphaTag().toString(),
@@ -1842,18 +1848,18 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
         if (geaAlgorithm != 0xFF) {
             try {
-                mSysRil.setInt8Val(ISysRilCmd.RIL_SUB_CMD_INT8_GEA_ALGORITHM, geaAlgorithm);
+                mSysRil.setInt8Val(ISysRilCmd.RIL_SUB_CMD_INT8_GEA_ALGORITHM, (byte)geaAlgorithm);
             } catch (Exception e) {
-                loge("failed to set gea_algorithm:");
+                loge("failed to set gea_algorithm");
                 //loge(e.getMessage());
             }
         }
 
         if (wbAmr != 0xFF) {
             try {
-                mSysRil.setInt8Val(ISysRilCmd.RIL_SUB_CMD_INT8_WB_AMR, wbAmr);
+                mSysRil.setInt8Val(ISysRilCmd.RIL_SUB_CMD_INT8_WB_AMR, (byte)wbAmr);
             } catch (Exception e) {
-                loge("failed to set wb_amr:");
+                loge("failed to set wb_amr");
                 //loge(e.getMessage());
             }
         }
@@ -1861,13 +1867,17 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         try {
             mSysRil.setInt8Val(ISysRilCmd.RIL_SUB_CMD_INT8_VOLTE_ROAMING, (byte)(volteRoaming ? 1 : 0));
         } catch (Exception e) {
-            loge("failed to set volte_roaming:");
+            loge("failed to set volte_roaming");
             //loge(e.getMessage());
         }
 
-        if (ecc_list != null) {
-            logd("ECC list: " + Arrays.toString(ecc_list));
+        try {
+            mSysRil.setInt8Val(ISysRilCmd.RIL_SUB_CMD_INT8_SMSCB_ENABLED, (byte) (smsCBEnabled ? 1 : 0));
+        } catch (Exception e) {
+            loge("failed to set sms CB enabled");
+        }
 
+        if (ecc_list != null) {
             String ecc_num_str = null;
             for (String ecc_num : ecc_list) {
                 if (ecc_num_str == null)
