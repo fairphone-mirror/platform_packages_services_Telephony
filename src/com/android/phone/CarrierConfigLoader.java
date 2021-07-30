@@ -80,6 +80,7 @@ import com.android.internal.telephony.TelephonyDevController;
 import com.android.internal.telephony.TelephonyPermissions;
 import com.android.internal.telephony.util.ArrayUtils;
 import com.android.internal.util.IndentingPrintWriter;
+import com.qualcomm.qcrilhook.QcRilHookCallback;
 import com.qualcomm.sysrilcmd.SysRilCmd;
 import com.qualcomm.sysrilcmd.ISysRilCmd;
 
@@ -809,13 +810,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         // get status of DSD locked and saved carrier id
         mEuiccManager = mContext.getSystemService(EuiccManager.class);
         mWifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-        mSysRil = new SysRilCmd(context, null);
-        try {
-            loge("set sms CB enabled in the beginning");
-            mSysRil.setInt8Val(ISysRilCmd.RIL_SUB_CMD_INT8_SMSCB_ENABLED, (byte) 1);
-        } catch (Exception e) {
-            loge("failed to set sms CB enabled in the beginning");
-        }
+        mSysRil = new SysRilCmd(context, mQcrilHookCb);
         m_dsd_locked = SystemProperties.getBoolean(DSDLOCKED_CARRIERID, false);
         m_phoneid_dsd_locked = SystemProperties.getInt(DSDLOCKED_PHONEID, -1);
         logd("init CarrierConfigLoader, get dsd_locked = " + m_dsd_locked
@@ -1899,6 +1894,24 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
             }
         }
     }
+
+    private QcRilHookCallback mQcrilHookCb = new QcRilHookCallback() {
+        @Override
+        public void onQcRilHookReady() {
+            logd(" onQcRilHookReady");
+            try {
+                loge("set sms CB enabled in the beginning");
+                mSysRil.setInt8Val(ISysRilCmd.RIL_SUB_CMD_INT8_SMSCB_ENABLED, (byte) 1);
+            } catch (Exception e) {
+                loge("failed to set sms CB enabled in the beginning");
+            }
+        }
+
+        @Override
+        public void onQcRilHookDisconnected() {
+            logd(" onQcRilHookDisconnected");
+        }
+    };
 
     private String spaceReplace(String strOld){
         String[] split = strOld.trim().split(" ");
