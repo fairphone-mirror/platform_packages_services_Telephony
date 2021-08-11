@@ -2173,6 +2173,9 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                         logd("current country: " + country + " operator: " + operator);
                         SystemProperties.set(PROP_OPERATOR, spaceReplace(operator).toLowerCase());
                         SystemProperties.set(PROP_COUNTRY, country.toLowerCase());
+                        CarrierIdentifier carrierId = getCarrierIdentifierForPhoneId(phoneId);
+                        SystemProperties.set(PROP_MCC_MNC, carrierId.getMcc() + carrierId.getMnc());
+
 
                         if (inDSDFlowFileList(phoneId, R.xml.dsd_locked_list, "dsd_locked")) {
                             m_update_dsd_locked_config = true;
@@ -2183,9 +2186,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                         }
 
                         if (inDSDFlowFileList(phoneId, R.xml.boot_cid_list, "boot_cid")) {
-                            CarrierIdentifier carrierId = getCarrierIdentifierForPhoneId(phoneId);
                             SystemProperties.set(BOOT_CARRIERID, String.valueOf(carrierId.getMcc() + carrierId.getMnc()));
-                            SystemProperties.set(PROP_MCC_MNC, carrierId.getMcc() + carrierId.getMnc());
                             SystemProperties.set(PROP_GID1, carrierId.getGid1());
                             m_reboot = true;
                         }
