@@ -125,53 +125,61 @@ public class CustomizeNVReceiver extends BroadcastReceiver {
         String brand = SystemProperties.get("ro.product.brand", "");
         String model = SystemProperties.get("ro.product.model", "");
         String softVer = SystemProperties.get("ro.build.version.incremental", "");
-
         String PROPERTY_ICC_OPERATOR_NUMERIC = "gsm.sim.operator.numeric";
-        String mccmnc = SystemProperties.get(PROPERTY_ICC_OPERATOR_NUMERIC);
-        if (TelephonyManager.getDefault().isMultiSimEnabled()) {
-            mccmnc = TelephonyManager.getTelephonyProperty(mPhoneId, PROPERTY_ICC_OPERATOR_NUMERIC, "0");
-        }
 
-        if(TextUtils.isEmpty(mccmnc)) {
-            Log.i(TAG, "writeIMSUserAgent() ,mccmnc is null, not handle.");
-            return;
-        } else if(!TextUtils.isEmpty(brand) && !TextUtils.isEmpty(model) && !TextUtils.isEmpty(softVer)) {
-            newStringVal = brand + "_" + model + "_" + softVer;
-        }
+        int numPhones = TelephonyManager.from(mContext).getSupportedModemCount();
+        for (int i = 0; i < numPhones; i++) {
+            String mccmnc = TelephonyManager.getTelephonyProperty(mPhoneId, PROPERTY_ICC_OPERATOR_NUMERIC, "" + i);
+            Log.i(TAG, "writeIMSUserAgent() , mccmnc = " + mccmnc);
+            if(TextUtils.isEmpty(mccmnc)) {
+                Log.i(TAG, "writeIMSUserAgent() ,mccmnc is null, not handle.");
+                break;
+            }
+            //Customize ims user agent for Orange
+            else if (mccmnc.equals("20610") || mccmnc.equals("21403") || mccmnc.equals("20801")){
+                //PRD-IR92/13 term-Fairphone/FP4-FP21 device-type/smart-phone_mno-custom/open-market
+                newStringVal = "PRD-IR92/12 term-" + brand + "/" + model + "-" + softVer + " device-type/smart-phone mno-custom/none";
+            }
+            else if(!TextUtils.isEmpty(brand) && !TextUtils.isEmpty(model) && !TextUtils.isEmpty(softVer)) {
+                newStringVal = brand + "_" + model + "_" + softVer;
+            }
 
-        if(TextUtils.isEmpty(newStringVal)) {
-            Log.i(TAG, "writeIMSUserAgent() ,newStringVal as null, not handle, else overwrite modem value");
-            return;
-        }else{
-            Log.i(TAG, "writeIMSUserAgent() , newStringVal = " + newStringVal);
-        }
+            if(TextUtils.isEmpty(newStringVal)) {
+                Log.i(TAG, "writeIMSUserAgent() ,newStringVal as null, not handle, else overwrite modem value");
+                return;
+            }else{
+                Log.i(TAG, "writeIMSUserAgent() , newStringVal = " + newStringVal);
+            }
 
-        /*   NV69689:
-         *
-         *   IMSUserAgent                           1024
-         */
-        String IMSUserAgent = null;
-        try {
-            IMSUserAgent = mSysRil.getDBStringVal(ISysRilCmd.RIL_SUB_CMD_STRING_IMS_USERAGENT);
-        }catch (Exception e) {
-            Log.w(TAG, "failed to read /nv/item_files/ims/ims_user_agent:");
-            Log.e(TAG, e.getMessage());
-        }
+            /*   NV69689:
+             *
+             *   IMSUserAgent                           1024
+             */
+            String IMSUserAgent = null;
+            try {
+                IMSUserAgent = mSysRil.getDBStringValByPhoneid(ISysRilCmd.RIL_SUB_CMD_STRING_IMS_USERAGENT, i);
+            }catch (Exception e) {
+                Log.w(TAG, "failed to read /nv/item_files/ims/ims_user_agent:");
+                Log.e(TAG, e.getMessage());
+            }
 
-        Log.i(TAG, "writeIMSUserAgent() , get IMSUserAgent = " + IMSUserAgent);
-        if(null != IMSUserAgent) {
-            if (!IMSUserAgent.equals(newStringVal)){
-                try {
-                    mSysRil.setStringVal(ISysRilCmd.RIL_SUB_CMD_STRING_IMS_USERAGENT, newStringVal);
-                    Log.i(TAG, "Wrote "
-                            + (null != newStringVal && newStringVal.length() > 0 ? newStringVal : "<empty>")
-                            + " into cUaUserAgent in /nv/item_files/ims/qp_ims_ut_config_item");
-                }
-                catch (Exception e) {
-                    Log.w(TAG, "Failed to write VoWiFiProvId in /nv/item_files/ims/ims_user_agent");
-                    Log.e(TAG, e.getMessage());
+            Log.i(TAG, "writeIMSUserAgent() , get IMSUserAgent = " + IMSUserAgent);
+            if(null != IMSUserAgent) {
+                if (!IMSUserAgent.equals(newStringVal)){
+                    try {
+                        mSysRil.setStringValByPhone(ISysRilCmd.RIL_SUB_CMD_STRING_IMS_USERAGENT, newStringVal, i);
+                        Log.i(TAG, "Wrote "
+                                    + (null != newStringVal && newStringVal.length() > 0 ? newStringVal : "<empty>")
+                                    + " into cUaUserAgent in /nv/item_files/ims/qp_ims_ut_config_item");
+                    }
+                    catch (Exception e) {
+                        Log.w(TAG, "Failed to write VoWiFiProvId in /nv/item_files/ims/ims_user_agent");
+                        Log.e(TAG, e.getMessage());
+                    }
                 }
             }
         }
+
+
     }
 }
