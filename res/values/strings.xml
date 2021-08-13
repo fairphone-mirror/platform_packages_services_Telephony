@@ -2220,4 +2220,19 @@
     <string name="mobile_data_setting_title">Mobile data</string>
     <string name="mobile_data_setting_description">Mobile data is enabled by default on this device.\nThis could result in charges, depending on your tariff.\nIf you chose to disable mobile data it can be enabled again at any time in the device settings.</string>
     <string name="mobile_data_setting">Enable mobile data</string>
+
+    <string name="inproduction_mode_flag_title">Mobile in Inproduction mode</string>
+    <string name="inproduction_mode_flag_cotent">Need to clear inproduction mode or skip</string>
+    <string name="inproduction_mode_flag_btn_skip">Skip</string>
+    <string name="inproduction_mode_flag_btn_clear">Clear mode</string>
+
+    <string name="inproduction_mode_flag_clear_cotent">Confirm to clear it or no.</string>
+    <string name="inproduction_mode_flag_clear_yes">YES</string>
+    <string name="inproduction_mode_flag_clear_no">NO</string>
+    <string name="inproduction_mode_flag_clear_success_title">Clear successfully!</string>
+    <string name="inproduction_mode_flag_clear_success_cotent">Clear inproduction flag successfully.It will work after reboot.You need to reboot.</string>
+
+    <string name="inproduction_mode_flag_clear_fail_title">Clear fail!</string>
+    <string name="inproduction_mode_flag_clear_fail_cotent">Clear inproduction flag fail.Please retry.</string>
+
 </resources>
