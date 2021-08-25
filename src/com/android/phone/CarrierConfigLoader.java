@@ -1293,15 +1293,12 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
     private boolean inDSDFlowFileList(int phoneId, int fileID, String tagName) {
         CarrierIdentifier carrierId = getCarrierIdentifierForPhoneId(phoneId);
-        int cid = carrierId.getCarrierId();
         String mcc = Integer.valueOf(carrierId.getMcc()).toString();
         String mnc = Integer.valueOf(carrierId.getMnc()).toString();
 
-        logd("loop dsd flow file list and check tag: " + tagName);
-        if (cid == TelephonyManager.UNKNOWN_CARRIER_ID) {
-            loge("failed to get carrier id");
-            return false;
-        }
+        logd("loop dsd flow file list and check tag: " + tagName
+                + " with mcc: " + mcc
+                + " mnc: " + mnc);
 
         try {
             XmlPullParser parser = mContext.getResources().getXml(fileID);
@@ -1314,11 +1311,6 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                     for (int i = 0; i < parser.getAttributeCount(); ++i) {
                         attribute = parser.getAttributeName(i);
                         value = parser.getAttributeValue(i);
-
-                        //if (attribute.equals(KEY_CID) && value.equals(cid)) {
-                        //    logd("cid: " + cid + " in dsd flow file list");
-                        //    return true;
-                        //}
 
                         if (attribute.equals(KEY_MCC) && value.equals(mcc)) {
                             logd("mcc: " + mcc + " in dsd flow file list, check mnc next");
