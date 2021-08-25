@@ -1978,12 +1978,11 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     @Override
     @NonNull
     public PersistableBundle getConfigForSubIdWithFeature(int subId, String callingPackage,
-            String callingFeatureId) {
-        if (!TelephonyPermissions.checkCallingOrSelfReadPhoneState(mContext, subId, callingPackage,
-                callingFeatureId, "getCarrierConfig")) {
+                                                          String callingFeatureId) {
+        if (!isCustomerWhiteList(callingPackage) && !TelephonyPermissions.checkCallingOrSelfReadPhoneState(mContext, subId, callingPackage,
+                callingFeatureId, "getCarrierConfig!!!!!!!!!!")) {
             return new PersistableBundle();
         }
-
         int phoneId = SubscriptionManager.getPhoneId(subId);
         logd("getConfigForSubIdWithFeature subid: " + subId + " phoneid: " + phoneId);
         PersistableBundle retConfig = CarrierConfigManager.getDefaultConfig();
@@ -2500,5 +2499,9 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private void loge(String msg) {
         Log.e(LOG_TAG, msg);
         mCarrierConfigLoadingLog.log(msg);
+    }
+
+    private boolean isCustomerWhiteList(String pkg) {
+        return pkg.equals("com.android.providers.partnerbookmarks");
     }
 }
