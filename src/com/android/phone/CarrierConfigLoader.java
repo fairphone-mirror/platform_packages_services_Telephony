@@ -228,7 +228,11 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
     // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
     private boolean m_dsd_locked = false;
-    private int m_phoneid_dsd_locked = -1;
+    private boolean m_esim_handled = false;
+    private int m_phoneid_dsd_locked = SubscriptionManager.INVALID_PHONE_INDEX;
+    private int m_phoneid_boot = SubscriptionManager.INVALID_PHONE_INDEX;
+    private int m_phoneid_dsd_locked_sim = SubscriptionManager.INVALID_PHONE_INDEX;
+    private int m_phoneid_boot_sim = SubscriptionManager.INVALID_PHONE_INDEX;
     private boolean m_reboot = false; // reboot when ro.boot.CID is changed
     private boolean m_update_dsd_locked_config = false;
     private static final String DSDLOCKED_CARRIER_CONFIG_FILENAME = "dsd_locked_carrier_config";
@@ -814,7 +818,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         mWifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
         mSysRil = new SysRilCmd(context, mQcrilHookCb);
         m_dsd_locked = SystemProperties.getBoolean(DSDLOCKED_CARRIERID, false);
-        m_phoneid_dsd_locked = SystemProperties.getInt(DSDLOCKED_PHONEID, -1);
+        m_phoneid_dsd_locked = SystemProperties.getInt(DSDLOCKED_PHONEID, SubscriptionManager.INVALID_PHONE_INDEX);
         logd("init CarrierConfigLoader, get dsd_locked = " + m_dsd_locked
                 + ", phoneid_locked = " + m_phoneid_dsd_locked);
 
@@ -2134,7 +2138,6 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                     String eID = null;
                     int phoneid_esim = 1; // ESIM always in slot2
                     int state_esim = TelephonyManager.SIM_STATE_UNKNOWN;
-                    int simcount = TelephonyDevController.getInstance().getSimCount();
                     TelephonyManager teleManager = TelephonyManager.from(mContext);
                     final List<UiccCardInfo> infos = teleManager.getUiccCardsInfo();
 
@@ -2155,9 +2158,9 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                         }
                     }
 
-                    if ((state_esim == TelephonyManager.SIM_STATE_READY
-                            && phoneId == phoneid_esim) // ESIM is primary card
-                            || (state_esim != TelephonyManager.SIM_STATE_READY
+                    if ((state_esim == TelephonyManager.SIM_STATE_READY // use it first if ESIM exist
+                            && phoneId == phoneid_esim)
+                            || (state_esim != TelephonyManager.SIM_STATE_READY // use physical SIM if ESIM is none
                             && phoneId != phoneid_esim)) {
                         String operator = teleManager.getSimOperatorNameForPhone(phoneId);
                         String country = teleManager.getSimCountryIsoForPhone(phoneId);
@@ -2167,18 +2170,58 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                         CarrierIdentifier carrierId = getCarrierIdentifierForPhoneId(phoneId);
                         SystemProperties.set(PROP_MCC_MNC, carrierId.getMcc() + carrierId.getMnc());
                         SystemProperties.set(PROP_GID1, carrierId.getGid1());
+                        m_esim_handled = true;
+                    }
 
-                        if (inDSDFlowFileList(phoneId, R.xml.dsd_locked_list, "dsd_locked")) {
+                    if (inDSDFlowFileList(phoneId, R.xml.dsd_locked_list, "dsd_locked")) {
+                        if (phoneId == phoneid_esim) { // lock it first if ESIM in dsd list
+                            logd("set dsd locked eSIM" + phoneId);
                             m_update_dsd_locked_config = true;
                             m_dsd_locked = true;
                             m_phoneid_dsd_locked = phoneId;
                             SystemProperties.set(DSDLOCKED_CARRIERID, "1");
-                            SystemProperties.set(DSDLOCKED_PHONEID, String.valueOf(phoneId));
+                            SystemProperties.set(DSDLOCKED_PHONEID, String.valueOf(m_phoneid_dsd_locked));
+                        } else { // physical SIM in dsd list
+                            if (!SubscriptionManager.isValidPhoneId(m_phoneid_dsd_locked_sim)) {
+                                logd("save dsd locked SIM" + phoneId);
+                                m_phoneid_dsd_locked_sim = phoneId;
+                            }
                         }
+                    }
 
-                        if (inDSDFlowFileList(phoneId, R.xml.boot_cid_list, "boot_cid")) {
+                    if (!SubscriptionManager.isValidPhoneId(m_phoneid_dsd_locked) && m_esim_handled) {
+                        if (SubscriptionManager.isValidPhoneId(m_phoneid_dsd_locked_sim)) {
+                            logd("set dsd locked SIM" + phoneId);
+                            m_update_dsd_locked_config = true;
+                            m_dsd_locked = true;
+                            m_phoneid_dsd_locked = m_phoneid_dsd_locked_sim;
+                            SystemProperties.set(DSDLOCKED_CARRIERID, "1");
+                            SystemProperties.set(DSDLOCKED_PHONEID, String.valueOf(m_phoneid_dsd_locked));
+                        }
+                    }
+
+                    if (inDSDFlowFileList(phoneId, R.xml.boot_cid_list, "boot_cid")) {
+                        if (phoneId == phoneid_esim) {
+                            logd("set boot eSIM" + phoneId);
+                            CarrierIdentifier carrierId = getCarrierIdentifierForPhoneId(phoneId);
                             SystemProperties.set(BOOT_CARRIERID, String.valueOf(carrierId.getMcc() + carrierId.getMnc()));
                             m_reboot = true;
+                            m_phoneid_boot = phoneId;
+                        } else {
+                            if (!SubscriptionManager.isValidPhoneId(m_phoneid_boot_sim)) {
+                                logd("save boot SIM" + phoneId);
+                                m_phoneid_boot_sim = phoneId;
+                            }
+                        }
+                    }
+
+                    if (!SubscriptionManager.isValidPhoneId(m_phoneid_boot) && m_esim_handled) {
+                        if (SubscriptionManager.isValidPhoneId(m_phoneid_boot_sim)) {
+                            logd("set boot SIM" + phoneId);
+                            CarrierIdentifier carrierId = getCarrierIdentifierForPhoneId(m_phoneid_boot_sim);
+                            SystemProperties.set(BOOT_CARRIERID, String.valueOf(carrierId.getMcc() + carrierId.getMnc()));
+                            m_reboot = true;
+                            m_phoneid_boot = phoneId;
                         }
                     }
                 }
