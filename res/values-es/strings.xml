@@ -915,4 +915,6 @@
     <string name="mobile_data_setting_title">Datos moviles</string>
     <string name="mobile_data_setting_description">Los datos moviles estan habilitados por defecto en este dispositivo.\nEsto podria resultar en cargos, dependiendo de su tarifa.\nSi elige desactivar los datos moviles, puede volver a activarlos en cualquier momento en la configuracion del dispositivo.</string>
     <string name="mobile_data_setting">Habilitar los datos moviles</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibración para llamada saliente aceptada.</string>
+    <string name="smart_divert_summary">Ajustes de CFNRc</string>
 </resources>

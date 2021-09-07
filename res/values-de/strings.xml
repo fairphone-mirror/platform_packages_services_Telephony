@@ -915,4 +915,6 @@
     <string name="mobile_data_setting_title">Mobile Daten</string>
     <string name="mobile_data_setting_description">Mobile Daten sind auf diesem Gerät standardmäßig aktiviert.\nDies kann je nach Ihrem Tarif zu Gebühren führen.\nWenn Sie sich fur die Deaktivierung mobiler Daten entschieden haben, können Sie diese jederzeit in den Geräteeinstellungen wieder aktivieren.</string>
     <string name="mobile_data_setting">Mobile Daten aktivieren</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibration für ausgehenden Anruf aktiviert.</string>
+    <string name="smart_divert_summary">CFNRC-Einstellungen</string>
 </resources>

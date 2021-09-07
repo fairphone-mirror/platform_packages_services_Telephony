@@ -915,4 +915,6 @@
     <string name="mobile_data_setting_title">Mobil data</string>
     <string name="mobile_data_setting_description">Mobildata aktiveras som standard på denhär enheten.\nDetta kan leda till avgifterberoende på din tulltaxa.\nOm du valde attinaktivera mobildata kan de aktiveras igennär som helst i enhetsinställningarna.</string>
     <string name="mobile_data_setting">Aktivera mobildata</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibrerande för Outoing Call Accepted</string>
+    <string name="smart_divert_summary">CFNRC-inställningar</string>
 </resources>
