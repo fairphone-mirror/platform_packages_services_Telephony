@@ -922,6 +922,8 @@
     <string name="mobile_data_setting">Mobile Daten aktivieren</string>
     <string name="labelCFVoice">Sprache</string>
     <string name="call_forward_option">Anrufumleitungsoptionen</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibration für ausgehenden Anruf aktiviert</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Aktivieren Sie den Vibrationsmodus für ausgehende Anrufe angenommen</string>
     <!-- Instruction text to notify user that emergency calls may not be possible when voice is enabled over wifi. [CHAR LIMIT=NONE] -->
     <string name="limited_service_alert_dialog_description"><b>Notruf über WiFi Calling</b>\nNotrufe können nicht über WiFi Calling abgesetzt werden.\n\nDas Endgerät wechselt bei einem Notruf automatisch auf ein vorhandenes Mobilfunknetz (2G/3G).\n\nNotrufe sind daher nur bei vorhandener Mobilfunkabdeckung möglich.</string>
     <!-- Option to hide the popup dialog if it is not necessary for the user. [CHAR LIMIT=40] -->

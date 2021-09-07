@@ -922,4 +922,5 @@
     <string name="mobile_data_setting">Habilitar los datos moviles</string>
     <string name="labelCFVoice">Voz</string>
     <string name="call_forward_option">Opciones de desvío de llamadas</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibración para llamada saliente aceptada</string>
 </resources>
