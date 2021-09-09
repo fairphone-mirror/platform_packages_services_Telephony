@@ -19,6 +19,7 @@ import com.android.internal.telephony.TelephonyIntents;
 import android.util.Log;
 import android.telephony.SubscriptionInfo;
 import java.util.List;
+import android.content.SharedPreferences;
 
 public class MobileDataSettingActivity extends Activity {
     private TelephonyManager tm = null;
@@ -28,9 +29,12 @@ public class MobileDataSettingActivity extends Activity {
     private Button btnNext;
     private CheckBox checkBox;
     private boolean mChecked = true;
-    public static final String INTENT_DATA_OFF = "com.android.internal.telephony.DATA_OFF";
-    public static final String INTENT_DATA_ON = "com.android.internal.telephony.DATA_ON";
-
+    private static final String INTENT_DATA_OFF = "com.android.internal.telephony.DATA_OFF";
+    private static final String INTENT_DATA_ON = "com.android.internal.telephony.DATA_ON";
+    private static final int NEXT_REQUEST_CODE = 1;
+    private static final int RESULT_SKIP = 1;
+    private static final String PREFERENCES = "MobileDataChecked";
+    private static final String PREFERENCES_KEY = "isChecked";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +68,6 @@ public class MobileDataSettingActivity extends Activity {
             @Override
             public void onClick(View v) {
                 setMobileData();
-                returnToGoogleSetupWizard();
             }
         });
 
@@ -77,11 +80,20 @@ public class MobileDataSettingActivity extends Activity {
               mChecked = false;
             }
             checkBox.setChecked(isChecked);
+            setMobileDataPrefrece(isChecked);
             }
         });
     }
 
-   private void returnToGoogleSetupWizard() {
+    private void setMobileDataPrefrece(boolean isChecked){
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCES,MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(PREFERENCES_KEY,isChecked);
+        boolean isCommitSuccess = editor.commit();
+        android.util.Log.e("MobileData","isChecked:"+isChecked+"   isCommitSuccess:"+isCommitSuccess);
+    }
+
+    private void returnToGoogleSetupWizard() {
         Intent i = new Intent("com.android.wizard.NEXT");
         //i.putExtra("scriptUri", getIntent().getStringExtra("scriptUri"));
         i.putExtra("actionId", getIntent().getStringExtra("actionId"));
@@ -105,6 +117,8 @@ public class MobileDataSettingActivity extends Activity {
            intent = new Intent(INTENT_DATA_OFF);
         }
         this.sendBroadcast(intent);
+        finish(RESULT_OK);
+        done(true);
     }
 
   private boolean hasSimCard(TelephonyManager tm){
@@ -121,5 +135,19 @@ public class MobileDataSettingActivity extends Activity {
     return result;
 
   }
+
+  private void finish(int resultCode) {
+        setResult(resultCode);
+//        finish();
+    }
+
+  public void done(boolean success) {
+        int resultCode = success ? Activity.RESULT_OK : RESULT_SKIP;
+        Intent intent =  new Intent("com.android.wizard.NEXT");
+        intent.putExtra("actionId", getIntent().getStringExtra("actionId"));
+        intent.putExtra("wizardBundle", getIntent().getBundleExtra("wizardBundle"));
+        intent.putExtra("com.android.setupwizard.ResultCode", resultCode);
+        startActivityForResult(intent, NEXT_REQUEST_CODE);
+    }
 
 }

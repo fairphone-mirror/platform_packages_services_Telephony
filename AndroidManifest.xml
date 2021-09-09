@@ -257,6 +257,14 @@
             </intent-filter>
         </activity>
 
+        <!--Reset Mobile Data Setting Page -->
+        <activity android:name="MobileData">
+            <intent-filter>
+                <action android:name="com.android.internal.telephony.RESET_MOBILE_DATA" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <!-- Mobile Data Setting Page -->
         <activity android:name="InproductionModeFlagActivity"
              android:theme="@style/Theme.AppCompat.Light.NoActionBar">
