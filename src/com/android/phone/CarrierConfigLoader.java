@@ -1992,7 +1992,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
             return new PersistableBundle();
         }
         int phoneId = SubscriptionManager.getPhoneId(subId);
-        logd("getConfigForSubIdWithFeature subid: " + subId + " phoneid: " + phoneId);
+        logd("getConfigForSubIdWithFeature subid: " + subId + " phoneid: " + phoneId+" callingPackage: "+callingPackage);
         PersistableBundle retConfig = CarrierConfigManager.getDefaultConfig();
         if (SubscriptionManager.isValidPhoneId(phoneId)) {
             PersistableBundle config = mConfigFromDefaultApp[phoneId];
@@ -2548,5 +2548,14 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
     private boolean isCustomerWhiteList(String pkg) {
         return pkg.equals("com.android.providers.partnerbookmarks");
+    }
+
+    public PersistableBundle getConfigLocked(int subId, String callingPackage) {
+        logd("getConfigLocked~~");
+        if (m_dsd_locked && mConfigFromDSDLocked != null) {
+            return mConfigFromDSDLocked;
+        }
+        return getConfigForSubId(subId, callingPackage);
+
     }
 }
