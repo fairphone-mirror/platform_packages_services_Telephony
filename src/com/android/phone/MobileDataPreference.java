@@ -177,6 +177,7 @@ public class MobileDataPreference extends DialogPreference {
     private void setChecked(boolean checked) {
         if (mChecked == checked) return;
         mChecked = checked;
+        callChangeListener(checked);
         notifyChanged();
     }
 

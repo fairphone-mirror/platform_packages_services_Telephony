@@ -812,6 +812,7 @@ public class MobileNetworkSettings extends Activity  {
             mWiFiCallingPref = findPreference(BUTTON_WIFI_CALLING_KEY);
             mVideoCallingPref = (SwitchPreference) findPreference(BUTTON_VIDEO_CALLING_KEY);
             mMobileDataPref = (MobileDataPreference) findPreference(BUTTON_MOBILE_DATA_ENABLE_KEY);
+            mMobileDataPref.setOnPreferenceChangeListener(this);
             mDataUsagePref = (DataUsagePreference) findPreference(BUTTON_DATA_USAGE_KEY);
 
             //get UI object references
@@ -1576,6 +1577,9 @@ public class MobileNetworkSettings extends Activity  {
                     || preference == getPreferenceScreen()
                     .findPreference(BUTTON_CDMA_SUBSCRIPTION_KEY)) {
                 return true;
+            } else if (preference == mMobileDataPref) {
+                // Update after 1s delay, so the UI will be configured correctly
+                mHandler.postDelayed(this::updateBody, 1000);
             }
 
             updateBody();
