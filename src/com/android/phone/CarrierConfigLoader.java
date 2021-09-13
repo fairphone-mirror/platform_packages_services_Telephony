@@ -240,10 +240,12 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private static final String DSDLOCKED_CARRIERID = "persist.radio.dsd.locked";
     private static final String DSDLOCKED_PHONEID = "persist.radio.locked.PHONEID";
     private static final String BOOT_CARRIERID = "persist.radio.boot.CID";
-    private static final String PROP_OPERATOR = "ril.sim.operator";
-    private static final String PROP_COUNTRY = "ril.sim.country";
-    private static final String PROP_MCC_MNC = "ril.sim.mcc.mnc";
-    private static final String PROP_GID1 = "ril.sim.gid1";
+    //[BUG]-Modify-Begin by shaopan.tang 2021-09-13 [FP4-2904]clientid will lost after reboot
+    private static final String PROP_OPERATOR = "persist.ril.sim.operator";
+    private static final String PROP_COUNTRY = "persist.ril.sim.country";
+    private static final String PROP_MCC_MNC = "persist.ril.sim.mcc.mnc";
+    private static final String PROP_GID1 = "persist.ril.sim.gid1";
+    //[BUG]-Modify-End by shaopan.tang
     private static final String KEY_CID = "cid", KEY_MCC = "mcc", KEY_MNC = "mnc";
     private PersistableBundle mConfigFromDSDLocked = null;
     private static final int EVENT_DSD_BEGIN = 22; // same as last event EVENT_FETCH_DEFAULT_FOR_NO_SIM_CONFIG_TIMEOUT
