@@ -11,7 +11,7 @@
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="60dp"
         android:src="@drawable/ic_data" />
 
     <TextView
@@ -30,13 +30,17 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_mobile_title"
         android:padding="10dp"
+        android:gravity="center_horizontal"
         android:text="@string/mobile_data_setting_description" />
 
     <ImageView
         android:id="@+id/img_mobile_background"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/data" />
+        android:layout_width="175dp"
+        android:layout_height="375dp"
+        android:layout_marginTop="45dp"
+        android:layout_below="@+id/tv_mobile_content"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/mobile_data_phone_Illustration" />
 
     <CheckBox
         android:id="@+id/ck_mobile"
@@ -44,7 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="72dp"
         android:text="@string/mobile_data_setting" />
     
     <Button
@@ -53,7 +57,7 @@
         android:layout_height="36dp"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="70dp"
         android:layout_marginEnd="24dp"
         android:textSize="18sp"
         android:textColor="@color/incall_call_banner_text_color"

@@ -15,11 +15,13 @@ import android.text.TextUtils;
 import android.telephony.SubscriptionManager;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.TextView;
 import com.android.internal.telephony.TelephonyIntents;
 import android.util.Log;
 import android.telephony.SubscriptionInfo;
 import java.util.List;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 
 public class MobileDataSettingActivity extends Activity {
     private TelephonyManager tm = null;
@@ -29,6 +31,8 @@ public class MobileDataSettingActivity extends Activity {
     private Button btnNext;
     private CheckBox checkBox;
     private boolean mChecked = true;
+    private TextView tvMobileContent;
+    private TextView tvMobileTitle;
     private static final String INTENT_DATA_OFF = "com.android.internal.telephony.DATA_OFF";
     private static final String INTENT_DATA_ON = "com.android.internal.telephony.DATA_ON";
     private static final int NEXT_REQUEST_CODE = 1;
@@ -56,13 +60,18 @@ public class MobileDataSettingActivity extends Activity {
             checkBox.setChecked(mChecked);
         }
         if(!hasSimCard(tm)){
-            returnToGoogleSetupWizard();
-            finish();
-        }
+           returnToGoogleSetupWizard();
+           finish();
+         }
     }
 
     private void initView() {
         btnNext = findViewById(R.id.btn_next);
+        tvMobileContent = findViewById(R.id.tv_mobile_content);
+        Typeface typeface = Typeface.createFromAsset(getAssets(),"RadikalRegular.ttf");
+        tvMobileContent.setTypeface(typeface);
+        tvMobileTitle = findViewById(R.id.tv_mobile_title);
+        tvMobileTitle.setTypeface(typeface);
         checkBox = findViewById(R.id.ck_mobile);
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
