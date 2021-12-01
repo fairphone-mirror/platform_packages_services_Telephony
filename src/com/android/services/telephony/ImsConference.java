@@ -1544,15 +1544,16 @@ public class ImsConference extends TelephonyConferenceBase implements Holdable {
                     SubscriptionInfo sub = SubscriptionManager.from(
                             mConferenceHost.getPhone().getContext())
                         .getActiveSubscriptionInfoForSimSlotIndex(phoneId);
+                    // modify by T2M.zhang renjie for FP4-3310 21-12-1 begin
                     if (sub != null) {
-                        displaySubId = sub.getDisplayName().toString();
-                        displaySubId  = " " + displaySubId;
+                        displaySubId = " " + sub.getDisplayName().toString();
                         PersistableBundle b = configMgr.getConfigForSubId(sub.getSubscriptionId());
                         if (b != null) {
                             label = b.getString(CarrierConfigManager.KEY_WIFI_CALLING_DISPLAY);
-                            if (label != null) {
-                                label += displaySubId;
-                            }
+                            Log.i(this, "updateStatusHints: phoneId = "+phoneId + ","+label);
+                        }
+                        if (label == null) {
+                            label = context.getString(R.string.status_hint_label_wifi_call) + displaySubId;
                         }
                     }
                 } else {
@@ -1563,8 +1564,10 @@ public class ImsConference extends TelephonyConferenceBase implements Holdable {
                 }
 
                 if (label == null) {
-                    label = context.getString(R.string.status_hint_label_wifi_call) + displaySubId;
+                    label = context.getString(R.string.status_hint_label_wifi_call);
                 }
+
+                // modify by T2M.zhang renjie for FP4-3310 21-12-1 end
                 // modify by T2M.dengxiangyu for FP4-61 2021-04-14 end
 
                 StatusHints hints = new StatusHints(
