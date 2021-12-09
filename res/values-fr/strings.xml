@@ -668,8 +668,8 @@
     <string name="sim_description_emergency_calls" msgid="5146872803938897296">"Appels d\'urgence seulement"</string>
     <string name="sim_description_default" msgid="7474671114363724971">"Carte SIM, emplacement : <xliff:g id="SLOT_ID">%s</xliff:g>"</string>
     <string name="accessibility_settings_activity_title" msgid="7883415189273700298">"Accessibilité"</string>
-    <string name="status_hint_label_incoming_wifi_call" msgid="2606052595898044071">"Appel Wi-Fi de"</string>
-    <string name="status_hint_label_wifi_call" msgid="942993035689809853">"Appel Wi-Fi"</string>
+    <string name="status_hint_label_incoming_wifi_call" msgid="2606052595898044071">"Appels Wi-Fi de"</string>
+    <string name="status_hint_label_wifi_call" msgid="942993035689809853">"Appels Wi-Fi"</string>
     <string name="emergency_action_launch_hint" msgid="2762016865340891314">"Appuyez à nouveau pour ouvrir."</string>
     <string name="message_decode_error" msgid="1061856591500290887">"Une erreur s\'est produite lors du décodage du message."</string>
     <string name="callFailed_cdma_activation" msgid="5392057031552253550">"Votre service a été activé et les fonctionnalités d\'itinérance de votre téléphone ont été mises à jour via une carte SIM."</string>
