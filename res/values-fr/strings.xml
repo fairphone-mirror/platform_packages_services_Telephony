@@ -917,4 +917,5 @@
     <string name="mobile_data_setting">Activer les données mobiles</string>
     <string name="vibrating_for_outgoing_call_accepted_title">Vibrations pour appel sortant acceptées</string>
     <string name="smart_divert_summary">Paramètres CFNRC</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Activer le mode vibreur pour les appels sortants acceptés</string>
 </resources>

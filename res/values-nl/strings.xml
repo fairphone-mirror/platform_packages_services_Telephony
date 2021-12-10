@@ -917,4 +917,5 @@
     <string name="mobile_data_setting">Mobiele gegevens inschakelen</string>
     <string name="vibrating_for_outgoing_call_accepted_title">Trillen voor uitgaand telefoongesprek geaccepteerd.</string>
     <string name="smart_divert_summary">CFNRC-instellingen</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Activeer trilmodus voor uitgaand gesprek geaccepteerd</string>
 </resources>

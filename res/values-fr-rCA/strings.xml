@@ -913,4 +913,5 @@
     <string name="carrier_provisioning" msgid="2668065041869578376">"Données d\'approvisionnement du fournisseur de services"</string>
     <string name="trigger_carrier_provisioning" msgid="1301829588620638234">"Déclencher l\'approvisionnement du fournisseur de services"</string>
     <string name="vibrating_for_outgoing_call_accepted_title">Vibrations pour appel sortant acceptées</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Activer le mode vibreur pour les appels sortants acceptés</string>
 </resources>
