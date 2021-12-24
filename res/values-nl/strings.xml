@@ -918,4 +918,6 @@
     <string name="vibrating_for_outgoing_call_accepted_title">Trillen voor uitgaand telefoongesprek geaccepteerd.</string>
     <string name="smart_divert_summary">CFNRC-instellingen</string>
     <string name="vibrating_for_outgoing_call_accepted_summary">Activeer trilmodus voor uitgaand gesprek geaccepteerd</string>
+    <string name="call_forward_option">"Opties voor doorschakelen."</string>
+    <string name="labelCFVoice">"Stem"</string>
 </resources>
