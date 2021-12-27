@@ -125,7 +125,7 @@
     <!-- Error message for users that aren't allowed to modify Mobile Network settings [CHAR LIMIT=none] -->
     <string name="mobile_network_settings_not_available">Mobile network settings are not available for this user</string>
     <!-- GSM Call settings screen, setting option name. [CHAR LIMIT=40] -->
-    <string name="labelGSMMore">GSM call settings</string>
+    <string name="labelGSMMore">Call settings</string>
     <!-- GSM Call settings screen, setting option name with label indicating the SIM the settings
          are applied to. [CHAR LIMIT=40] -->
     <string name="labelGsmMore_with_label">GSM call settings (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)</string>
@@ -203,7 +203,7 @@
     <!-- GSM Call settings screen, setting option name, with label identifying the SIM the settings are for. -->
     <string name="additional_gsm_call_settings_with_label">Additional settings (<xliff:g id="subscriptionlabel" example="Verizon">%s</xliff:g>)</string>
     <!-- GSM-only Call settings screen, setting option name-->
-    <string name="sum_gsm_call_settings">Additional GSM only call settings</string>
+    <string name="sum_gsm_call_settings">Additional call settings</string>
     <!-- CDMA Call settings screen, setting option name -->
     <string name="additional_cdma_call_settings">Additional CDMA call settings</string>
     <!-- CDMA-only Call settings screen, setting option name-->

@@ -56,7 +56,7 @@
     <string name="unlock_failed" msgid="7103543844840661366">"Verzoek voor ontgrendelen netwerk mislukt."</string>
     <string name="unlock_success" msgid="32681089371067565">"Het netwerk is ontgrendeld."</string>
     <string name="mobile_network_settings_not_available" msgid="8678168497517090039">"Instellingen voor mobiele netwerken zijn niet beschikbaar voor deze gebruiker"</string>
-    <string name="labelGSMMore" msgid="7354182269461281543">"GSM-oproepinstellingen"</string>
+    <string name="labelGSMMore" msgid="7354182269461281543">"Oproepinstellingen"</string>
     <string name="labelGsmMore_with_label" msgid="3206015314393246224">"GSM-oproepinstellingen (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
     <string name="labelCDMAMore" msgid="7937441382611224632">"CDMA-oproepinstellingen"</string>
     <string name="labelCdmaMore_with_label" msgid="7759692829160238152">"CDMA-oproepinstellingen (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
@@ -87,7 +87,7 @@
     <string name="call_settings" msgid="3677282690157603818">"Gespreksinstellingen"</string>
     <string name="additional_gsm_call_settings" msgid="1561980168685658846">"Aanvullende instellingen"</string>
     <string name="additional_gsm_call_settings_with_label" msgid="7973920539979524908">"Aanvullende instellingen (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
-    <string name="sum_gsm_call_settings" msgid="7964692601608878138">"Aanvullende oproepinstellingen voor alleen GSM"</string>
+    <string name="sum_gsm_call_settings" msgid="7964692601608878138">"Aanvullende oproepinstellingen"</string>
     <string name="additional_cdma_call_settings" msgid="2178016561980611304">"Aanvullende CDMA-oproepinstellingen"</string>
     <string name="sum_cdma_call_settings" msgid="3185825305136993636">"Aanvullende oproepinstellingen voor alleen CDMA"</string>
     <string name="labelNwService" msgid="6015891883487125120">"Instellingen voor netwerkservice"</string>

@@ -56,7 +56,7 @@
     <string name="unlock_failed" msgid="7103543844840661366">"Échec de la demande de déblocage du réseau."</string>
     <string name="unlock_success" msgid="32681089371067565">"Le réseau a bien été débloqué."</string>
     <string name="mobile_network_settings_not_available" msgid="8678168497517090039">"Les paramètres des réseaux mobiles ne sont pas disponibles pour cet utilisateur."</string>
-    <string name="labelGSMMore" msgid="7354182269461281543">"Paramètres d\'appel GSM"</string>
+    <string name="labelGSMMore" msgid="7354182269461281543">"Paramètres d\'appel"</string>
     <string name="labelGsmMore_with_label" msgid="3206015314393246224">"Paramètres d\'appel GSM (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
     <string name="labelCDMAMore" msgid="7937441382611224632">"Paramètres d\'appel CDMA"</string>
     <string name="labelCdmaMore_with_label" msgid="7759692829160238152">"Paramètres d\'appel CDMA (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
@@ -87,7 +87,7 @@
     <string name="call_settings" msgid="3677282690157603818">"Paramètres d\'appel"</string>
     <string name="additional_gsm_call_settings" msgid="1561980168685658846">"Autres paramètres"</string>
     <string name="additional_gsm_call_settings_with_label" msgid="7973920539979524908">"Param. suppl. (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
-    <string name="sum_gsm_call_settings" msgid="7964692601608878138">"Autres paramètres d\'appel \"GSM uniquement\""</string>
+    <string name="sum_gsm_call_settings" msgid="7964692601608878138">"Paramètres d\'appel"</string>
     <string name="additional_cdma_call_settings" msgid="2178016561980611304">"Autres paramètres d\'appel CDMA"</string>
     <string name="sum_cdma_call_settings" msgid="3185825305136993636">"Autres paramètres d\'appel \"CDMA uniquement\""</string>
     <string name="labelNwService" msgid="6015891883487125120">"Paramètres du service réseau"</string>
