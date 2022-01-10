@@ -920,4 +920,5 @@
     <string name="vibrating_for_outgoing_call_accepted_summary">Activeer trilmodus voor uitgaand gesprek geaccepteerd</string>
     <string name="call_forward_option">"Opties voor doorschakelen."</string>
     <string name="labelCFVoice">"Stem"</string>
+    <string name="dsd_rebooting">"Telefoon instellen, geduld terwijl hij herstart"</string>
 </resources>

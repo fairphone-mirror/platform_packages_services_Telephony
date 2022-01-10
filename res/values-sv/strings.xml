@@ -917,4 +917,5 @@
     <string name="mobile_data_setting">Aktivera mobildata</string>
     <string name="vibrating_for_outgoing_call_accepted_title">Vibrerande för utgående samtal accepteras</string>
     <string name="smart_divert_summary">CFNRc-inställningar</string>
+    <string name="dsd_rebooting">"Konfigurera telefonen. Var tålmodig när den startar om"</string>
 </resources>

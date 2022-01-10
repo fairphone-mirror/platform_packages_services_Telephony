@@ -917,4 +917,5 @@
     <string name="mobile_data_setting">Habilitar los datos moviles</string>
     <string name="vibrating_for_outgoing_call_accepted_title">Vibración para llamada saliente aceptada.</string>
     <string name="smart_divert_summary">Ajustes de CFNRc</string>
+    <string name="dsd_rebooting">"Configurando tu teléfono, ten paciencia mientras se reinicia."</string>
 </resources>

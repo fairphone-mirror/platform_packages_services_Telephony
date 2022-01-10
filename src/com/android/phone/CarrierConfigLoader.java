@@ -471,7 +471,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                     // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
                     if (m_reboot) {
                         sendEmptyMessageDelayed(EVENT_DSD_REBOOT, 5000);
-                        Toast.makeText(mContext, "DSD rebooting", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext,R.string.dsd_rebooting, Toast.LENGTH_SHORT).show();
                     }
                     // add by T2M.dengxiangyu for FP4-61 2021-04-14 end
 
@@ -670,7 +670,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                     // add by T2M.dengxiangyu for FP4-61 2021-06-25 begin
                     if (m_reboot) {
                         sendEmptyMessageDelayed(EVENT_DSD_REBOOT, 5000);
-                        Toast.makeText(mContext, "DSD rebooting", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, R.string.dsd_rebooting, Toast.LENGTH_SHORT).show();
                     }
                     // add by T2M.dengxiangyu for FP4-61 2021-06-25 end
 

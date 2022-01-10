@@ -2234,5 +2234,5 @@
 
     <string name="inproduction_mode_flag_clear_fail_title">Clear fail!</string>
     <string name="inproduction_mode_flag_clear_fail_cotent">Clear inproduction flag fail.Please retry.</string>
-
+    <string name="dsd_rebooting">"Setting up your phone. Be patient while it reboots"</string>
 </resources>

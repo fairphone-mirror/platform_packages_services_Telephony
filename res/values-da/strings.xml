@@ -914,4 +914,5 @@
     <string name="trigger_carrier_provisioning" msgid="1301829588620638234">"Aktivér mobilselskab"</string>
     <string name="vibrating_for_outgoing_call_accepted_title">Vibreren for udgående opkald accepteret</string>
     <string name="smart_divert_summary">Indstillinger CFNRc</string>
+    <string name="dsd_rebooting">"Opsætning af din telefon. Vær tålmodig, mens den genstarter"</string>
 </resources>

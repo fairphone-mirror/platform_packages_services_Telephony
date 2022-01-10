@@ -920,4 +920,5 @@
     <string name="vibrating_for_outgoing_call_accepted_summary">Activer le mode vibreur pour les appels sortants acceptés</string>
     <string name="call_forward_option">"Options de renvoi d'appel"</string>
     <string name="labelCFVoice">"Voix"</string>
+    <string name="dsd_rebooting">"Configuration de votre téléphone. Soyez patient pendant que cela redémarre"</string>
 </resources>
