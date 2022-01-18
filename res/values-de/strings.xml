@@ -57,7 +57,7 @@
     <string name="unlock_success" msgid="32681089371067565">"Entsperrung des netzgebundenen Geräts war nicht erfolgreich."</string>
     <string name="mobile_network_settings_not_available" msgid="8678168497517090039">"Mobile Netzwerkeinstellungen sind für diesen Nutzer nicht verfügbar."</string>
     <string name="labelGSMMore" msgid="7354182269461281543">"Anrufeinstellungen"</string>
-    <string name="labelGsmMore_with_label" msgid="3206015314393246224">"GSM-Anrufeinstellungen (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
+    <string name="labelGsmMore_with_label" msgid="3206015314393246224">"Anrufeinstellungen (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
     <string name="labelCDMAMore" msgid="7937441382611224632">"CDMA-Anrufeinstellungen"</string>
     <string name="labelCdmaMore_with_label" msgid="7759692829160238152">"CDMA-Anrufeinstellungen (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
     <string name="apn_settings" msgid="1978652203074756623">"Zugangspunkte (APNs)"</string>

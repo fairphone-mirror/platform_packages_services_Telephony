@@ -57,7 +57,7 @@
     <string name="unlock_success" msgid="32681089371067565">"Sblocco della rete riuscito."</string>
     <string name="mobile_network_settings_not_available" msgid="8678168497517090039">"Le impostazioni per dispositivi mobili non sono disponibili per questo utente"</string>
     <string name="labelGSMMore" msgid="7354182269461281543">"Imp. chiamate"</string>
-    <string name="labelGsmMore_with_label" msgid="3206015314393246224">"Impostazioni di chiamata GSM (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
+    <string name="labelGsmMore_with_label" msgid="3206015314393246224">"Impostazioni di chiamata (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
     <string name="labelCDMAMore" msgid="7937441382611224632">"Impostazioni di chiamata CDMA"</string>
     <string name="labelCdmaMore_with_label" msgid="7759692829160238152">"Impostazioni di chiamata CDMA (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
     <string name="apn_settings" msgid="1978652203074756623">"Nomi punti di accesso"</string>
