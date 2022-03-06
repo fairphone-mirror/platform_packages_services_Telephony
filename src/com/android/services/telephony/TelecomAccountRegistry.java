@@ -1657,6 +1657,13 @@ public class TelecomAccountRegistry {
         // Clean up any PhoneAccounts that are no longer relevant
         cleanupPhoneAccounts();
 
+        // Do not fallback to next available sub if AOSP user
+        // preference option enabled for voice calls
+        if (SystemProperties.getBoolean("persist.vendor.radio.aosp_usr_pref_sel", true)) {
+            Log.i(this, "AOSP user preference option enabled ");
+            return;
+        }
+
         PhoneAccountHandle defaultPhoneAccount =
                 mTelecomManager.getUserSelectedOutgoingPhoneAccount();
 
