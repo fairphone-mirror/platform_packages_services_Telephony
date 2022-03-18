@@ -922,7 +922,7 @@
     <string name="labelCFVoice">"Sprache"</string>
     <string name="dsd_rebooting">"Telefon wird eingerichtet. Bitte warten, während es neu startet"</string>
 
-    <string name="limited_service_alert_dialog_description"><b>Notrufüber WiFi Calling</b>\nNotrufe können nicht über WiFi Calling abgesetzt werden.
+    <string name="limited_service_alert_dialog_description"><b>Notruf über WiFi Calling</b>\nNotrufe können nicht über WiFi Calling abgesetzt werden.
 \n\nDas Endgerät wechselt bei einem Notruf automatisch auf ein vorhandenes Mobilfunknetz (2G/3G).
 \n\nNotrufe sind daher nur bei vorhandener Mobilfunkabdeckung möglich.</string>
     <string name="do_not_show_again">Nicht mehr anzeigen</string>
