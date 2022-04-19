@@ -8668,13 +8668,14 @@ public class PhoneInterfaceManager extends ITelephony.Stub {
     public void setTransmitPower(int key, int value) {
         try {
             Phone phone = PhoneFactory.getDefaultPhone();
-            if (phone != null) {
-                loge("[SW_SAR] phone get successful");
-                phone.getUnitTestMode();
-                phone.setTransmitPower(key, value);
+            if (phone == null) {
+                loge("[SW_SAR] error getting phone (null)");
+                return;
             }
+            phone.getUnitTestMode();
+            phone.setTransmitPower(key, value);
         } catch (IllegalStateException e) {
-            loge("[SW_SAR] error to get phone");
+            loge("[SW_SAR] error getting phone: " + e);
         }
     }
 }
