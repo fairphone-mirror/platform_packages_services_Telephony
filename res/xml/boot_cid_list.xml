@@ -38,4 +38,8 @@
     <boot_cid mcc="262" mnc="06" />
     <boot_cid mcc="294" mnc="01" />
     <boot_cid mcc="297" mnc="02" />
+    <boot_cid mcc="204" mnc="04" />
+    <boot_cid mcc="234" mnc="15" />
+    <boot_cid mcc="235" mnc="91" />
+    <boot_cid mcc="262" mnc="02" />
 </boot_cid_list>
