@@ -617,7 +617,9 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                                         + lastFingerprint
                                         + " new: "
                                         + Build.FINGERPRINT);
-                        clearCachedConfigForPackage(null);
+                        //modify by T2M yubin.ying for FP4-3655 20220421
+                        //clearCachedConfigForPackage(null);
+                        //modify by T2M yubin.ying for FP4-3655 20220421
                         sharedPrefs
                                 .edit()
                                 .putString(KEY_FINGERPRINT, Build.FINGERPRINT)
