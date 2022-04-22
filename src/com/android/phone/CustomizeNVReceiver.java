@@ -13,7 +13,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.internal.telephony.TelephonyIntents;
-import com.android.internal.telephony.IccCardConstants;
 import com.qualcomm.qcrilhook.QcRilHookCallback;
 import com.qualcomm.sysrilcmd.SysRilCmd;
 import com.qualcomm.sysrilcmd.ISysRilCmd;
