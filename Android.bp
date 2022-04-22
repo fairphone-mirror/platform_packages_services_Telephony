@@ -32,7 +32,6 @@ license {
     ],
 }
 
-
 android_app {
     name: "TeleService",
 
@@ -46,8 +45,6 @@ android_app {
          "extphonelib",
         "ims-ext-common",
         "org.apache.http.legacy",
-        "qcrilhook",
-        "sysrilcmd",
     ],
     enforce_uses_libs: false,
 
