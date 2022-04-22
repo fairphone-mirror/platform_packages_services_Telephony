@@ -617,29 +617,36 @@ public class PhoneGlobals extends ContextWrapper {
             private void enableEarPiece() {
                 if (!speakerOn && !bluetoothOn && !headsetOn) {
                     if (voiceInCall && earpieceOn == false) {
-                        Log.d(LOG_TAG, "Switching to earpiece : HEAD ON -- 3");
+                        Log.d(LOG_TAG, "Switching to earpiece : HEAD ON");
                         earpieceOn = true;
-                        changeSar(3);
+                        improveSar();
                     }
                 }
             }
 
             private void disableEarPiece() {
                 if (earpieceOn == true) {
-                    Log.d(LOG_TAG, "Switching from earpiece : HEAD OFF -- 1");
+                    Log.d(LOG_TAG, "Switching from earpiece : HEAD OFF");
                     earpieceOn = false;
-                    changeSar(1);
+                    reduceSar();
                 }
             }
 
-            private void changeSar(int val) {
+            private void improveSar() {
                 if (mRilHookReady) {
                     try {
-                        mSysRil.setTransmitMaxPower(val, 0x80);
+                        mSysRil.setTransmitMaxPower(0, 0x80);
                     } catch (Exception e) {}
                 }
             }
 
+            private void reduceSar() {
+                if (mRilHookReady) {
+                    try {
+                        mSysRil.setTransmitMaxPower(1, 0x80);
+                    } catch (Exception e) {}
+                }
+            }
 
             @Override
             public void onReceive(Context context, Intent intent) {
