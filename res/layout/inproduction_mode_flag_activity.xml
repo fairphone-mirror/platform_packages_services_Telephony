@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/img_mobile"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:src="@drawable/ic_selected" />
+
+    <TextView
+        android:id="@+id/tv_mobile_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/img_mobile"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="#000000"
+        android:text="@string/inproduction_mode_flag_title"
+        android:textSize="26sp" />
+
+    <TextView
+        android:id="@+id/tv_mobile_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_mobile_title"
+        android:gravity="center_horizontal"
+        android:padding="10dp"
+        android:textColor="#99000000"
+        android:text="@string/inproduction_mode_flag_cotent"
+        android:textSize="16sp"/>
+
+
+
+
+    <Button
+        android:id="@+id/btn_next"
+        android:layout_width="90dp"
+        android:layout_height="36dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="24dp"
+        android:textSize="15sp"
+        android:textColor="#ffffff"
+        android:text="@string/inproduction_mode_flag_btn_skip"
+        android:textAllCaps="false"
+        android:background="@drawable/main_recommend_card_btn_bg"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        />
+
+
+    <Button
+        android:id="@+id/btn_clear"
+        android:layout_width="90dp"
+        android:layout_height="36dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="24dp"
+        android:textSize="15sp"
+        android:textColor="#ffffff"
+        android:text="@string/inproduction_mode_flag_btn_clear"
+        android:textAllCaps="false"
+        android:background="@drawable/main_recommend_card_btn_bg"
+        android:layout_alignParentBottom="true"
+        />
+
+</RelativeLayout>

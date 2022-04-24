@@ -55,9 +55,15 @@ public class CarrierVvmPackageInstalledReceiver extends BroadcastReceiver {
      */
     private static final String ACTION_CARRIER_VVM_PACKAGE_INSTALLED =
             "com.android.internal.telephony.CARRIER_VVM_PACKAGE_INSTALLED";
-
+    //[FEATURE]-Add-BEGIN by JI.LI,TASK-8180257,07/29/2019
+    private static final String ACTION_CARRIER_VVM_PACKAGE_REMOVED =
+            "com.android.internal.telephony.CARRIER_VVM_PACKAGE_REMOVED";
+    //[FEATURE]-Add-END by JI.LI,TASK-8180257,07/29/2019
     public void register(Context context) {
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_PACKAGE_ADDED);
+        //[FEATURE]-Add-BEGIN by JI.LI,TASK-8180257,07/29/2019
+        intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        //[FEATURE]-Add-END by JI.LI,TASK-8180257,07/29/2019
         intentFilter.addDataScheme("package");
         context.registerReceiver(this, intentFilter);
     }
@@ -99,6 +105,11 @@ public class CarrierVvmPackageInstalledReceiver extends BroadcastReceiver {
 
             VvmLog.i(TAG, "sending broadcast to " + vvmPackage);
             Intent broadcast = new Intent(ACTION_CARRIER_VVM_PACKAGE_INSTALLED);
+            //[FEATURE]-Add-BEGIN by JI.LI,TASK-8180257,07/29/2019
+            if (Intent.ACTION_PACKAGE_REMOVED.equals(intent.getAction())) {
+                broadcast = new Intent(ACTION_CARRIER_VVM_PACKAGE_REMOVED);
+            }
+            //[FEATURE]-Add-END by JI.LI,TASK-8180257,07/29/2019
             broadcast.putExtra(Intent.EXTRA_PACKAGE_NAME, packageName);
             broadcast.setPackage(vvmPackage);
             context.sendBroadcast(broadcast);

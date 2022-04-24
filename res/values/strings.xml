@@ -125,10 +125,10 @@
     <!-- Error message for users that aren't allowed to modify Mobile Network settings [CHAR LIMIT=none] -->
     <string name="mobile_network_settings_not_available">Mobile network settings are not available for this user</string>
     <!-- GSM Call settings screen, setting option name. [CHAR LIMIT=40] -->
-    <string name="labelGSMMore">GSM call settings</string>
+    <string name="labelGSMMore">Call settings</string>
     <!-- GSM Call settings screen, setting option name with label indicating the SIM the settings
          are applied to. [CHAR LIMIT=40] -->
-    <string name="labelGsmMore_with_label">GSM call settings (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)</string>
+    <string name="labelGsmMore_with_label">Call settings (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)</string>
     <string name="labelCFType">Call Forward Setting</string>
     <string name="labelCFVoice">Voice</string>
     <string name="labelCFVideo">Video</string>
@@ -203,7 +203,7 @@
     <!-- GSM Call settings screen, setting option name, with label identifying the SIM the settings are for. -->
     <string name="additional_gsm_call_settings_with_label">Additional settings (<xliff:g id="subscriptionlabel" example="Verizon">%s</xliff:g>)</string>
     <!-- GSM-only Call settings screen, setting option name-->
-    <string name="sum_gsm_call_settings">Additional GSM only call settings</string>
+    <string name="sum_gsm_call_settings">Additional call settings</string>
     <!-- CDMA Call settings screen, setting option name -->
     <string name="additional_cdma_call_settings">Additional CDMA call settings</string>
     <!-- CDMA-only Call settings screen, setting option name-->
@@ -2216,4 +2216,23 @@
 \n\nEmergency calls are only possible in areas with cellular coverage.</string>
     <!-- Option to hide the popup dialog if it is not necessary for the user. [CHAR LIMIT=40] -->
     <string name="do_not_show_again">Do not show again</string>
+    <!-- Mobile Data Setting -->
+    <string name="mobile_data_setting_title">Mobile data</string>
+    <string name="mobile_data_setting_description">Mobile data is enabled by default on this device.\nThis could result in charges, depending on your tariff.\nIf you chose to disable mobile data it can be enabled again at any time in the device settings.</string>
+    <string name="mobile_data_setting">Enable mobile data</string>
+
+    <string name="inproduction_mode_flag_title">Mobile in Inproduction mode</string>
+    <string name="inproduction_mode_flag_cotent">Need to clear inproduction mode or skip</string>
+    <string name="inproduction_mode_flag_btn_skip">Skip</string>
+    <string name="inproduction_mode_flag_btn_clear">Clear mode</string>
+
+    <string name="inproduction_mode_flag_clear_cotent">Confirm to clear it or no.</string>
+    <string name="inproduction_mode_flag_clear_yes">YES</string>
+    <string name="inproduction_mode_flag_clear_no">NO</string>
+    <string name="inproduction_mode_flag_clear_success_title">Clear successfully!</string>
+    <string name="inproduction_mode_flag_clear_success_cotent">Clear inproduction flag successfully.It will work after reboot.You need to reboot.</string>
+
+    <string name="inproduction_mode_flag_clear_fail_title">Clear fail!</string>
+    <string name="inproduction_mode_flag_clear_fail_cotent">Clear inproduction flag fail.Please retry.</string>
+    <string name="dsd_rebooting">"Setting up your phone. Be patient while it reboots"</string>
 </resources>

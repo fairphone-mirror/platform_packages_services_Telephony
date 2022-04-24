@@ -56,8 +56,8 @@
     <string name="unlock_failed" msgid="7103543844840661366">"Échec de la demande de déblocage du réseau."</string>
     <string name="unlock_success" msgid="32681089371067565">"Le réseau a bien été débloqué."</string>
     <string name="mobile_network_settings_not_available" msgid="8678168497517090039">"Les paramètres des réseaux mobiles ne sont pas disponibles pour cet utilisateur."</string>
-    <string name="labelGSMMore" msgid="7354182269461281543">"Paramètres d\'appel GSM"</string>
-    <string name="labelGsmMore_with_label" msgid="3206015314393246224">"Paramètres d\'appel GSM (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
+    <string name="labelGSMMore" msgid="7354182269461281543">"Paramètres d\'appel"</string>
+    <string name="labelGsmMore_with_label" msgid="3206015314393246224">"Paramètres d\'appel (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
     <string name="labelCDMAMore" msgid="7937441382611224632">"Paramètres d\'appel CDMA"</string>
     <string name="labelCdmaMore_with_label" msgid="7759692829160238152">"Paramètres d\'appel CDMA (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
     <string name="apn_settings" msgid="1978652203074756623">"Noms des points d\'accès"</string>
@@ -87,7 +87,7 @@
     <string name="call_settings" msgid="3677282690157603818">"Paramètres d\'appel"</string>
     <string name="additional_gsm_call_settings" msgid="1561980168685658846">"Autres paramètres"</string>
     <string name="additional_gsm_call_settings_with_label" msgid="7973920539979524908">"Param. suppl. (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
-    <string name="sum_gsm_call_settings" msgid="7964692601608878138">"Autres paramètres d\'appel \"GSM uniquement\""</string>
+    <string name="sum_gsm_call_settings" msgid="7964692601608878138">"Paramètres d\'appel"</string>
     <string name="additional_cdma_call_settings" msgid="2178016561980611304">"Autres paramètres d\'appel CDMA"</string>
     <string name="sum_cdma_call_settings" msgid="3185825305136993636">"Autres paramètres d\'appel \"CDMA uniquement\""</string>
     <string name="labelNwService" msgid="6015891883487125120">"Paramètres du service réseau"</string>
@@ -668,8 +668,8 @@
     <string name="sim_description_emergency_calls" msgid="5146872803938897296">"Appels d\'urgence seulement"</string>
     <string name="sim_description_default" msgid="7474671114363724971">"Carte SIM, emplacement : <xliff:g id="SLOT_ID">%s</xliff:g>"</string>
     <string name="accessibility_settings_activity_title" msgid="7883415189273700298">"Accessibilité"</string>
-    <string name="status_hint_label_incoming_wifi_call" msgid="2606052595898044071">"Appel Wi-Fi de"</string>
-    <string name="status_hint_label_wifi_call" msgid="942993035689809853">"Appel Wi-Fi"</string>
+    <string name="status_hint_label_incoming_wifi_call" msgid="2606052595898044071">"Appels Wi-Fi de"</string>
+    <string name="status_hint_label_wifi_call" msgid="942993035689809853">"Appels Wi-Fi"</string>
     <string name="emergency_action_launch_hint" msgid="2762016865340891314">"Appuyez à nouveau pour ouvrir."</string>
     <string name="message_decode_error" msgid="1061856591500290887">"Une erreur s\'est produite lors du décodage du message."</string>
     <string name="callFailed_cdma_activation" msgid="5392057031552253550">"Votre service a été activé et les fonctionnalités d\'itinérance de votre téléphone ont été mises à jour via une carte SIM."</string>
@@ -912,4 +912,13 @@
     <string name="phone_info_label" product="default" msgid="1784175881556791433">"Informations sur le téléphone"</string>
     <string name="carrier_provisioning" msgid="2668065041869578376">"Informations de gestion des comptes opérateur"</string>
     <string name="trigger_carrier_provisioning" msgid="1301829588620638234">"Déclencher la gestion des comptes opérateur"</string>
+    <string name="mobile_data_setting_title">Données mobiles</string>
+    <string name="mobile_data_setting_description">Les données mobiles sont activées par défaut sur cet appareil.\nCela peut entraîner des frais, en fonction de votre forfait téléphonique.\nSi vous avez choisi de désactiver les données mobiles, elles peuvent être réactivées à tout moment dans les paramètres de l\'appareil.</string>
+    <string name="mobile_data_setting">Activer les données mobiles</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibrations pour appel sortant acceptées</string>
+    <string name="smart_divert_summary">Paramètres CFNRC</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Activer le mode vibreur pour les appels sortants acceptés</string>
+    <string name="call_forward_option">"Options de renvoi d'appel"</string>
+    <string name="labelCFVoice">"Voix"</string>
+    <string name="dsd_rebooting">"Configuration de votre téléphone. Soyez patient pendant que cela redémarre"</string>
 </resources>

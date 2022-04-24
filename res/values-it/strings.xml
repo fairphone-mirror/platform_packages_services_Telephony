@@ -17,7 +17,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="phoneAppLabel" product="tablet" msgid="1916019789885839910">"Dati cellulare"</string>
-    <string name="phoneAppLabel" product="default" msgid="130465039375347763">"Phone Services"</string>
+    <string name="phoneAppLabel" product="default" msgid="130465039375347763">"Servizi mobili"</string>
     <string name="emergencyDialerIconLabel" msgid="8668005772339436680">"Chiamata di emergenza"</string>
     <string name="phoneIconLabel" msgid="3015941229249651419">"Telefono"</string>
     <string name="fdnListLabel" msgid="4119121875004244097">"Elenco numeri consentiti"</string>
@@ -56,8 +56,8 @@
     <string name="unlock_failed" msgid="7103543844840661366">"Richiesta di sblocco della rete respinta."</string>
     <string name="unlock_success" msgid="32681089371067565">"Sblocco della rete riuscito."</string>
     <string name="mobile_network_settings_not_available" msgid="8678168497517090039">"Le impostazioni per dispositivi mobili non sono disponibili per questo utente"</string>
-    <string name="labelGSMMore" msgid="7354182269461281543">"Imp. chiamate GSM"</string>
-    <string name="labelGsmMore_with_label" msgid="3206015314393246224">"Impostazioni di chiamata GSM (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
+    <string name="labelGSMMore" msgid="7354182269461281543">"Imp. chiamate"</string>
+    <string name="labelGsmMore_with_label" msgid="3206015314393246224">"Impostazioni di chiamata (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
     <string name="labelCDMAMore" msgid="7937441382611224632">"Impostazioni di chiamata CDMA"</string>
     <string name="labelCdmaMore_with_label" msgid="7759692829160238152">"Impostazioni di chiamata CDMA (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
     <string name="apn_settings" msgid="1978652203074756623">"Nomi punti di accesso"</string>
@@ -87,7 +87,7 @@
     <string name="call_settings" msgid="3677282690157603818">"Impostazioni chiamate"</string>
     <string name="additional_gsm_call_settings" msgid="1561980168685658846">"Altre impostazioni"</string>
     <string name="additional_gsm_call_settings_with_label" msgid="7973920539979524908">"Impostazioni aggiuntive (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
-    <string name="sum_gsm_call_settings" msgid="7964692601608878138">"Altre impostazioni chiamata solo GSM"</string>
+    <string name="sum_gsm_call_settings" msgid="7964692601608878138">"Altre impostazioni chiamata"</string>
     <string name="additional_cdma_call_settings" msgid="2178016561980611304">"Altre impostazioni chiamata CDMA"</string>
     <string name="sum_cdma_call_settings" msgid="3185825305136993636">"Altre impostazioni chiamata solo CDMA"</string>
     <string name="labelNwService" msgid="6015891883487125120">"Impostazioni servizio di rete"</string>
@@ -912,4 +912,10 @@
     <string name="phone_info_label" product="default" msgid="1784175881556791433">"Info telefono"</string>
     <string name="carrier_provisioning" msgid="2668065041869578376">"Informazioni sul provisioning operatore"</string>
     <string name="trigger_carrier_provisioning" msgid="1301829588620638234">"Attiva provisioning operatore"</string>
+    <string name="mobile_data_setting_title">Dati mobili</string>
+    <string name="mobile_data_setting_description">I dati mobili sono abilitati di default su questo dispositivo.\nQuesto potrebbe comportare dei costi, a seconda della tariffa.\nSe si sceglie di disattivare i dati mobili, questi possono essere riattivati in qualsiasi momento nelle impostazioni del dispositivo.</string>
+    <string name="mobile_data_setting">Abilitare i dati mobili</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibrazione per chiamata in uscita accettata.</string>
+    <string name="smart_divert_summary">Impostazioni CFNRC.</string>
+    <string name="dsd_rebooting">"Configurazione in corso, riavvio del telefono."</string>
 </resources>

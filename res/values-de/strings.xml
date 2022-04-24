@@ -56,8 +56,8 @@
     <string name="unlock_failed" msgid="7103543844840661366">"Entsperranforderung für netzgebundenes Gerät war nicht erfolgreich."</string>
     <string name="unlock_success" msgid="32681089371067565">"Entsperrung des netzgebundenen Geräts war nicht erfolgreich."</string>
     <string name="mobile_network_settings_not_available" msgid="8678168497517090039">"Mobile Netzwerkeinstellungen sind für diesen Nutzer nicht verfügbar."</string>
-    <string name="labelGSMMore" msgid="7354182269461281543">"GSM-Anrufeinstellungen"</string>
-    <string name="labelGsmMore_with_label" msgid="3206015314393246224">"GSM-Anrufeinstellungen (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
+    <string name="labelGSMMore" msgid="7354182269461281543">"Anrufeinstellungen"</string>
+    <string name="labelGsmMore_with_label" msgid="3206015314393246224">"Anrufeinstellungen (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
     <string name="labelCDMAMore" msgid="7937441382611224632">"CDMA-Anrufeinstellungen"</string>
     <string name="labelCdmaMore_with_label" msgid="7759692829160238152">"CDMA-Anrufeinstellungen (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
     <string name="apn_settings" msgid="1978652203074756623">"Zugangspunkte (APNs)"</string>
@@ -74,7 +74,7 @@
     <string name="phone_accounts_configure_account_settings" msgid="6622119715253196586">"Kontoeinstellungen konfigurieren"</string>
     <string name="phone_accounts_all_calling_accounts" msgid="1609600743500618823">"Alle Anrufkonten"</string>
     <string name="phone_accounts_all_calling_accounts_summary" msgid="2214134955430107240">"Auswählen, welche Konten Anrufe tätigen können"</string>
-    <string name="wifi_calling" msgid="3650509202851355742">"WLAN-Telefonie"</string>
+    <string name="wifi_calling" msgid="3650509202851355742">"Wi-Fi Calling"</string>
     <string name="connection_service_default_label" msgid="7332739049855715584">"Integrierter Verbindungsdienst"</string>
     <string name="voicemail" msgid="7697769412804195032">"Mailbox"</string>
     <string name="voicemail_settings_with_label" msgid="4228431668214894138">"Mailbox (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
@@ -87,7 +87,7 @@
     <string name="call_settings" msgid="3677282690157603818">"Anrufeinstellungen"</string>
     <string name="additional_gsm_call_settings" msgid="1561980168685658846">"Zusätzliche Einstellungen"</string>
     <string name="additional_gsm_call_settings_with_label" msgid="7973920539979524908">"Weitere Einstellungen (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
-    <string name="sum_gsm_call_settings" msgid="7964692601608878138">"Zusätzliche Anrufeinstellungen nur für GSM"</string>
+    <string name="sum_gsm_call_settings" msgid="7964692601608878138">"Zusätzliche Anrufeinstellungen"</string>
     <string name="additional_cdma_call_settings" msgid="2178016561980611304">"Zusätzliche CDMA-Anrufeinstellungen"</string>
     <string name="sum_cdma_call_settings" msgid="3185825305136993636">"Zusätzliche Anrufeinstellungen nur für CDMA"</string>
     <string name="labelNwService" msgid="6015891883487125120">"Einstellungen für Netzwerkservice"</string>
@@ -298,7 +298,7 @@
     <string name="sim_selection_required_pref" msgid="6985901872978341314">"Auswahl erforderlich"</string>
     <string name="sim_change_data_title" msgid="9142726786345906606">"SIM für mobile Daten ändern?"</string>
     <string name="sim_change_data_message" msgid="3567358694255933280">"<xliff:g id="NEW_SIM">%1$s</xliff:g> anstelle von <xliff:g id="OLD_SIM">%2$s</xliff:g> für mobile Daten verwenden?"</string>
-    <string name="wifi_calling_settings_title" msgid="5800018845662016507">"WLAN-Telefonie"</string>
+    <string name="wifi_calling_settings_title" msgid="5800018845662016507">"Wi-Fi Calling"</string>
     <string name="video_calling_settings_title" msgid="342829454913266078">"Videoanrufe über Mobilfunkanbieter"</string>
     <string name="gsm_umts_options" msgid="4968446771519376808">"GSM-/UMTS-Optionen"</string>
     <string name="cdma_options" msgid="3669592472226145665">"CDMA-Optionen"</string>
@@ -542,7 +542,7 @@
     <string name="incall_error_supp_service_hangup" msgid="836524952243836735">"Anrufe können nicht freigegeben werden."</string>
     <string name="incall_error_supp_service_hold" msgid="8535056414643540997">"Anrufe können nicht gehalten werden."</string>
     <string name="incall_error_wfc_only_no_wireless_network" msgid="5860742792811400109">"Stelle zum Telefonieren eine WLAN-Verbindung her."</string>
-    <string name="incall_error_promote_wfc" msgid="9164896813931363415">"Aktiviere WLAN-Telefonie, um anzurufen."</string>
+    <string name="incall_error_promote_wfc" msgid="9164896813931363415">"Aktiviere Wi-Fi Calling, um anzurufen."</string>
     <string name="emergency_information_hint" msgid="9208897544917793012">"Notfallinformationen"</string>
     <string name="emergency_information_owner_hint" msgid="6256909888049185316">"Eigentümer"</string>
     <string name="emergency_information_confirm_hint" msgid="5109017615894918914">"Noch einmal tippen, um Informationen anzuzeigen"</string>
@@ -678,8 +678,8 @@
     <string name="callFailed_wifi_lost" msgid="1788036730589163141">"WLAN-Verbindung unterbrochen. Anruf beendet."</string>
     <string name="dialFailed_low_battery" msgid="6857904237423407056">"Der Videoanruf kann aufgrund des niedrigen Akkustands nicht getätigt werden."</string>
     <string name="callFailed_low_battery" msgid="4056828320214416182">"Der Videoanruf wurde aufgrund des niedrigen Akkustands beendet."</string>
-    <string name="callFailed_emergency_call_over_wfc_not_available" msgid="5944309590693432042">"Notrufe über WLAN-Telefonie sind an diesem Standort nicht verfügbar."</string>
-    <string name="callFailed_wfc_service_not_available_in_this_location" msgid="3624536608369524988">"WLAN-Telefonie ist an diesem Standort nicht verfügbar."</string>
+    <string name="callFailed_emergency_call_over_wfc_not_available" msgid="5944309590693432042">"Notrufe über Wi-Fi Calling sind an diesem Standort nicht verfügbar."</string>
+    <string name="callFailed_wfc_service_not_available_in_this_location" msgid="3624536608369524988">"Wi-Fi Calling ist an diesem Standort nicht verfügbar."</string>
     <string name="change_pin_title" msgid="3564254326626797321">"Mailbox-PIN ändern"</string>
     <string name="change_pin_continue_label" msgid="5177011752453506371">"Weiter"</string>
     <string name="change_pin_cancel_label" msgid="2301711566758827936">"Abbrechen"</string>
@@ -912,4 +912,18 @@
     <string name="phone_info_label" product="default" msgid="1784175881556791433">"Über das Telefon"</string>
     <string name="carrier_provisioning" msgid="2668065041869578376">"Informationen zur Nutzerverwaltung durch den Anbieter"</string>
     <string name="trigger_carrier_provisioning" msgid="1301829588620638234">"Nutzerverwaltung durch den Anbieter auslösen"</string>
+    <string name="mobile_data_setting_title">Mobile Daten</string>
+    <string name="mobile_data_setting_description">Mobile Daten sind auf diesem Gerät standardmäßig aktiviert.\nDies kann je nach Ihrem Tarif zu Gebühren führen.\nWenn Sie sich fur die Deaktivierung mobiler Daten entschieden haben, können Sie diese jederzeit in den Geräteeinstellungen wieder aktivieren.</string>
+    <string name="mobile_data_setting">Mobile Daten aktivieren</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibration für ausgehenden Anruf aktiviert.</string>
+    <string name="smart_divert_summary">CFNRC-Einstellungen</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Aktivieren Sie den Vibrationsmodus für ausgehende Anrufe angenommen</string>
+    <string name="call_forward_option">"Optionen zur Anrufweiterleitung."</string>
+    <string name="labelCFVoice">"Sprache"</string>
+    <string name="dsd_rebooting">"Telefon wird eingerichtet. Bitte warten, während es neu startet"</string>
+
+    <string name="limited_service_alert_dialog_description"><b>Notruf über WiFi Calling</b>\nNotrufe können nicht über WiFi Calling abgesetzt werden.
+\n\nDas Endgerät wechselt bei einem Notruf automatisch auf ein vorhandenes Mobilfunknetz (2G/3G).
+\n\nNotrufe sind daher nur bei vorhandener Mobilfunkabdeckung möglich.</string>
+    <string name="do_not_show_again">Nicht mehr anzeigen</string>
 </resources>

@@ -7749,7 +7749,8 @@ public class PhoneInterfaceManager extends ITelephony.Stub {
         final CarrierConfigManager configMgr = (CarrierConfigManager)
                 mApp.getSystemService(Context.CARRIER_CONFIG_SERVICE);
         boolean isDataRoamingEnabled = TelephonyProperties.data_roaming().orElse(false);
-        isDataRoamingEnabled |= configMgr.getConfigForSubId(subId).getBoolean(
+        // modify by T2M.dengxiangyu for FP4-61 2021-04-14
+        isDataRoamingEnabled &= configMgr.getConfigForSubId(subId).getBoolean(
                 CarrierConfigManager.KEY_CARRIER_DEFAULT_DATA_ROAMING_ENABLED_BOOL);
         return isDataRoamingEnabled;
     }
@@ -8389,7 +8390,7 @@ public class PhoneInterfaceManager extends ITelephony.Stub {
             Log.d(LOG_TAG, "isMvnoMatched# IccRecords is null");
             return false;
         }
-        return ApnSettingUtils.mvnoMatches(iccRecords, mvnoType, mvnoMatchData);
+        return ApnSettingUtils.mvnoMatches(iccRecords, mvnoType, mvnoMatchData, subId);
     }
 
     @Override

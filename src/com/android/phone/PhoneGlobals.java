@@ -56,6 +56,7 @@ import android.util.LocalLog;
 import android.util.Log;
 import android.widget.Toast;
 
+
 import com.android.internal.telephony.CallManager;
 import com.android.internal.telephony.IccCardConstants;
 import com.android.internal.telephony.MmiCode;
@@ -81,6 +82,8 @@ import java.io.PrintWriter;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
+import android.bluetooth.BluetoothHeadset;
+import android.net.wifi.WifiManager;
 
 /**
  * Global state for the telephony subsystem when running in the primary
@@ -202,6 +205,9 @@ public class PhoneGlobals extends ContextWrapper {
     private final BroadcastReceiver mReceiver = new PhoneAppBroadcastReceiver();
     // Broadcast receiver for SIP based intents (see onCreate())
     private final SipReceiver mSipReceiver = new SipReceiver();
+
+    private final SetSarReceiver mSarReceiver = new SetSarReceiver();
+    //private final CustomizeNVReceiver mCustNVReceiver = new CustomizeNVReceiver();//Add by shaopan.tang 2021-04-28 [FP4-89]Customize SIP/XCAP UserAgent string
 
     private final CarrierVvmPackageInstalledReceiver mCarrierVvmPackageInstalledReceiver =
             new CarrierVvmPackageInstalledReceiver();
@@ -476,6 +482,20 @@ public class PhoneGlobals extends ContextWrapper {
                     SettingsConstants.HAC_KEY + "=" + (hac == SettingsConstants.HAC_ENABLED
                             ? SettingsConstants.HAC_VAL_ON : SettingsConstants.HAC_VAL_OFF));
         }
+
+        mSarReceiver.init(this);
+        IntentFilter sarIntentFilter = new IntentFilter(Intent.ACTION_BOOT_COMPLETED);
+        sarIntentFilter.addAction(WifiManager.WIFI_AP_STATE_CHANGED_ACTION);
+        sarIntentFilter.addAction(AudioManager.STREAM_DEVICES_CHANGED_ACTION);
+        registerReceiver(mSarReceiver, sarIntentFilter);
+
+        //[FEATURE]-Add-Begin by shaopan.tang 2021-04-28 [FP4-89]Customize SIP/XCAP UserAgent string
+        /*mCustNVReceiver.init(this);
+        IntentFilter CustNVIntentFilter = new IntentFilter(Intent.ACTION_BOOT_COMPLETED);
+        CustNVIntentFilter.addAction(TelephonyIntents.ACTION_SIM_STATE_CHANGED);
+        registerReceiver(mCustNVReceiver, CustNVIntentFilter);*/
+        //[FEATURE]-Add-End by shaopan.tang
+
     }
 
     /**

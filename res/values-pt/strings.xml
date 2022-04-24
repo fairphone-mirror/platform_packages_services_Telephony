@@ -912,4 +912,10 @@
     <string name="phone_info_label" product="default" msgid="1784175881556791433">"Informações do telefone"</string>
     <string name="carrier_provisioning" msgid="2668065041869578376">"Informações de provisionamento da operadora"</string>
     <string name="trigger_carrier_provisioning" msgid="1301829588620638234">"Acionar provisionamento da operadora"</string>
+    <string name="mobile_data_setting_title">Dados moveis</string>
+    <string name="mobile_data_setting_description">Os dados moveis sao ativados por padrao neste dispositivo.\nIsto pode resultar em taxas, dependendo da sua tarifa.\nSe voce optar por desativar os dados moveis, eles podem ser ativados novamente a qualquer momento nas configuracoes do dispositivo.</string>
+    <string name="mobile_data_setting">Habilitar dados moveis</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibração para camada realizada aceite</string>
+    <string name="smart_divert_summary">Definições CFNRc</string>
+    <string name="dsd_rebooting">"Configurando seu telefone. Seja paciente enquanto ele reinicia"</string>
 </resources>

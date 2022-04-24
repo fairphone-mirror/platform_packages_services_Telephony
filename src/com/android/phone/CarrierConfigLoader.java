@@ -22,8 +22,10 @@ import static android.service.carrier.CarrierService.ICarrierServiceWrapper.RESU
 import android.annotation.NonNull;
 import android.annotation.Nullable;
 import android.app.AppOpsManager;
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -41,28 +43,60 @@ import android.os.PersistableBundle;
 import android.os.Process;
 import android.os.RemoteException;
 import android.os.ResultReceiver;
+import android.os.ServiceManager;
+import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.service.carrier.CarrierIdentifier;
 import android.service.carrier.CarrierService;
 import android.service.carrier.ICarrierService;
 import android.telephony.CarrierConfigManager;
+import android.telephony.SmsCbMessage;
+import android.telephony.SmsManager;
+import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyFrameworkInitializer;
 import android.telephony.TelephonyManager;
+import android.telephony.UiccCardInfo;
+import android.telephony.euicc.EuiccManager;
 import android.text.TextUtils;
 import android.util.ArraySet;
 import android.util.LocalLog;
 import android.util.Log;
 
+import android.widget.Toast;
+import android.os.PowerManager;
+import android.sysprop.TelephonyProperties;
+
+import com.android.ims.ImsManager;
+import com.android.internal.telephony.GlobalSettingsHelper;
 import com.android.internal.telephony.ICarrierConfigLoader;
 import com.android.internal.telephony.IccCardConstants;
 import com.android.internal.telephony.Phone;
 import com.android.internal.telephony.PhoneFactory;
 import com.android.internal.telephony.SubscriptionInfoUpdater;
+import com.android.internal.telephony.TelephonyDevController;
 import com.android.internal.telephony.TelephonyPermissions;
 import com.android.internal.telephony.util.ArrayUtils;
 import com.android.internal.util.IndentingPrintWriter;
+import com.qualcomm.qcrilhook.QcRilHookCallback;
+import com.qualcomm.sysrilcmd.SysRilCmd;
+import com.qualcomm.sysrilcmd.ISysRilCmd;
+
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiEnterpriseConfig;
+import android.net.wifi.WifiEnterpriseConfig.Eap;
+import android.net.wifi.WifiManager;
+import android.security.Credentials;
+
+import android.net.wifi.WifiConfiguration.KeyMgmt;
+import com.android.settingslib.wifi.AccessPoint;
+
+import com.android.settingslib.wifi.WifiTracker;
+
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -83,6 +117,11 @@ import java.util.Set;
  */
 public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private static final String LOG_TAG = "CarrierConfigLoader";
+    private final String KEYSTORE_SPACE = "keystore://";
+    private final String PSK = "PSK";
+    private final String WEP = "WEP";
+    private final String EAP = "EAP";
+    private final String AP_STATE_PUBLIC = "Public";
 
     // Package name for platform carrier config app, bundled with system image.
     private final String mPlatformCarrierConfigPackage;
@@ -182,6 +221,42 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     // carrier B is on SIM 2, in which case we should not dump carrier B's service when carrier A
     // requested the dump.
     private static final String DUMP_ARG_REQUESTING_PACKAGE = "--requesting-package";
+
+    private boolean isSIMInserted = false;
+    private boolean isSIM1Inserted = false;
+    private boolean isSIM2Inserted = false;
+
+    // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
+    private boolean m_dsd_locked = false;
+    private boolean m_esim_handled = false;
+    private int m_phoneid_dsd_locked = SubscriptionManager.INVALID_PHONE_INDEX;
+    private int m_phoneid_boot = SubscriptionManager.INVALID_PHONE_INDEX;
+    private int m_phoneid_dsd_locked_sim = SubscriptionManager.INVALID_PHONE_INDEX;
+    private int m_phoneid_boot_sim = SubscriptionManager.INVALID_PHONE_INDEX;
+    private boolean m_reboot = false; // reboot when ro.boot.CID is changed
+    private boolean m_update_dsd_locked_config = false;
+    private static final String DSDLOCKED_CARRIER_CONFIG_FILENAME = "dsd_locked_carrier_config";
+    private static final String DSDLOCKED_ADDITION = "-dsdlocked";
+    private static final String DSDLOCKED_CARRIERID = "persist.radio.dsd.locked";
+    private static final String DSDLOCKED_PHONEID = "persist.radio.locked.PHONEID";
+    private static final String BOOT_CARRIERID = "persist.radio.boot.CID";
+    //[BUG]-Modify-Begin by shaopan.tang 2021-09-13 [FP4-2904]clientid will lost after reboot
+    private static final String PROP_OPERATOR = "persist.ril.sim.operator";
+    private static final String PROP_COUNTRY = "persist.ril.sim.country";
+    private static final String PROP_MCC_MNC = "persist.ril.sim.mcc.mnc";
+    private static final String PROP_GID1 = "persist.ril.sim.gid1";
+    //[BUG]-Modify-End by shaopan.tang
+    private static final String KEY_CID = "cid", KEY_MCC = "mcc", KEY_MNC = "mnc";
+    private PersistableBundle mConfigFromDSDLocked = null;
+    private static final int EVENT_DSD_BEGIN = 22; // same as last event EVENT_FETCH_DEFAULT_FOR_NO_SIM_CONFIG_TIMEOUT
+    private static final int EVENT_DSD_REBOOT = EVENT_DSD_BEGIN + 1;
+    private EuiccManager mEuiccManager;
+    private WifiManager mWifiManager;
+    private SysRilCmd mSysRil;
+
+    List<WifiConfiguration> mConfigList = null;
+    private int highestPriority = 0;
+    // add by T2M.dengxiangyu for FP4-61 2021-04-14 end
 
     // Handler to process various events.
     //
@@ -318,9 +393,38 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                                     }
                                     PersistableBundle config =
                                             resultData.getParcelable(KEY_CONFIG_BUNDLE);
-                                    saveConfigToXml(mPlatformCarrierConfigPackage, "", phoneId,
-                                            carrierId, config);
-                                    mConfigFromDefaultApp[phoneId] = config;
+
+                                    // modify by T2M.dengxiangyu for FP4-61 2021-04-14 begin
+                                    if (SubscriptionManager.getSimStateForSlotIndex(phoneId)
+                                            != TelephonyManager.SIM_STATE_LOADED) {
+                                        loge("Skip EVENT_CONNECTED_TO_DEFAULT because SIM"
+                                                + phoneId + " records are not loaded.");
+                                    } else {
+                                        // save as dsd_locked_carrier_config.xml if mcc/mnc in dsd locked list
+                                        logd("update dsd locked: " + m_update_dsd_locked_config);
+                                        if (m_update_dsd_locked_config && phoneId == m_phoneid_dsd_locked) {
+                                            saveConfigToXml(mPlatformCarrierConfigPackage, DSDLOCKED_ADDITION, phoneId,
+                                                    carrierId, config);
+                                            mConfigFromDSDLocked = new PersistableBundle(config);
+                                            //int numPhones = TelephonyManager.from(mContext).getSupportedModemCount();
+                                            //for (int i = 0; i < numPhones; i++) {
+                                            //    updateSettingsProvider(i, config);
+                                            //    updateModemSettings(i, config);
+                                            //}
+                                            //loadPredefineNetworks(config);
+                                        }
+
+                                        //if (!m_dsd_locked) {
+                                            saveConfigToXml(mPlatformCarrierConfigPackage, "", phoneId,
+                                                    carrierId, config);
+                                            mConfigFromDefaultApp[phoneId] = config;
+                                            updateSettingsProvider(phoneId, config);
+                                            updateModemSettings(phoneId, config);
+                                            loadPredefineNetworks(config);
+                                        //}
+                                    }
+                                    // modify by T2M.dengxiangyu for FP4-61 2021-04-14 end
+
                                     sendMessage(
                                             obtainMessage(
                                                     EVENT_FETCH_DEFAULT_DONE, phoneId, -1));
@@ -364,6 +468,13 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                 }
 
                 case EVENT_FETCH_DEFAULT_DONE: {
+                    // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
+                    if (m_reboot) {
+                        sendEmptyMessageDelayed(EVENT_DSD_REBOOT, 5000);
+                        Toast.makeText(mContext,R.string.dsd_rebooting, Toast.LENGTH_SHORT).show();
+                    }
+                    // add by T2M.dengxiangyu for FP4-61 2021-04-14 end
+
                     // If we attempted to bind to the app, but the service connection is null, then
                     // config was cleared while we were waiting and we should not continue.
                     if (!msg.getData().getBoolean("loaded_from_xml", false)
@@ -506,7 +617,9 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                                         + lastFingerprint
                                         + " new: "
                                         + Build.FINGERPRINT);
-                        clearCachedConfigForPackage(null);
+                        //modify by T2M yubin.ying for FP4-3655 20220421
+                        //clearCachedConfigForPackage(null);
+                        //modify by T2M yubin.ying for FP4-3655 20220421
                         sharedPrefs
                                 .edit()
                                 .putString(KEY_FINGERPRINT, Build.FINGERPRINT)
@@ -556,6 +669,13 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                 }
 
                 case EVENT_FETCH_DEFAULT_FOR_NO_SIM_CONFIG_DONE: {
+                    // add by T2M.dengxiangyu for FP4-61 2021-06-25 begin
+                    if (m_reboot) {
+                        sendEmptyMessageDelayed(EVENT_DSD_REBOOT, 5000);
+                        Toast.makeText(mContext, R.string.dsd_rebooting, Toast.LENGTH_SHORT).show();
+                    }
+                    // add by T2M.dengxiangyu for FP4-61 2021-06-25 end
+
                     broadcastConfigChangedIntent(phoneId, false);
                     break;
                 }
@@ -606,8 +726,17 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                                     }
                                     PersistableBundle config =
                                             resultData.getParcelable(KEY_CONFIG_BUNDLE);
-                                    saveNoSimConfigToXml(mPlatformCarrierConfigPackage, config);
-                                    mNoSimConfig = config;
+
+                                    // modify by T2M.dengxiangyu for FP4-61 2021-06-25 begin
+                                    //if (!m_dsd_locked) {
+                                        saveNoSimConfigToXml(mPlatformCarrierConfigPackage, config);
+                                        mNoSimConfig = config;
+                                        updateSettingsProvider(phoneId, config);
+                                        updateModemSettings(phoneId, config);
+                                        loadPredefineNetworks(config);
+                                    //}
+                                    // modify by T2M.dengxiangyu for FP4-61 2021-06-25 end
+
                                     sendMessage(
                                             obtainMessage(
                                                     EVENT_FETCH_DEFAULT_FOR_NO_SIM_CONFIG_DONE,
@@ -633,6 +762,13 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                                         phoneId, -1), BIND_TIMEOUT_MILLIS);
                     break;
                 }
+
+                // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
+                case EVENT_DSD_REBOOT:
+                    PowerManager pm = (PowerManager)mContext.getSystemService(Context.POWER_SERVICE);
+                    pm.reboot(null);
+                    break;
+                // add by T2M.dengxiangyu for FP4-61 2021-04-14 end
             }
         }
     }
@@ -679,6 +815,31 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                 .getTelephonyServiceManager().getCarrierConfigServiceRegisterer().register(this);
         logd("CarrierConfigLoader has started");
         mSubscriptionInfoUpdater = PhoneFactory.getSubscriptionInfoUpdater();
+
+        // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
+        // get status of DSD locked and saved carrier id
+        mEuiccManager = mContext.getSystemService(EuiccManager.class);
+        mWifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+        mSysRil = new SysRilCmd(context, mQcrilHookCb);
+        m_dsd_locked = SystemProperties.getBoolean(DSDLOCKED_CARRIERID, false);
+        m_phoneid_dsd_locked = SystemProperties.getInt(DSDLOCKED_PHONEID, SubscriptionManager.INVALID_PHONE_INDEX);
+        logd("init CarrierConfigLoader, get dsd_locked = " + m_dsd_locked
+                + ", phoneid_locked = " + m_phoneid_dsd_locked);
+
+        if (m_dsd_locked) {
+            final PersistableBundle config = restoreDSDLockedConfigFromXml();
+            if (config != null) {
+                logd("Loaded carrier config DSD locked from XML. phoneId = "
+                        + m_phoneid_dsd_locked);
+                mConfigFromDSDLocked = new PersistableBundle(config);
+                //notifySubscriptionInfoUpdater(m_phoneid_dsd_locked);
+            } else {
+                // No cached config, so fetch it from a carrier app.
+                loge("find no carrier config DSD locked, weird case !!!");
+            }
+        }
+        // add by T2M.dengxiangyu for FP4-61 2021-04-14 end
+
         mHandler.sendEmptyMessage(EVENT_CHECK_SYSTEM_UPDATE);
     }
 
@@ -727,7 +888,17 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         int carrierId = getSpecificCarrierIdForPhoneId(phoneId);
         // Prefer the carrier privileged carrier app, but if there is not one, use the platform
         // default carrier app.
-        if (mConfigFromCarrierApp[phoneId] != null) {
+
+        // add by T2M.dengxiangyu for FP4-61 2021-04-14, notify carrier config DSD locked begin
+        logd("notify carrierconfig[" + phoneId + "]");
+        //if (mConfigFromDSDLocked != null) {
+        //    logd("notify DSD locked carrierconfig");
+        //    configPackagename = mPlatformCarrierConfigPackage;
+        //    configToSend = mConfigFromDSDLocked;
+        //}
+        // add by T2M.dengxiangyu for FP4-61 2021-04-14 end
+
+        /*else*/ if (mConfigFromCarrierApp[phoneId] != null) {
             configPackagename = getCarrierPackageForPhoneId(phoneId);
             configToSend = mConfigFromCarrierApp[phoneId];
         } else {
@@ -742,10 +913,12 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         // mOverrideConfigs is for testing. And it will override current configs.
         PersistableBundle config = mOverrideConfigs[phoneId];
         if (config != null) {
+            logd("notify override carrierconfig");
             configToSend = new PersistableBundle(configToSend);
             configToSend.putAll(config);
         }
 
+        //logd("notify carrierconfig: " + configToSend);
         mSubscriptionInfoUpdater.updateSubscriptionByCarrierConfigAndNotifyComplete(
                 phoneId, configPackagename, configToSend,
                 mHandler.obtainMessage(EVENT_SUBSCRIPTION_INFO_UPDATED, phoneId, -1));
@@ -912,6 +1085,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
      */
     private void saveConfigToXml(String packageName, @NonNull String extraString, int phoneId,
             CarrierIdentifier carrierId, PersistableBundle config, boolean isNoSimConfig) {
+        logd("saved config phoneid: " + phoneId + " extra: " + extraString + " no sim: " + isNoSimConfig);
         if (packageName == null) {
             loge("Cannot save config with null packageName");
             return;
@@ -942,6 +1116,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         // Downside is for genuinely empty bundle, will bind and load
         // on every power on.
         if (config == null || config.isEmpty()) {
+            loge("config is empty");
             return;
         }
 
@@ -952,11 +1127,25 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         }
 
         logdWithLocalLog(
-                "Save config to xml, packagename: " + packageName + " phoneId: " + phoneId);
+                "Save config to xml, packagename: "
+                        + packageName + " phoneId: " + phoneId + " extraString: " + extraString);
 
         FileOutputStream outFile = null;
         try {
-            outFile = new FileOutputStream(new File(mContext.getFilesDir(), fileName));
+            // add by T2M.dengxiangyu for FP4-61 2021-04-14, save carrier config DSD locked begin
+            String carrier_config_file_name;
+
+            if (extraString.equals(DSDLOCKED_ADDITION)) {
+                //logd("save config as dsd locekd: " + config);
+                carrier_config_file_name = DSDLOCKED_CARRIER_CONFIG_FILENAME + ".xml";
+            } else {
+                carrier_config_file_name = fileName;
+            }
+            // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
+
+            outFile = new FileOutputStream(
+                    new File(mContext.getFilesDir(),
+                            carrier_config_file_name));
             config.putString(KEY_VERSION, version);
             config.writeToStream(outFile);
             outFile.flush();
@@ -1086,6 +1275,662 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         return true;
     }
 
+    // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
+    private PersistableBundle restoreDSDLockedConfigFromXml() {
+        PersistableBundle restoredBundle = null;
+        File file = null;
+        FileInputStream inFile = null;
+        try {
+            file = new File(mContext.getFilesDir(),
+                    DSDLOCKED_CARRIER_CONFIG_FILENAME + ".xml");
+            inFile = new FileInputStream(file);
+
+            restoredBundle = PersistableBundle.readFromStream(inFile);
+            logd("read config dsd locekd: " + restoredBundle);
+            inFile.close();
+        } catch (FileNotFoundException e) {
+            // Missing file is normal occurrence that might occur with a new sim or when restoring
+            // an override file during boot and should not be treated as an error.
+            if (file != null) loge("DSD-Locked File not found: " + file.getPath());
+        } catch (IOException e) {
+            loge(e.toString());
+        }
+
+        return restoredBundle;
+    }
+
+    private boolean inDSDFlowFileList(int phoneId, int fileID, String tagName) {
+        CarrierIdentifier carrierId = getCarrierIdentifierForPhoneId(phoneId);
+        String mcc = Integer.valueOf(carrierId.getMcc()).toString();
+        String mnc = Integer.valueOf(carrierId.getMnc()).toString();
+
+        logd("loop dsd flow file list and check tag: " + tagName
+                + " with mcc: " + mcc
+                + " mnc: " + mnc);
+
+        try {
+            XmlPullParser parser = mContext.getResources().getXml(fileID);
+            int event = -1;
+
+            while (((event = parser.next()) != XmlPullParser.END_DOCUMENT)) {
+                if (event == XmlPullParser.START_TAG && tagName.equals(parser.getName())) {
+                    boolean checkMnc = false;
+                    String attribute, value;
+                    for (int i = 0; i < parser.getAttributeCount(); ++i) {
+                        attribute = parser.getAttributeName(i);
+                        value = parser.getAttributeValue(i);
+
+                        if (attribute.equals(KEY_MCC) && value.equals(mcc)) {
+                            logd("mcc: " + mcc + " in dsd flow file list, check mnc next");
+                            checkMnc = true;
+                            continue;
+                        }
+
+                        if (checkMnc == true && attribute.equals(KEY_MNC)
+                                && (value.equals("*") || value.equals(mnc))) {
+                            logd("mnc: " + mnc + " in dsd flow file list");
+                            return true;
+                        }
+
+                        checkMnc = false;
+                    }
+                }
+            }
+        } catch (IOException | XmlPullParserException e) {
+            loge(e.toString());
+        }
+
+        return false;
+    }
+
+    private void updateSettingsProvider(int phoneId, PersistableBundle config) {
+        ContentResolver resolver = mContext.getContentResolver();
+        Phone phone = PhoneFactory.getPhone(phoneId);
+        final ImsManager imsManager = ImsManager.getInstance(mContext, phoneId);
+        int[] subIds = SubscriptionManager.getSubId(phoneId);
+
+        boolean data_roaming_enabled = config.getBoolean(CarrierConfigManager.KEY_CARRIER_DEFAULT_DATA_ROAMING_ENABLED_BOOL, false);
+        int default_nwmode = config.getInt(CarrierConfigManager.KEY_DEFAULT_NETWORK_MODE, TelephonyProperties.default_network().get(phoneId));
+        String time_format = config.getString(CarrierConfigManager.KEY_TIME_FORMAT, "24");
+        boolean bluetooth_on = (m_dsd_locked && mConfigFromDSDLocked != null) ?
+                mConfigFromDSDLocked.getBoolean(CarrierConfigManager.KEY_BLUETOOTH_DEFAULT_ON, false) :
+                config.getBoolean(CarrierConfigManager.KEY_BLUETOOTH_DEFAULT_ON, false);
+
+        // VOLTE settings
+        boolean enhancedLteDefault = config.getBoolean(CarrierConfigManager.KEY_ENHANCED_4G_LTE_ON_BY_DEFAULT_BOOL, false);
+
+        // VILTE settings
+        boolean vtEnabledByUser = config.getBoolean(CarrierConfigManager.KEY_VT_IMS_ENABLED_BOOLEAN, false);
+
+        // WFC settings
+        boolean wfcEnabledByUser = config.getBoolean(CarrierConfigManager.KEY_CARRIER_DEFAULT_WFC_IMS_ENABLED_BOOL, false);
+        boolean wfc_editable = config.getBoolean(CarrierConfigManager.KEY_EDITABLE_WFC_MODE_BOOL, false);
+        boolean wfc_roaming_editable = config.getBoolean(CarrierConfigManager.KEY_EDITABLE_WFC_ROAMING_MODE_BOOL, false);
+        int wfc_default_mode = config.getInt(CarrierConfigManager.KEY_CARRIER_DEFAULT_WFC_IMS_MODE_INT, 1);
+        int wfc_roaming_default_mode = config.getInt(CarrierConfigManager.KEY_CARRIER_DEFAULT_WFC_IMS_ROAMING_MODE_INT, 1);
+        boolean voWifiRoamingEnabled = config.getBoolean(CarrierConfigManager.KEY_EDITABLE_WFC_ROAMING_MODE_BOOL, false);
+
+        logd("update settings or phone: " + phoneId
+                + " data_roaming_enabled: " + data_roaming_enabled
+                + " default_nwmode: " + default_nwmode
+                + " time_format: " + time_format
+                + " bluetooth_on: " + bluetooth_on
+                + " enhancedLteDefault: " + enhancedLteDefault
+                + " vtEnabledByUser: " + vtEnabledByUser
+                + " wfcEnabledByUser: " + wfcEnabledByUser
+                + " wfc_editable: " + wfc_editable
+                + " wfc_default_mode: " + wfc_default_mode
+                + " wfc_roaming_editable: " + wfc_roaming_editable
+                + " wfc_roaming_default_mode: " + wfc_roaming_default_mode
+                + " voWifiRoamingEnabled: " + voWifiRoamingEnabled
+        );
+
+        if (subIds != null && subIds.length > 0) {
+            logd("update data roaming enabled for phone: " + phoneId + ", subId: " + subIds[0]);
+            GlobalSettingsHelper.setBoolean(mContext,
+                    Settings.Global.DATA_ROAMING,
+                    subIds[0],
+                    data_roaming_enabled);
+
+            logd("update default network mode for phone: " + phoneId + ", subId: " + subIds[0]);
+            phone.setPreferredNetworkType(default_nwmode, null);
+            GlobalSettingsHelper.setInt(mContext,
+                    Settings.Global.PREFERRED_NETWORK_MODE,
+                    subIds[0],
+                    default_nwmode);
+        }
+
+        Intent timeChanged = new Intent(Intent.ACTION_TIME_CHANGED);
+        timeChanged.addFlags(Intent.FLAG_RECEIVER_INCLUDE_BACKGROUND);
+        int timeFormatPreference = time_format.equals("24")
+                ? Intent.EXTRA_TIME_PREF_VALUE_USE_24_HOUR
+                : Intent.EXTRA_TIME_PREF_VALUE_USE_12_HOUR;
+        timeChanged.putExtra(Intent.EXTRA_TIME_PREF_24_HOUR_FORMAT, timeFormatPreference);
+        mContext.sendBroadcast(timeChanged);
+        Settings.System.putString(resolver, Settings.System.TIME_12_24, time_format);
+
+        BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetooth_on) btAdapter.enable();
+        else btAdapter.disable();
+
+        if (imsManager != null && subIds != null && subIds.length > 0) {
+            imsManager.setEnhanced4gLteModeSetting(enhancedLteDefault);
+            imsManager.setVtSetting(vtEnabledByUser);
+
+            if (wfc_editable) {
+                imsManager.setWfcMode(wfc_default_mode, false);
+            }
+
+            if (wfc_roaming_editable) {
+                imsManager.setWfcMode(wfc_roaming_default_mode, true);
+            }
+
+            imsManager.setWfcSetting(wfcEnabledByUser);
+            imsManager.setWfcRoamingSetting(voWifiRoamingEnabled);
+        }
+    }
+
+    private boolean isAlreadyLoadedEapApWithoutEapMethod(String ssid, int selSlot) {
+        if (mConfigList != null && !mConfigList.isEmpty()) {
+            for (WifiConfiguration config : mConfigList) {
+                if (config.SSID.trim().equals('"'+ssid.trim()+'"')
+                        && config.allowedKeyManagement.get(KeyMgmt.WPA_EAP)) {
+                    if (TctWifiUtil.getIsPresetAP(config)) {
+                        if (selSlot != TctWifiUtil.getSimSlot(config)) {
+                            logd("you have changed the sim slot,reload");
+                            mWifiManager.forget(config.networkId, null);
+                            mConfigList = mWifiManager.getConfiguredNetworks();
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public void loadPredefineNetworks(PersistableBundle config) {
+        if (WifiTracker.sVerboseLogging) {
+            //logd("loadPredefineNetworks mPreConfigNum: " + mPreConfigNum);
+            String simMcc = SystemProperties.get("gsm.sim.operator.numeric", "");
+            logd("loadPredefineNetworks simMcc:" + simMcc);
+        }
+
+        int preConfigNum = config.getInt(CarrierConfigManager.KEY_WIFI_NETWORK_EXIST, 0);
+        if (preConfigNum == 0) {
+            logd("There is not any configured AP");
+            return;
+        }
+
+        boolean isDeleteAp = config.getBoolean(CarrierConfigManager.KEY_WIFI_PRECONFIG_AP_DELETE, false);
+
+        synchronized(this) {
+            mConfigList = mWifiManager.getConfiguredNetworks();
+            getCurrentSimcardState();
+            deletePredefineNetworks(isDeleteAp);
+            addPredefineNetworks(preConfigNum, isDeleteAp, config);
+        }
+    }
+
+    /**
+     * method to judge whether sim card 1 or sim card 2 has been plugged in
+     */
+    public void getCurrentSimcardState() {
+        isSIM1Inserted = TelephonyManager.from(mContext).getSimState(0) == TelephonyManager.SIM_STATE_READY;
+        int simSum = TelephonyManager.from(mContext).getSimCount();
+        if (simSum == 2) {
+            isSIM2Inserted = TelephonyManager.from(mContext).getSimState(1) == TelephonyManager.SIM_STATE_READY;
+        }
+        isSIMInserted = isSIM1Inserted || isSIM2Inserted;
+        logd("isSIM1Inserted is " + isSIM1Inserted + " ,isSIM2Inserted is " + isSIM2Inserted);
+    }
+
+    private int getHighestPriority() {
+        int priority = 0;
+        if (mConfigList != null && !mConfigList.isEmpty()) {
+            for (WifiConfiguration config : mConfigList) {
+                if (!TctWifiUtil.getIsPresetAP(config) && (config.priority > priority)) {
+                    priority = config.priority;
+                }
+            }
+        }
+        logd("highest priority is " + priority);
+        return priority;
+    }
+
+    /**
+     * delete unused networks when wifi is on or sim card status changed
+     * usually, this action will be executed when one sim card has been plugged out
+     */
+    private void deletePredefineNetworks(boolean isDeleteAp) {
+        if (mConfigList == null || mConfigList.isEmpty()) {
+            logd("config is null, there's no any configured networks");
+            return;
+        }
+
+        boolean hasDeleteNetwork = false;
+
+        for (WifiConfiguration config : mConfigList) {
+            if (!TctWifiUtil.getIsPresetAP(config)) {
+                // it is not define ap, no need to delete, return!
+                logd("it is not define ap, no need to delete, return!");
+                continue;
+            }
+
+            String oldIdentity = config.enterpriseConfig.getIdentity();
+            if (WifiTracker.sVerboseLogging) {
+                logd("deletePredefineNetworks oldIdentity: " + oldIdentity);
+            }
+            if (isDeleteAp || (oldIdentity != null && !oldIdentity.isEmpty())) {
+                logd("config.SSID " + config.SSID);
+                //logd("config.imsi " + config.imsi);
+                logd("config.networkId " + config.networkId);
+                int slot = TctWifiUtil.getSimSlot(config);
+                logd("config simSlot " + slot);
+                // if (config.simSlot.equals("\"1\"")) {
+                //     slot = 1;
+                // }
+                int subId = TctWifiUtil.getSubId(slot);
+
+                String eapMethod = TctWifiUtil.getEapMethodStr(config.enterpriseConfig.getEapMethod());
+
+                if (!eapMethod.isEmpty()) {
+                    logd("telephonyEx.getSubscriberId() " + TelephonyManager.from(mContext).getSubscriberId(subId));
+                    String sTemp = TctWifiUtil.makeNAI(TelephonyManager.from(mContext).getSimOperator(subId), TelephonyManager.from(mContext).getSubscriberId(subId), eapMethod);
+                    logd("makeNAI:" + sTemp);
+                    if (sTemp.contains("error") && isSIMInserted) {
+                        continue;
+                    }
+
+                    if ((null == oldIdentity) || (oldIdentity != null && oldIdentity.isEmpty())) {
+                        continue;
+                    }
+
+                    if (!sTemp.equals(oldIdentity)
+                            || (!isSIM1Inserted && (slot == 0)) || (!isSIM2Inserted && (slot == 1))) {
+                        logd("this config is invalid for current sim card, so remove it");
+                        mWifiManager.removeNetwork(config.networkId);
+                        mWifiManager.saveConfiguration();
+                        hasDeleteNetwork = true;
+                        continue;
+                    }
+                    logd("user doesn't change or remove usim card");
+                }
+            }
+        }
+
+        if (hasDeleteNetwork) {
+            mConfigList = mWifiManager.getConfiguredNetworks();
+        }
+    }
+
+    /**
+     * add networks from customization file when wifi is on or sim card status changed
+     * usually, this action will be executed when one sim card has been plugged in or wifi has been on
+     */
+    private void addPredefineNetworks(int preConfigNum, boolean isDeleteAp, PersistableBundle config) {
+        logd("def_Settings_wifi_network_exist= " + preConfigNum + " isDeleteAp = "+isDeleteAp);
+        if(isDeleteAp && !isSIMInserted){
+            logd("The not is vzw simcard!");
+            return;
+        }
+        //load predefined networks from plf file and save wifi configuration
+        //currently, support at most 3 pre-config ap
+        for (int index = 0 ; index < preConfigNum ; index ++) {
+            addPreconfigNetwork(index + 1, config);
+        }
+    }
+
+    private void addPreconfigNetwork(int witchAp, PersistableBundle preConfig) {
+        String ssid = "";
+        String password = "";
+        String security = "";
+        String identity = "";
+        String eapMethod = "";
+
+        String mccCode = "";
+
+        String phase2 = "";
+        String caCert = "";
+        String userCert = "";
+        String anonymous = "";
+        int ssidPriority = 0;
+        String state = "";
+        if (witchAp == 1) {
+            //ssid = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_network_ssid);
+            ssid = preConfig.getString(CarrierConfigManager.KEY_WIFI_NETWORK_SSID, "");
+            //password = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_password);
+            //security = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_security_mode);
+            security = preConfig.getString(CarrierConfigManager.KEY_WIFI_SECURITY_MODE, "");
+            //identity = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_identity);
+            //eapMethod = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_method);
+            eapMethod = preConfig.getString(CarrierConfigManager.KEY_WIFI_EAP_METHOD, "");
+
+            //mccCode = mContext.getResources().getString(com.android.settings.R.string.def_Settings_preloaded_eap_sim_mcc_mnc);
+            //phase2 = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_phrase2_authentication);
+            //caCert = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_ca_certification);
+            //userCert = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_user_certificate);
+            //anonymous = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_anonymous_identity);
+            //ssidPriority = mContext.getResources().getInteger(com.android.settings.R.integer.def_Settings_wifi_priority);
+            //state = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_network_status);
+        } else if (witchAp == 2) {
+            //ssid = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_network_ssid_2);
+            ssid = preConfig.getString(CarrierConfigManager.KEY_WIFI_NETWORK_SSID_2, "");
+            //password = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_password_2);
+            //security = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_security_mode_2);
+            security = preConfig.getString(CarrierConfigManager.KEY_WIFI_SECURITY_MODE_2, "");
+            //identity = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_identity_2);
+            //eapMethod = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_method_2);
+            eapMethod = preConfig.getString(CarrierConfigManager.KEY_WIFI_EAP_METHOD_2, "");
+
+            //mccCode = mContext.getResources().getString(com.android.settings.R.string.def_Settings_preloaded_eap_sim_mcc_mnc_2);
+            //phase2 = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_phrase2_authentication_2);
+            //caCert = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_ca_certification_2);
+            //userCert = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_user_certificate_2);
+            //anonymous = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_anonymous_identity_2);
+            //ssidPriority = mContext.getResources().getInteger(com.android.settings.R.integer.def_Settings_wifi_priority_2);
+            //state = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_network_status_2);
+        } else if (witchAp == 3) {
+            //ssid = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_network_ssid_3);
+            ssid = preConfig.getString(CarrierConfigManager.KEY_WIFI_NETWORK_SSID_3, "");
+            //password = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_password_3);
+            //security = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_security_mode_3);
+            security = preConfig.getString(CarrierConfigManager.KEY_WIFI_SECURITY_MODE_3, "");
+            //identity = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_identity_3);
+            //eapMethod = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_method_3);
+            eapMethod = preConfig.getString(CarrierConfigManager.KEY_WIFI_EAP_METHOD_3, "");  
+
+            //mccCode = mContext.getResources().getString(com.android.settings.R.string.def_Settings_preloaded_eap_sim_mcc_mnc_3);
+            //phase2 = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_phrase2_authentication_3);
+            //caCert = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_ca_certification_3);
+            //userCert = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_user_certificate_3);
+            //anonymous = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_eap_anonymous_identity_3);
+            //ssidPriority = mContext.getResources().getInteger(com.android.settings.R.integer.def_Settings_wifi_priority_3);
+            //state = mContext.getResources().getString(com.android.settings.R.string.def_Settings_wifi_network_status_3);
+        }
+
+        logd("witchAp:" + witchAp);
+        logd("pre ssid:" + ssid);
+        logd("pre password:" + password);
+        logd("pre eap method:" + eapMethod);
+        logd("pre mccCode:" + mccCode);
+        logd("pre security:" + security);
+        logd("pre state:" + state);
+        logd("pre ssidPriority:" + ssidPriority);
+
+        int selSlot = -1;
+        if (security.equals("EAP") && (eapMethod.equals("SIM") || eapMethod.equals("AKA"))) {
+            // For EAP or AKA authentication, if there's no sim card inserted, no need to load
+            if (!isSIMInserted) {
+                return;
+            }
+
+           /* selSlot = getMatchedSimSlot(mccCode);
+            if (-1 == selSlot) {
+                logd(" current inserted SIM not equal to preloaded SIM on MCC_MNC or no sim card inserted");
+                return;
+            }
+
+            logd("selSlot::" + selSlot);
+            //if (isAlreadyLoadedEapAp(ssid, eapMethod, selSlot)) {
+            if (isAlreadyLoadedEapApWithoutEapMethod(ssid, selSlot)) {
+                logd(" current preloaded ap is alread existing");
+                return;
+            }*/
+        }
+
+        WifiConfiguration config = new WifiConfiguration();
+        config.SSID = AccessPoint.convertToQuotedString(ssid);
+        TctWifiUtil.setIsPresetAP(config, true);
+
+        if (!TextUtils.isEmpty(security) && (security.equals(PSK))) {
+            config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+            if (!TextUtils.isEmpty(password)) {
+                if (password.matches("[0-9A-Fa-f]{64}")) {
+                    config.preSharedKey = password;
+                } else {
+                    config.preSharedKey = '"' + password + '"';
+                }
+            }
+        } else if (!TextUtils.isEmpty(security) && (security.equals(WEP))) {
+            config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+            config.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
+            config.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.SHARED);
+            if (!TextUtils.isEmpty(password)) {
+                int length = password.length();
+                // WEP-40, WEP-104, and 256-bit WEP (WEP-232?)
+                if ((length == 10 || length == 26 || length == 58) && password.matches("[0-9A-Fa-f]*")) {
+                    config.wepKeys[0] = password;
+                } else {
+                    config.wepKeys[0] = '"' + password + '"';
+                }
+            }
+        } else if (!TextUtils.isEmpty(security) && (security.equals(EAP))) {
+            config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_EAP);
+            config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.IEEE8021X);
+            if (password.length() != 0) {
+                config.enterpriseConfig.setPassword(password);
+            }
+
+            int eapMethodIndex = TctWifiUtil.getEapMethodIndex(eapMethod);
+            if (eapMethodIndex != -1) {
+                config.enterpriseConfig.setEapMethod(eapMethodIndex);
+            }
+
+            int phase2MethodIndex = TctWifiUtil.getPhase2MethodIndex(phase2);
+            if (phase2MethodIndex != -1) {
+                config.enterpriseConfig.setPhase2Method(phase2MethodIndex);
+            }
+
+            config.enterpriseConfig.setIdentity(identity);
+
+            config.enterpriseConfig.setCaCertificateAlias((caCert.equals("")) ? "" :
+                    KEYSTORE_SPACE + Credentials.CA_CERTIFICATE + caCert);
+            config.enterpriseConfig.setClientCertificateAlias((userCert.equals("")) ? "" :
+                    KEYSTORE_SPACE + Credentials.USER_CERTIFICATE + userCert);
+            config.enterpriseConfig.setClientCertificateAlias((userCert.equals("")) ? "" :
+                    KEYSTORE_SPACE + Credentials.USER_PRIVATE_KEY + userCert);
+            config.enterpriseConfig.setAnonymousIdentity(anonymous);
+
+            if ("SIM".equals(eapMethod) || "AKA".equals(eapMethod)) {
+                config = setEapConfig(config, eapMethod, selSlot);
+            }
+        } else {
+            logd("OPEN");
+            config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+        }
+
+        if (!state.equals(AP_STATE_PUBLIC)) {
+            config.hiddenSSID = true;
+        } else {
+            config.hiddenSSID = false;
+        }
+
+        TctWifiUtil.setIsPresetAP(config, true);
+
+        //config.defineSsidPriority = ssidPriority;
+        highestPriority = getHighestPriority();
+        config.priority = highestPriority + ssidPriority;
+
+        WifiManager.ActionListener mSaveListener = new WifiManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                logd(" mWifiManager.save(config, null); is successed !!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            }
+            @Override
+            public void onFailure(int reason) {
+                logd(" mWifiManager.save(config, null); is failuer XXXXXXXXXXXXXXXXXXXXXXXXXXX");
+            }
+        };
+        mWifiManager.save(config, mSaveListener);
+    }
+
+    /*return value: -1,no sim card match
+     *              0,sim1 match
+     *              1,sim2,match
+     *              2:sim1&sim2 are using the same mccmnc and all match. 2 don't used,just backup
+     * single phone:simcc will show like 46000
+     * dual phone:simcc format:sim1 only:"46000",sim2 only:",46002" dual sim : "46000,46002"
+     *
+     * */
+    private int getMatchedSimSlot(String definedMccCode) {
+
+        logd("current preloaded MccCode is: " + definedMccCode);
+        if (isSIMInserted) {
+            //get mcc code from phone when sim card is inserted
+            String simMcc = SystemProperties.get("gsm.sim.operator.numeric", "");
+            logd("simMcc:" + simMcc);
+            String simMccSplit[] = simMcc.split(",");
+
+            if (simMccSplit == null || simMccSplit.length == 0) {
+                logd("simMccSplit length equal 0");
+                return -1;
+            }
+
+            if (isSIM1Inserted && TctWifiUtil.checkSimMccMatch(simMccSplit[0], definedMccCode)) {
+                return 0;
+            }
+
+            if (isSIM2Inserted && simMccSplit.length == 2
+                    && TctWifiUtil.checkSimMccMatch(simMccSplit[1], definedMccCode)) {
+                return 1;
+            }
+
+        }
+
+        return -1;
+    }
+
+    /* config:the wifi config
+     * eapType:sim or aka
+     * slot:the config slot,0 slot 1,1->slot2
+     * */
+    private WifiConfiguration setEapConfig(WifiConfiguration config, String eapType, int selSlot) {
+        if (selSlot == 0 || selSlot == 1) {
+            //int subId = TctWifiUtil.getSubId(selSlot);
+            //config.imsi = makeNAI(mTm.getSimOperator(subId), mTm.getSubscriberId(subId), eapType);
+            TctWifiUtil.setSimSlot(config, selSlot);
+            //config.simSlot = "\"" + String.valueOf(selSlot) + "\"";
+        } else {
+            logd("exception selSlot found,selSlot::" + selSlot);
+        }
+
+        return config;
+    }
+
+    private void updateModemSettings(int phoneId, PersistableBundle config) {
+        Phone phone = PhoneFactory.getPhone(phoneId);
+
+        String vm_number = config.getString(CarrierConfigManager.KEY_DEFAULT_VM_NUMBER_STRING, "");
+        int geaAlgorithm = config.getInt(CarrierConfigManager.KEY_GEA_ALGORITHM_INT, 0xFF);
+        int wbAmr = (m_dsd_locked && mConfigFromDSDLocked != null) ?
+                mConfigFromDSDLocked.getInt(CarrierConfigManager.KEY_WB_AMR_INT, 0xFF) :
+                config.getInt(CarrierConfigManager.KEY_WB_AMR_INT, 0xFF);
+        boolean volteRoaming = config.getBoolean(CarrierConfigManager.KEY_VOLTE_ROAMING_BOOL, false);
+        boolean smsCBEnabled = config.getBoolean(CarrierConfigManager.KEY_SMS_CELL_BROADCAST_ENABLED, false);
+        String[] ecc_list = config.getStringArray(CarrierConfigManager.KEY_ECC_NUMBER_LIST);
+
+        logd("update modem[" + phoneId + "]"
+                + " vm_number: " + vm_number
+                + " GEA: " + geaAlgorithm
+                + " WB ARM: " + wbAmr
+                + " volte roaming: " + volteRoaming
+                + " sms CB enabled: " + smsCBEnabled
+                + " ECC list: " + Arrays.toString(ecc_list));
+
+        if (!vm_number.isEmpty()) {
+            phone.setVoiceMailNumber(
+                    phone.getVoiceMailAlphaTag().toString(),
+                    vm_number,
+                    null);
+        }
+
+        if (geaAlgorithm != 0xFF) {
+            try {
+                mSysRil.setInt8Val(ISysRilCmd.RIL_SUB_CMD_INT8_GEA_ALGORITHM, (byte)geaAlgorithm);
+            } catch (Exception e) {
+                loge("failed to set gea_algorithm");
+                //loge(e.getMessage());
+            }
+        }
+
+        if (wbAmr != 0xFF) {
+            try {
+                mSysRil.setInt8Val(ISysRilCmd.RIL_SUB_CMD_INT8_WB_AMR, (byte)wbAmr);
+            } catch (Exception e) {
+                loge("failed to set wb_amr");
+                //loge(e.getMessage());
+            }
+        }
+
+        try {
+            mSysRil.setInt8Val(ISysRilCmd.RIL_SUB_CMD_INT8_VOLTE_ROAMING, (byte)(volteRoaming ? 1 : 0));
+        } catch (Exception e) {
+            loge("failed to set volte_roaming");
+            //loge(e.getMessage());
+        }
+
+        try {
+            mSysRil.setInt8Val(ISysRilCmd.RIL_SUB_CMD_INT8_SMSCB_ENABLED, (byte) (smsCBEnabled ? 1 : 0));
+        } catch (Exception e) {
+            loge("failed to set sms CB enabled");
+        }
+
+        if (ecc_list != null) {
+            String ecc_num_str = null;
+            for (String ecc_num : ecc_list) {
+                if (ecc_num_str == null)
+                    ecc_num_str = ecc_num + ",";
+                else
+                    ecc_num_str += ecc_num + ",";
+            }
+
+            if (!ecc_num_str.isEmpty()) {
+                logd("set ecc list: " + ecc_num_str + " by phone: " + phoneId);
+                try {
+                    mSysRil.setStringValByPhone(ISysRilCmd.RIL_SUB_CMD_STRING_ECC_NUM_LIST, ecc_num_str, phoneId);
+                    // TODO temporary modification
+                    //m_reboot = true; // effect after reboot
+                } catch (Exception e) {
+                    loge("failed to set ecc_list:");
+                    //loge(e.getMessage());
+                }
+            }
+        }
+    }
+
+    private QcRilHookCallback mQcrilHookCb = new QcRilHookCallback() {
+        @Override
+        public void onQcRilHookReady() {
+            logd(" onQcRilHookReady");
+            try {
+                loge("set sms CB enabled in the beginning");
+                mSysRil.setInt8Val(ISysRilCmd.RIL_SUB_CMD_INT8_SMSCB_ENABLED, (byte) 1);
+            } catch (Exception e) {
+                loge("failed to set sms CB enabled in the beginning");
+            }
+        }
+
+        @Override
+        public void onQcRilHookDisconnected() {
+            logd(" onQcRilHookDisconnected");
+        }
+    };
+
+    private String spaceReplace(String strOld){
+        String[] split = strOld.trim().split(" ");
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < split.length - 1; i++) {
+            stringBuilder.append(split[i]).append("_");
+        }
+        stringBuilder.append(split[split.length - 1]);
+        String strNew = stringBuilder.toString();
+        return strNew;
+    }
+    // add by T2M.dengxiangyu for FP4-61 2021-04-14 end
+
     /** Builds a canonical file name for a config file. */
     private static String getFilenameForConfig(
             @NonNull String packageName, @NonNull String extraString,
@@ -1145,13 +1990,13 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     @Override
     @NonNull
     public PersistableBundle getConfigForSubIdWithFeature(int subId, String callingPackage,
-            String callingFeatureId) {
-        if (!TelephonyPermissions.checkCallingOrSelfReadPhoneState(mContext, subId, callingPackage,
-                callingFeatureId, "getCarrierConfig")) {
+                                                          String callingFeatureId) {
+        if (!isCustomerWhiteList(callingPackage) && !TelephonyPermissions.checkCallingOrSelfReadPhoneState(mContext, subId, callingPackage,
+                callingFeatureId, "getCarrierConfig!!!!!!!!!!")) {
             return new PersistableBundle();
         }
-
         int phoneId = SubscriptionManager.getPhoneId(subId);
+        logd("getConfigForSubIdWithFeature subid: " + subId + " phoneid: " + phoneId+" callingPackage: "+callingPackage);
         PersistableBundle retConfig = CarrierConfigManager.getDefaultConfig();
         if (SubscriptionManager.isValidPhoneId(phoneId)) {
             PersistableBundle config = mConfigFromDefaultApp[phoneId];
@@ -1167,20 +2012,43 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                 retConfig.putAll(config);
                 retConfig.putBoolean(CarrierConfigManager.KEY_CARRIER_CONFIG_APPLIED_BOOL, true);
             }
+
+            // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
+            //config = mConfigFromDSDLocked;
+            //if (config != null) {
+            //    logd("return DSD locked carrierconfig");
+            //    retConfig.putAll(config);
+            //    retConfig.putBoolean(CarrierConfigManager.KEY_CARRIER_CONFIG_APPLIED_BOOL, true);
+            //}
+            // add by T2M.dengxiangyu for FP4-61 2021-04-14 end
+
             config = mPersistentOverrideConfigs[phoneId];
             if (config != null) {
+                logd("return persistent override carrierconfig[" + phoneId + "]: " + config);
                 retConfig.putAll(config);
                 retConfig.putBoolean(CarrierConfigManager.KEY_CARRIER_CONFIG_APPLIED_BOOL, true);
             }
             config = mOverrideConfigs[phoneId];
             if (config != null) {
+                logd("return override carrierconfig[" + phoneId + "]: " + config);
                 retConfig.putAll(config);
             }
         } else {
             if (mNoSimConfig != null) {
                 retConfig.putAll(mNoSimConfig);
             }
+
+            // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
+            //if (m_dsd_locked) {
+            //    PersistableBundle config = mConfigFromDSDLocked;
+            //    if (config != null) {
+            //        logd("if no sim, append DSD locked carrierconfig");
+            //        retConfig.putAll(config);
+            //    }
+            //}
+            // add by T2M.dengxiangyu for FP4-61 2021-04-14 end
         }
+
         return retConfig;
     }
 
@@ -1268,6 +2136,103 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                 break;
             case IccCardConstants.INTENT_VALUE_ICC_LOADED:
             case IccCardConstants.INTENT_VALUE_ICC_LOCKED:
+                // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
+                // check DSD locked list & boot cid list when icc ready
+                // follow the original process if DSD locked
+                if (!m_dsd_locked
+                        && simState == IccCardConstants.INTENT_VALUE_ICC_LOADED) {
+                    String eID = null;
+                    int phoneid_esim = 1; // ESIM always in slot2
+                    int state_esim = TelephonyManager.SIM_STATE_UNKNOWN;
+                    TelephonyManager teleManager = TelephonyManager.from(mContext);
+                    final List<UiccCardInfo> infos = teleManager.getUiccCardsInfo();
+
+                    for (UiccCardInfo info : infos) {
+                        if (info.isEuicc()) {
+                            eID = info.getEid();
+                            logd("get uicc eid: " + eID);
+                            if (TextUtils.isEmpty(eID)) {
+                                eID = mEuiccManager.createForCardId(info.getCardId()).getEid();
+                                logd("get euicc eid: " + eID);
+                            }
+
+                            if (eID != null) {
+                                phoneid_esim = info.getSlotIndex();
+                                state_esim = teleManager.getSimState(phoneid_esim);
+                                logd("euicc phoneid: " + phoneid_esim + " state: " + state_esim);
+                            }
+                        }
+                    }
+
+                    if ((state_esim == TelephonyManager.SIM_STATE_READY // use it first if ESIM exist
+                            && phoneId == phoneid_esim)
+                            || (state_esim != TelephonyManager.SIM_STATE_READY // use physical SIM if ESIM is none
+                            && phoneId != phoneid_esim)) {
+                        String operator = teleManager.getSimOperatorNameForPhone(phoneId);
+                        String country = teleManager.getSimCountryIsoForPhone(phoneId);
+                        logd("current country: " + country + " operator: " + operator);
+                        SystemProperties.set(PROP_OPERATOR, spaceReplace(operator).toLowerCase());
+                        SystemProperties.set(PROP_COUNTRY, country.toLowerCase());
+                        CarrierIdentifier carrierId = getCarrierIdentifierForPhoneId(phoneId);
+                        SystemProperties.set(PROP_MCC_MNC, carrierId.getMcc() + carrierId.getMnc());
+                        SystemProperties.set(PROP_GID1, carrierId.getGid1());
+                        m_esim_handled = true;
+                    }
+
+                    if (inDSDFlowFileList(phoneId, R.xml.dsd_locked_list, "dsd_locked")) {
+                        if (phoneId == phoneid_esim) { // lock it first if ESIM in dsd list
+                            logd("set dsd locked eSIM" + phoneId);
+                            m_update_dsd_locked_config = true;
+                            m_dsd_locked = true;
+                            m_phoneid_dsd_locked = phoneId;
+                            SystemProperties.set(DSDLOCKED_CARRIERID, "1");
+                            SystemProperties.set(DSDLOCKED_PHONEID, String.valueOf(m_phoneid_dsd_locked));
+                        } else { // physical SIM in dsd list
+                            if (!SubscriptionManager.isValidPhoneId(m_phoneid_dsd_locked_sim)) {
+                                logd("save dsd locked SIM" + phoneId);
+                                m_phoneid_dsd_locked_sim = phoneId;
+                            }
+                        }
+                    }
+
+                    if (!SubscriptionManager.isValidPhoneId(m_phoneid_dsd_locked) && m_esim_handled) {
+                        if (SubscriptionManager.isValidPhoneId(m_phoneid_dsd_locked_sim)) {
+                            logd("set dsd locked SIM" + phoneId);
+                            m_update_dsd_locked_config = true;
+                            m_dsd_locked = true;
+                            m_phoneid_dsd_locked = m_phoneid_dsd_locked_sim;
+                            SystemProperties.set(DSDLOCKED_CARRIERID, "1");
+                            SystemProperties.set(DSDLOCKED_PHONEID, String.valueOf(m_phoneid_dsd_locked));
+                        }
+                    }
+
+                    if (inDSDFlowFileList(phoneId, R.xml.boot_cid_list, "boot_cid")) {
+                        if (phoneId == phoneid_esim) {
+                            logd("set boot eSIM" + phoneId);
+                            CarrierIdentifier carrierId = getCarrierIdentifierForPhoneId(phoneId);
+                            SystemProperties.set(BOOT_CARRIERID, String.valueOf(carrierId.getMcc() + carrierId.getMnc()));
+                            m_reboot = true;
+                            m_phoneid_boot = phoneId;
+                        } else {
+                            if (!SubscriptionManager.isValidPhoneId(m_phoneid_boot_sim)) {
+                                logd("save boot SIM" + phoneId);
+                                m_phoneid_boot_sim = phoneId;
+                            }
+                        }
+                    }
+
+                    if (!SubscriptionManager.isValidPhoneId(m_phoneid_boot) && m_esim_handled) {
+                        if (SubscriptionManager.isValidPhoneId(m_phoneid_boot_sim)) {
+                            logd("set boot SIM" + phoneId);
+                            CarrierIdentifier carrierId = getCarrierIdentifierForPhoneId(m_phoneid_boot_sim);
+                            SystemProperties.set(BOOT_CARRIERID, String.valueOf(carrierId.getMcc() + carrierId.getMnc()));
+                            m_reboot = true;
+                            m_phoneid_boot = phoneId;
+                        }
+                    }
+                }
+                // add by T2M.dengxiangyu for FP4-61 2021-04-14 end
+
                 updateConfigForPhoneId(phoneId);
                 break;
         }
@@ -1583,5 +2548,18 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private void loge(String msg) {
         Log.e(LOG_TAG, msg);
         mCarrierConfigLoadingLog.log(msg);
+    }
+
+    private boolean isCustomerWhiteList(String pkg) {
+        return pkg.equals("com.android.providers.partnerbookmarks");
+    }
+
+    public PersistableBundle getConfigLocked(int subId, String callingPackage) {
+        logd("getConfigLocked~~");
+        if (m_dsd_locked && mConfigFromDSDLocked != null) {
+            return mConfigFromDSDLocked;
+        }
+        return getConfigForSubId(subId, callingPackage);
+
     }
 }
