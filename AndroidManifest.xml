@@ -420,17 +420,20 @@
 
         <activity android:name="com.android.phone.settings.fdn.GetPin2Screen"
                 android:label="@string/get_pin2"
+                android:exported="true"
                 android:theme="@style/DialerSettingsLight"
                 android:windowSoftInputMode="stateVisible">
         </activity>
 
         <activity android:name="com.android.phone.settings.fdn.EditFdnContactScreen"
                 android:theme="@style/DialerSettingsLight"
+                android:exported="true"
                 android:windowSoftInputMode="stateVisible">
         </activity>
 
         <activity android:name="com.android.phone.settings.fdn.DeleteFdnContactScreen"
                 android:theme="@style/DialerSettingsLight"
+                android:exported="true"
                 android:label="@string/delete_fdn_contact">
         </activity>
 
@@ -477,10 +480,12 @@
         </activity>
 
         <!-- CDMA Emergency Callback Mode -->
-        <service android:name="EmergencyCallbackModeService">
+        <service android:name="EmergencyCallbackModeService"
+                android:exported="true">
         </service>
 
-        <service android:name="SmsCallbackModeService">
+        <service android:name="SmsCallbackModeService"
+                android:exported="true">
         </service>
 
         <!-- service to dump telephony information -->
@@ -593,6 +598,7 @@
         </activity>
         <activity android:name="MMIDialogActivity"
                 android:configChanges="orientation|screenSize|keyboardHidden"
+                android:exported="true"
                 android:excludeFromRecents="true"
                 android:launchMode="singleInstance"
                 android:theme="@style/Empty">
