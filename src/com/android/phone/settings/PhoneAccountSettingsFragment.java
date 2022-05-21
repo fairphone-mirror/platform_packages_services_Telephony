@@ -388,13 +388,14 @@ public class PhoneAccountSettingsFragment extends PreferenceFragment
                 mMakeAndReceiveCallsCategory.removePreference(mDefaultOutgoingAccount);
                 mMakeAndReceiveCallsCategoryPresent = false;
             }
-
-            if (isXdivertAvailable) {
+                /* add by T2M.zhangrenjie for FP4-1958 begin */
+            /*if (isXdivertAvailable) {
                 if (mSmartDivertPref != null) {
                     Log.d(LOG_TAG, "Add smart divert preference");
                     mAccountList.addPreference(mSmartDivertPref);
                 }
-            }
+            }*/
+                /* add by T2M.zhangrenjie for FP4-1958 end */
         }
     }
 
