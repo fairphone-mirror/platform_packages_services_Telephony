@@ -2285,4 +2285,5 @@
     <string name="mobile_data_title">Mobile data</string>
     <string name="mobile_data_content">Mobile data is enabled by default on this device.\nThis could result in charges,depending on your tariff.\nIf you chose to disable mobile data it can be enabled again at any time in the device settings.</string>
     <string name="mobile_data_next_button">Next</string>
+    <string name="dsd_rebooting">"Setting up your phone. Be patient while it reboots"</string>
 </resources>
