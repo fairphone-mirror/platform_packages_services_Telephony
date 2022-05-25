@@ -21,6 +21,7 @@ import android.content.Context;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.telecom.Connection;
 import android.telecom.Connection.VideoProvider;
 import android.telecom.DisconnectCause;
@@ -28,6 +29,7 @@ import android.telecom.PhoneAccountHandle;
 import android.telecom.StatusHints;
 import android.telecom.TelecomManager;
 import android.telecom.VideoProfile;
+import android.telephony.CarrierConfigManager;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
@@ -1615,18 +1617,40 @@ public class ImsConference extends TelephonyConferenceBase implements Holdable {
             if (phone != null) {
                 Context context = phone.getContext();
                 String displaySubId = "";
+                String label = null;
+
+                CarrierConfigManager configMgr = (CarrierConfigManager)
+                        context.getSystemService(Context.CARRIER_CONFIG_SERVICE);
+
                 if (TelephonyManager.getDefault().getActiveModemCount() > 1) {
                     final int phoneId = mConferenceHost.getPhone().getPhoneId();
                     SubscriptionInfo sub = SubscriptionManager.from(
                             mConferenceHost.getPhone().getContext())
                         .getActiveSubscriptionInfoForSimSlotIndex(phoneId);
                     if (sub != null) {
-                        displaySubId = sub.getDisplayName().toString();
-                        displaySubId  = " " + displaySubId;
+                        displaySubId = " " + sub.getDisplayName().toString();
+                        PersistableBundle b = configMgr.getConfigForSubId(sub.getSubscriptionId());
+                        if (b != null) {
+                            label = b.getString(CarrierConfigManager.KEY_WIFI_CALLING_DISPLAY);
+                            Log.i(this, "updateStatusHints: phoneId = "+phoneId + ","+label);
+                        }
+                        if (label == null) {
+                            label = context.getString(R.string.status_hint_label_wifi_call) + displaySubId;
+                        }
+                    }
+                } else {
+                    PersistableBundle b = configMgr.getConfig();
+                    if (b != null) {
+                        label = b.getString(CarrierConfigManager.KEY_WIFI_CALLING_DISPLAY);
                     }
                 }
+
+                if (label == null) {
+                    label = context.getString(R.string.status_hint_label_wifi_call);
+                }
+
                 StatusHints hints = new StatusHints(
-                        context.getString(R.string.status_hint_label_wifi_call) + displaySubId,
+                        label,
                         Icon.createWithResource(
                                 context, R.drawable.ic_signal_wifi_4_bar_24dp),
                         null /* extras */);

@@ -3338,8 +3338,19 @@ abstract class TelephonyConnection extends Connection implements Holdable,
             }
 
             Context context = getPhone().getContext();
+
+            String label = getResourceString(labelId) + displaySubId;
+            PersistableBundle carrierconfig = getCarrierConfig();
+            if (carrierconfig != null && !isValidRingingCall()) {
+                String label_from_carrier = carrierconfig.getString(CarrierConfigManager.KEY_WIFI_CALLING_DISPLAY);
+                if (label_from_carrier != null) {
+                    label = label_from_carrier;
+                    Log.i(this, "updateStatusHints: label_from_carrier = " + label);
+                }
+            }
+
             setTelephonyStatusHints(new StatusHints(
-                    getResourceString(labelId) + displaySubId,
+                    label,
                     Icon.createWithResource(
                             context, R.drawable.ic_signal_wifi_4_bar_24dp),
                     null /* extras */));
