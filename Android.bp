@@ -70,10 +70,12 @@ android_app {
         "ecc/output",
     ],
 
-    platform_apis: true,
-
     certificate: "platform",
     privileged: true,
+
+     defaults: [
+         "framework-wifi-vendor-hide-access-defaults",
+     ],
 
     optimize: {
         proguard_flags_files: [
