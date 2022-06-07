@@ -88,10 +88,12 @@ android_app {
         "--extra-packages com.android.services.telephony.sip",
     ],
 
-    platform_apis: true,
-
     certificate: "platform",
     privileged: true,
+
+     defaults: [
+         "framework-wifi-vendor-hide-access-defaults",
+     ],
 
     optimize: {
         proguard_flags_files: [
