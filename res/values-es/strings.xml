@@ -917,9 +917,6 @@
     <string name="smart_divert_title">Smart-Divert</string>
     <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
     <string name="smart_divert_summary">Configuración de CFNRc</string>
-    <string name="mobile_data_setting_title">Datos moviles</string>
-    <string name="mobile_data_setting_description">Los datos moviles estan habilitados por defecto en este dispositivo.\nEsto podria resultar en cargos, dependiendo de su tarifa.\nSi elige desactivar los datos moviles, puede volver a activarlos en cualquier momento en la configuracion del dispositivo.</string>
-    <string name="mobile_data_setting">Habilitar los datos moviles</string>
     <string name="labelCFVoice">Voz</string>
     <string name="call_forward_option">Opciones de desvío de llamadas</string>
     <string name="vibrating_for_outgoing_call_accepted_title">Vibración para llamada saliente aceptada</string>

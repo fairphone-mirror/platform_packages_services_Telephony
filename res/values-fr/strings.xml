@@ -918,9 +918,6 @@
     <string name="smart_divert_title">Smart-Divert</string>
     <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
     <string name="smart_divert_summary">Paramètres du CFNRc</string>
-    <string name="mobile_data_setting_title">Données mobiles</string>
-    <string name="mobile_data_setting_description">Les données mobiles sont activées par défaut sur cet appareil.\nCela peut entraîner des frais, en fonction de votre forfait téléphonique.\nSi vous avez choisi de désactiver les données mobiles, elles peuvent être réactivées à tout moment dans les paramètres de l\'appareil.</string>
-    <string name="mobile_data_setting">Activer les données mobiles</string>
     <string name="labelCFVoice">Voix</string>
     <string name="call_forward_option">"Options de renvoi d\'appel"</string>
     <string name="vibrating_for_outgoing_call_accepted_title">Vibrations pour appel sortant acceptées</string>

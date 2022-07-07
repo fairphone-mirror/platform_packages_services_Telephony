@@ -305,14 +305,6 @@
                   android:theme="@android:style/Theme.Translucent.NoTitleBar"
                   android:exported="false"/>
 
-        <!-- Mobile Data Setting Page -->
-        <activity android:name="MobileDataSettingActivity">
-            <intent-filter>
-                <action android:name="com.android.internal.telephony.MOBILE_DATA_SETTING" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
         <activity android:name="GsmUmtsCallOptions"
                 android:label="@string/gsm_umts_options"
                 android:theme="@style/DialerSettingsLight">
