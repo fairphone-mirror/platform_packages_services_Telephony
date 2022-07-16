@@ -1466,9 +1466,18 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                     data_roaming_enabled);
 
             logd("update default network mode for phone: " + phoneId + ", subId: " + subIds[0]);
-            telephonyManager.setAllowedNetworkTypesForReason(
-                    TelephonyManager.ALLOWED_NETWORK_TYPES_REASON_CARRIER,
-                    RadioAccessFamily.getRafFromNetworkType(default_nwmode));
+            // modify by T2M.zhang renjie for FP4S-349 22-7-16 begin
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    telephonyManager.setAllowedNetworkTypesForReason(
+                            TelephonyManager.ALLOWED_NETWORK_TYPES_REASON_CARRIER,
+                            RadioAccessFamily.getRafFromNetworkType(default_nwmode));
+                }
+            }).start();
+
+            // modify by T2M.zhang renjie for FP4S-349 22-7-16 end
+
         }
 
         Intent timeChanged = new Intent(Intent.ACTION_TIME_CHANGED);
@@ -2188,13 +2197,13 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                 break;
             case IccCardConstants.INTENT_VALUE_ICC_LOADED:
             case IccCardConstants.INTENT_VALUE_ICC_LOCKED:
-            case ExtTelephonyManager.SIM_STATE_ESSENTIAL_RECORDS_LOADED:
+                // modify by T2M.zhang renjie for FP4S-349 22-7-16 begin
+                
                 // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
                 // check DSD locked list & boot cid list when icc ready
                 // follow the original process if DSD locked
                 if (!m_dsd_locked
-                        && (simState == IccCardConstants.INTENT_VALUE_ICC_LOADED
-                        || simState == ExtTelephonyManager.SIM_STATE_ESSENTIAL_RECORDS_LOADED)) {
+                        && simState == IccCardConstants.INTENT_VALUE_ICC_LOADED) {
                     String eID = null;
                     int phoneid_esim = 1; // ESIM always in slot2
                     int state_esim = TelephonyManager.SIM_STATE_UNKNOWN;
@@ -2286,15 +2295,16 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                     }
                 }
                 // add by T2M.dengxiangyu for FP4-61 2021-04-14 end
-
-                if (simState == ExtTelephonyManager.SIM_STATE_ESSENTIAL_RECORDS_LOADED) {
-                    mIsEssentialSimRecordsLoaded[phoneId] = true;
-                } else {
-                    mIsEssentialSimRecordsLoaded[phoneId] = false;
-                }
-
+                mIsEssentialSimRecordsLoaded[phoneId] = false;
                 updateConfigForPhoneId(phoneId);
                 break;
+                // modify by T2M.zhang renjie for FP4S-349 22-7-16 end
+
+            case ExtTelephonyManager.SIM_STATE_ESSENTIAL_RECORDS_LOADED:
+                mIsEssentialSimRecordsLoaded[phoneId] = true;
+                updateConfigForPhoneId(phoneId);
+                break;
+
         }
     }
 
