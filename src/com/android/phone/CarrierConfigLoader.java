@@ -2313,11 +2313,11 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                         String operator = teleManager.getSimOperatorNameForPhone(phoneId);
                         String country = teleManager.getSimCountryIsoForPhone(phoneId);
                         logd("current country: " + country + " operator: " + operator);
-                        //SystemProperties.set(PROP_OPERATOR, spaceReplace(operator).toLowerCase());
-                        //SystemProperties.set(PROP_COUNTRY, country.toLowerCase());
+                        SystemProperties.set(PROP_OPERATOR, spaceReplace(operator).toLowerCase());
+                        SystemProperties.set(PROP_COUNTRY, country.toLowerCase());
                         CarrierIdentifier carrierId = getCarrierIdentifierForPhoneId(phoneId);
-                        //SystemProperties.set(PROP_MCC_MNC, carrierId.getMcc() + carrierId.getMnc());
-                        //SystemProperties.set(PROP_GID1, carrierId.getGid1());
+                        SystemProperties.set(PROP_MCC_MNC, carrierId.getMcc() + carrierId.getMnc());
+                        SystemProperties.set(PROP_GID1, carrierId.getGid1());
                         m_esim_handled = true;
                     }
 
