@@ -2065,7 +2065,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     @NonNull
     public PersistableBundle getConfigForSubIdWithFeature(int subscriptionId, String callingPackage,
             String callingFeatureId) {
-        if (!TelephonyPermissions.checkCallingOrSelfReadPhoneState(mContext, subscriptionId,
+        if (!isCustomerWhiteList(callingPackage) && !TelephonyPermissions.checkCallingOrSelfReadPhoneState(mContext, subscriptionId,
                 callingPackage, callingFeatureId, "getCarrierConfig")) {
             return new PersistableBundle();
         }
@@ -2314,6 +2314,9 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                 android.Manifest.permission.READ_PRIVILEGED_PHONE_STATE,
                 "getDefaultCarrierServicePackageName");
         return mPlatformCarrierConfigPackage;
+    }
+    private boolean isCustomerWhiteList(String pkg) {
+        return pkg.equals("com.android.providers.partnerbookmarks");
     }
 
     @VisibleForTesting
