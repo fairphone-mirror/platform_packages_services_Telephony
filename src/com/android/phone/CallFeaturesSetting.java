@@ -583,6 +583,7 @@ public class CallFeaturesSetting extends PreferenceActivity
             prefSet.removePreference(mImsSettingsScreen);
         }*/
         /* add by T2M.zhangrenjie for FP4-1958 end */
+        prefSet.removePreference(mImsSettingsScreen);
         boolean useWfcHomeModeForRoaming = carrierConfig.getBoolean(
                     CarrierConfigManager.KEY_USE_WFC_HOME_NETWORK_MODE_IN_ROAMING_NETWORK_BOOL,
                     false);
