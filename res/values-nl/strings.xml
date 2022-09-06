@@ -939,4 +939,6 @@
     <string name="install_messages_on_work_profile_action_str" msgid="3773440996395152903">"Werk-app voor berichten installeren"</string>
     <string name="call_forward_option">"Opties voor doorschakelen."</string>
     <string name="labelCFVoice">"Stem"</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Trillen voor uitgaand telefoongesprek geaccepteerd.</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Activeer trilmodus voor uitgaand gesprek geaccepteerd</string>
 </resources>
