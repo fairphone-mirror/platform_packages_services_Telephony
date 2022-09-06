@@ -919,4 +919,5 @@
     <string name="call_quality_notification_bluetooth_details" msgid="8348950331707346711">"Il segnale del Bluetooth è debole. Prova a passare al vivavoce."</string>
     <string name="call_quality_notification_name" msgid="3476828289553948830">"Notifica sulla qualità della chiamata"</string>
     <string name="notification_channel_sip_account" msgid="1261816025156179637">"Account SIP deprecati"</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibrazione per chiamata in uscita accettata.</string>
 </resources>
