@@ -439,11 +439,19 @@ public class GsmUmtsCallBarringOptions extends TimeConsumingPreferenceActivity
         boolean disableChangePasswordOverIms = false;
 
         ImsPhone imsPhone = mPhone != null ? (ImsPhone) mPhone.getImsPhone() : null;
+        //[BUG]-Modify-Begin by shaopan.tang 2022-08-31 [FP4-3540]Enable Deactive All option in call barring for vodafone nl
+        String operator = TelephonyManager.from(this).getNetworkOperator(mSubscriptionInfoHelper.getSubId());
         if (imsPhone != null && imsPhone.isUtEnabled()) {
-            useDisableaAll = false;
+            if (operator != null && !operator.isEmpty() && operator.equals("20404")){//20404 vodafone nl
+                useDisableaAll = true;
+            } else {
+                useDisableaAll = false;
+            }
+            Log.d(LOG_TAG, "onCreate, useDisableaAll " + useDisableaAll);
             disableOutCallBarringOverIms = isDisableOutCallBarringOverIms();
             disableChangePasswordOverIms = isDisableChangePasswordOverIms();
         }
+        //[BUG]-Modify-End by shaopan.tang
 
         // Find out if the sim card is ready.
         boolean isSimReady = TelephonyManager.from(this).getSimState(
