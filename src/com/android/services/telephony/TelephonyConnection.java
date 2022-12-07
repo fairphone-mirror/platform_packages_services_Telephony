@@ -3341,7 +3341,7 @@ abstract class TelephonyConnection extends Connection implements Holdable,
 
             String label = getResourceString(labelId) + displaySubId;
             PersistableBundle carrierconfig = getCarrierConfig();
-            if (carrierconfig != null && !isValidRingingCall()) {
+            if (carrierconfig != null) {
                 String label_from_carrier = carrierconfig.getString(CarrierConfigManager.KEY_WIFI_CALLING_DISPLAY);
                 if (label_from_carrier != null) {
                     label = label_from_carrier;
