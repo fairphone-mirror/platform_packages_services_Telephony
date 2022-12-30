@@ -256,6 +256,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     // modify by T2M.zhangrenjie for FP4S-683 2022/10/13 begin
     private static final String PROP_FET_OTA_UPDATE = "persist.ril.sim.fet_update";
     // modify by T2M.zhangrenjie for FP4S-683 2022/10/13 end
+    private boolean hasOTAUpdate = false;
     private static final String KEY_CID = "cid", KEY_MCC = "mcc", KEY_MNC = "mnc";
     private PersistableBundle mConfigFromDSDLocked = null;
     private static final int EVENT_DSD_BEGIN = 22; // same as last event EVENT_FETCH_DEFAULT_FOR_NO_SIM_CONFIG_TIMEOUT
@@ -671,9 +672,9 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                         if (!hasRefresh) {
                               clearCachedConfigForPackage(1881);
                               SystemProperties.set(PROP_FET_OTA_UPDATE, "true");
+                              hasOTAUpdate = true;
                         }
                         // modify by T2M.zhangrenjie for FP4S-683 2022/10/13 end
-                      
                         sharedPrefs
                                 .edit()
                                 .putString(KEY_FINGERPRINT, Build.FINGERPRINT)
@@ -1459,6 +1460,12 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     }
 
     private void updateSettingsProvider(int phoneId, PersistableBundle config) {
+        // modify by T2M.zhangrenjie for FP4S-767 2022/12/30 begin
+        if (hasOTAUpdate){
+            Log.i(LOG_TAG, "skip updateSettingsProvider when OTA first delete config file");
+            return;
+        }
+        // modify by T2M.zhangrenjie for FP4S-767 2022/12/30 end
         ContentResolver resolver = mContext.getContentResolver();
         Phone phone = PhoneFactory.getPhone(phoneId);
         final ImsManager imsManager = ImsManager.getInstance(mContext, phoneId);
@@ -1944,6 +1951,12 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     }
 
     private void updateModemSettings(int phoneId, PersistableBundle config) {
+        // modify by T2M.zhangrenjie for FP4S-767 2022/12/30 begin
+        if (hasOTAUpdate){
+            Log.i(LOG_TAG, "skip updateModemSettings when OTA first delete config file");
+            return;
+        }
+        // modify by T2M.zhangrenjie for FP4S-767 2022/12/30 end
         Phone phone = PhoneFactory.getPhone(phoneId);
 
         String vm_number = config.getString(CarrierConfigManager.KEY_DEFAULT_VM_NUMBER_STRING, "");
