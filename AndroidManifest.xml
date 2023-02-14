@@ -704,5 +704,7 @@
 
         <uses-library android:name="ims-ext-common"/>
         <uses-library android:name="com.qti.extphone.extphonelib"/>
+        <uses-library android:name="com.qualcomm.sysrilcmd"/>
+        <uses-library android:name="com.qualcomm.qcrilhook"/>
     </application>
 </manifest>

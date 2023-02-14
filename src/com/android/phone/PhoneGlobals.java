@@ -91,6 +91,8 @@ import java.io.PrintWriter;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
+import android.bluetooth.BluetoothHeadset;
+import android.net.wifi.WifiManager;
 
 /**
  * Global state for the telephony subsystem when running in the primary
@@ -217,6 +219,7 @@ public class PhoneGlobals extends ContextWrapper {
     // Broadcast receiver for various intent broadcasts (see onCreate())
     private final BroadcastReceiver mReceiver = new PhoneAppBroadcastReceiver();
 
+    private final SetSarReceiver mSarReceiver = new SetSarReceiver();
     private final CarrierVvmPackageInstalledReceiver mCarrierVvmPackageInstalledReceiver =
             new CarrierVvmPackageInstalledReceiver();
 
@@ -618,11 +621,17 @@ public class PhoneGlobals extends ContextWrapper {
         }
 
         // Start tracking Binder latency for the phone process.
+        mSarReceiver.init(this);
+
         mBinderCallsSettingsObserver = new BinderCallsStats.SettingsObserver(
             getApplicationContext(),
             new BinderCallsStats(
                     new BinderCallsStats.Injector(),
                     com.android.internal.os.BinderLatencyProto.Dims.TELEPHONY));
+        IntentFilter sarIntentFilter = new IntentFilter(Intent.ACTION_BOOT_COMPLETED);
+        sarIntentFilter.addAction(WifiManager.WIFI_AP_STATE_CHANGED_ACTION);
+        sarIntentFilter.addAction(AudioManager.STREAM_DEVICES_CHANGED_ACTION);
+        registerReceiver(mSarReceiver, sarIntentFilter);
 
         PhoneUtils.connectExtTelephonyManager(this);
     }
