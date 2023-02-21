@@ -91,6 +91,9 @@ import com.android.phone.callcomposer.CallComposerPictureManager;
 import com.android.phone.callcomposer.CallComposerPictureTransfer;
 import com.android.telephony.Rlog;
 
+import org.codeaurora.ims.QtiCallConstants;
+import org.codeaurora.ims.utils.QtiImsExtUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -149,6 +152,8 @@ abstract class TelephonyConnection extends Connection implements Holdable, Commu
     private List<Uri> mParticipants;
     private boolean mIsAdhocConferenceCall;
 
+    private SuppServiceNotification mSsNotification = null;
+
     private final Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
@@ -200,8 +205,15 @@ abstract class TelephonyConnection extends Connection implements Holdable, Commu
                     Log.v(TelephonyConnection.this, "MSG_SUPP_SERVICE_NOTIFY on phoneId : "
                             + (phone != null ? Integer.toString(phone.getPhoneId())
                             : "null"));
-                    SuppServiceNotification mSsNotification = null;
+                    if (phone == null) {
+                        break;
+                    }
                     if (msg.obj != null && ((AsyncResult) msg.obj).result != null) {
+                        if (mOriginalConnection != null && ((SuppServiceNotification)((AsyncResult)
+                                msg.obj).result).history != null && !(mConnectionState ==
+                                Call.State.DIALING || mConnectionState == Call.State.ALERTING)) {
+                           return;
+                        }
                         mSsNotification =
                                 (SuppServiceNotification)((AsyncResult) msg.obj).result;
                         if (mOriginalConnection != null) {
@@ -1607,22 +1619,34 @@ abstract class TelephonyConnection extends Connection implements Holdable, Commu
         // Propagate VERSTAT for IMS calls.
         setCallerNumberVerificationStatus(mOriginalConnection.getNumberVerificationStatus());
 
+        Bundle extrasToPut = new Bundle();
+        List<String> extrasToRemove = new ArrayList<>();
+
         if (isImsConnection()) {
             mWasImsConnection = true;
+        } else {
+            extrasToRemove.add(QtiImsExtUtils.QTI_IMS_PHONE_ID_EXTRA_KEY);
+            extrasToRemove.add(QtiImsExtUtils.EXTRA_TIR_OVERWRITE_ALLOWED);
+            extrasToRemove.add(QtiCallConstants.ORIENTATION_MODE_EXTRA_KEY);
+            extrasToRemove.add(QtiCallConstants.EXTRAS_CALL_PROGRESS_INFO_TYPE);
+            extrasToRemove.add(QtiCallConstants.EXTRAS_CALL_PROGRESS_REASON_CODE);
+            extrasToRemove.add(QtiCallConstants.EXTRAS_CALL_PROGRESS_REASON_TEXT);
+            extrasToRemove.add(QtiCallConstants.EXTRA_CRS_TYPE);
+            extrasToRemove.add(QtiCallConstants.EXTRA_ORIGINAL_CALL_TYPE);
+            extrasToRemove.add(QtiCallConstants.EXTRA_IS_PREPARATORY);
         }
         if (originalConnection instanceof ImsPhoneConnection) {
             maybeConfigureDeviceToDeviceCommunication();
         }
         mIsMultiParty = mOriginalConnection.isMultiparty();
 
-        Bundle extrasToPut = new Bundle();
         // Also stash the number verification status in a hidden extra key in the connection.
         // We do this because a RemoteConnection DOES NOT include a getNumberVerificationStatus
         // method and we need to be able to pass the number verification status up to Telecom
         // despite the missing pathway in the RemoteConnectionService API surface.
         extrasToPut.putInt(Connection.EXTRA_CALLER_NUMBER_VERIFICATION_STATUS,
                 mOriginalConnection.getNumberVerificationStatus());
-        List<String> extrasToRemove = new ArrayList<>();
+
         if (mOriginalConnection.isActiveCallDisconnectedOnAnswer()) {
             extrasToPut.putBoolean(Connection.EXTRA_ANSWERING_DROPS_FG_CALL, true);
         } else {
@@ -2145,6 +2169,10 @@ abstract class TelephonyConnection extends Connection implements Holdable, Commu
     @VisibleForTesting
     public void hangup(int telephonyDisconnectCode) {
         if (mOriginalConnection != null) {
+            if (mHangupDisconnectCause != DisconnectCause.NOT_VALID) {
+                Log.i(this, "hangup already called once");
+                return;
+            }
             mHangupDisconnectCause = telephonyDisconnectCode;
             try {
                 // Hanging up a ringing call requires that we invoke call.hangup() as opposed to
