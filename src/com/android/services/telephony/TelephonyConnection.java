@@ -3269,8 +3269,23 @@ abstract class TelephonyConnection extends Connection implements Holdable,
             }
 
             Context context = getPhone().getContext();
+
+            // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
+            // add by T2M.zhangrenjie for FP4-3592 2022-03-17 begin
+            String label = getResourceString(labelId) + displaySubId;
+            PersistableBundle carrierconfig = getCarrierConfig();
+            if (carrierconfig != null) {
+                String label_from_carrier = carrierconfig.getString(CarrierConfigManager.KEY_WIFI_CALLING_DISPLAY);
+                if (label_from_carrier != null) {
+                    label = label_from_carrier;
+                    Log.i(this, "updateStatusHints: label_from_carrier = " + label);
+                }
+            }
+            // add by T2M.zhangrenjie for FP4-3592 2022-03-17 end
+            // add by T2M.dengxiangyu for FP4-61 2021-04-14 end
+
             setTelephonyStatusHints(new StatusHints(
-                    getResourceString(labelId) + displaySubId,
+                    label,
                     Icon.createWithResource(
                             context, R.drawable.ic_signal_wifi_4_bar_24dp),
                     null /* extras */));
