@@ -670,10 +670,9 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                         //modify by T2M yubin.ying for FP4-3655 20220421
                         //clearCachedConfigForPackage(null);
                         //modify by T2M yubin.ying for FP4-3655 20220421
-
-
+                      
+                      
                         // modify by T2M.zhangrenjie for FP4S-683 2022/10/13 begin
-                        /*
                         boolean hasRefresh = SystemProperties.getBoolean(PROP_FET_OTA_UPDATE, false);
                         if (!hasRefresh) {
                               clearCachedConfigForPackage(1881);
@@ -698,7 +697,6 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                             SystemProperties.set(PROP_DT_OTA_UPDATE, "true");
                             hasOTAUpdate = true;
                         }
-                        */
                         // modify by T2M.zhangrenjie for FP4S-767 2022/12/1 end
                         sharedPrefs
                                 .edit()
