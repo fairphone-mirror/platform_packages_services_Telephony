@@ -2641,4 +2641,16 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         Log.e(LOG_TAG, msg);
         mCarrierConfigLoadingLog.log(msg);
     }
+
+    @Override
+    @NonNull
+    public PersistableBundle getConfigLocked(int subId, String callingPackage) {
+        logd("getConfigLocked~~ m_dsd_locked:"+m_dsd_locked + " mConfigFromDSDLocked != null :" + (mConfigFromDSDLocked != null));
+        if (m_dsd_locked && mConfigFromDSDLocked != null) {
+            return mConfigFromDSDLocked;
+        }
+        return getConfigForSubId(subId, callingPackage);
+
+    }
+
 }
