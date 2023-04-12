@@ -256,6 +256,9 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     // modify by T2M.zhangrenjie for FP4S-683 2022/10/13 begin
     private static final String PROP_FET_OTA_UPDATE = "persist.ril.sim.fet_update";
     // modify by T2M.zhangrenjie for FP4S-683 2022/10/13 end
+    // modify by T2M.zhangrenjie for FP4S-767 2022/12/1 begin
+    private static final String PROP_DT_OTA_UPDATE = "persist.ril.sim.dt_update";
+    // modify by T2M.zhangrenjie for FP4S-767 2022/12/1 end
     private boolean hasOTAUpdate = false;
     private static final String KEY_CID = "cid", KEY_MCC = "mcc", KEY_MNC = "mnc";
     private PersistableBundle mConfigFromDSDLocked = null;
@@ -675,6 +678,22 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                               hasOTAUpdate = true;
                         }
                         // modify by T2M.zhangrenjie for FP4S-683 2022/10/13 end
+
+                        // modify by T2M.zhangrenjie for FP4S-767 2022/12/1 begin
+                        boolean hasDtRefresh = SystemProperties.getBoolean(PROP_DT_OTA_UPDATE, false);
+                        if (!hasDtRefresh) {
+                            clearCachedConfigForPackage(2395);//de
+                            clearCachedConfigForPackage(2092);//de congstar
+                            clearCachedConfigForPackage(2394);//cz
+                            clearCachedConfigForPackage(6);//cz
+                            clearCachedConfigForPackage(4);//at
+                            clearCachedConfigForPackage(5);//nl
+                            clearCachedConfigForPackage(2468);//nl
+                            clearCachedConfigForPackage(2095);//nl
+                            clearCachedConfigForPackage(8);//hu
+                            SystemProperties.set(PROP_DT_OTA_UPDATE, "true");
+                        }
+                        // modify by T2M.zhangrenjie for FP4S-767 2022/12/1 end
                         sharedPrefs
                                 .edit()
                                 .putString(KEY_FINGERPRINT, Build.FINGERPRINT)
