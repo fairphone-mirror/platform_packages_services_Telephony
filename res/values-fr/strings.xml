@@ -16,6 +16,7 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="ims_settings">"Paramètres IMS"</string>
     <string name="phoneAppLabel" product="tablet" msgid="1916019789885839910">"Données mobiles"</string>
     <string name="phoneAppLabel" product="default" msgid="130465039375347763">"Services téléphoniques"</string>
     <string name="emergencyDialerIconLabel" msgid="8668005772339436680">"Appels d\'urgence"</string>
@@ -919,4 +920,9 @@
     <string name="call_quality_notification_bluetooth_details" msgid="8348950331707346711">"Votre signal Bluetooth est faible. Essayez d\'utiliser le haut-parleur."</string>
     <string name="call_quality_notification_name" msgid="3476828289553948830">"Notification concernant la qualité de l\'appel"</string>
     <string name="notification_channel_sip_account" msgid="1261816025156179637">"Comptes SIP obsolètes"</string>
+    <!-- Smart Divert Settings -->
+    <!-- Title for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_title">Smart-Divert</string>
+    <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_summary">Paramètres du CFNRc</string>
 </resources>

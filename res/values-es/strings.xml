@@ -321,7 +321,7 @@
     <string name="throttle_status_subtext" msgid="1110276415078236687">"<xliff:g id="USED_0">%1$s</xliff:g> (<xliff:g id="USED_1">%2$d</xliff:g>٪) de periodo máximo de <xliff:g id="USED_2">%3$s</xliff:g>.\nPróx periodo en <xliff:g id="USED_3">%4$d</xliff:g> días (<xliff:g id="USED_4">%5$s</xliff:g>)"</string>
     <string name="throttle_data_usage_subtext" msgid="3185429653996709840">"<xliff:g id="USED_0">%1$s</xliff:g> (<xliff:g id="USED_1">%2$d</xliff:g>٪) de periodo máx de <xliff:g id="USED_2">%3$s</xliff:g>"</string>
     <string name="throttle_data_rate_reduced_subtext" msgid="8369839346277847725">"Máx de <xliff:g id="USED_0">%1$s</xliff:g> superado.\nFrec datos reducida a <xliff:g id="USED_1">%2$d</xliff:g> Kb/s"</string>
-    <string name="throttle_time_frame_subtext" msgid="6462089615392402127">"<xliff:g id="USED_0">%1$d</xliff:g>٪ del ciclo transcurrido.\nPróx periodo en <xliff:g id="USED_1">%2$d</xliff:g> días (<xliff:g id="USED_2">%3$s</xliff:g>)"</string>
+    <string name="throttle_time_frame_subtext" msgid="6462089615392402127">"(<xliff:g id="USED_0">%1$d</xliff:g>٪) del ciclo transcurrido.\nPróx periodo en <xliff:g id="USED_1">%2$d</xliff:g> días (<xliff:g id="USED_2">%3$s</xliff:g>)"</string>
     <string name="throttle_rate_subtext" msgid="7221971817325779535">"Frec datos se reduce a <xliff:g id="USED">%1$d</xliff:g> Kb/s si se supera límite uso datos"</string>
     <string name="throttle_help_subtext" msgid="2817114897095534807">"Más información sobre política de uso de datos móviles de tu operador"</string>
     <string name="cell_broadcast_sms" msgid="4053449797289031063">"SMS de difusión móvil"</string>
@@ -643,7 +643,7 @@
     <string name="progress_dialog_exiting_ecm" msgid="9159080081676927217">"Saliendo del modo de devolución de llamada de emergencia"</string>
     <string name="alert_dialog_yes" msgid="3532525979632841417">"Sí"</string>
     <string name="alert_dialog_no" msgid="1075632654085988420">"No"</string>
-    <string name="alert_dialog_dismiss" msgid="1336356286354517054">"Cerrar"</string>
+    <string name="alert_dialog_dismiss" msgid="1336356286354517054">"Descartar"</string>
     <string name="phone_in_ecm_call_notification_text_without_data_restriction_hint" msgid="3747860785153531225">"El teléfono está en modo de devolución de llamada de emergencia"</string>
     <string name="phone_in_ecm_notification_complete_time_without_data_restriction_hint" msgid="3690292264812050858">"Hasta las <xliff:g id="COMPLETETIME">%s</xliff:g>"</string>
     <string name="alert_dialog_exit_ecm_without_data_restriction_hint" msgid="7549850847524907932">"{count,plural, =1{El teléfono estará en modo de devolución de llamada de emergencia durante un minuto.\n¿Quieres salir ahora?}other{El teléfono estará en modo de devolución de llamada de emergencia durante %s minutos.\n¿Quieres salir ahora?}}"</string>
@@ -919,4 +919,9 @@
     <string name="call_quality_notification_bluetooth_details" msgid="8348950331707346711">"Tu señal de Bluetooth es débil. Prueba a cambiar al altavoz."</string>
     <string name="call_quality_notification_name" msgid="3476828289553948830">"Notificación de calidad de la llamada"</string>
     <string name="notification_channel_sip_account" msgid="1261816025156179637">"Cuentas SIP obsoletas"</string>
+    <!-- Smart Divert Settings -->
+    <!-- Title for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_title">Smart-Divert</string>
+    <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_summary">Configuración de CFNRc</string>
 </resources>

@@ -88,7 +88,7 @@
     <string name="call_settings" msgid="3677282690157603818">"Gespreksinstellingen"</string>
     <string name="additional_gsm_call_settings" msgid="1561980168685658846">"Aanvullende instellingen"</string>
     <string name="additional_gsm_call_settings_with_label" msgid="7973920539979524908">"Aanvullende instellingen (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
-    <string name="sum_gsm_call_settings" msgid="7964692601608878138">"Aanvullende oproepinstellingen voor alleen GSM"</string>
+    <string name="sum_gsm_call_settings" msgid="7964692601608878138">"Aanvullende oproepinstellingen"</string>
     <string name="additional_cdma_call_settings" msgid="2178016561980611304">"Aanvullende CDMA-oproepinstellingen"</string>
     <string name="sum_cdma_call_settings" msgid="3185825305136993636">"Aanvullende oproepinstellingen voor alleen CDMA"</string>
     <string name="labelNwService" msgid="6015891883487125120">"Instellingen voor netwerkservice"</string>
@@ -919,4 +919,9 @@
     <string name="call_quality_notification_bluetooth_details" msgid="8348950331707346711">"Het bluetooth-signaal is zwak. Schakel over naar bellen op luidspreker."</string>
     <string name="call_quality_notification_name" msgid="3476828289553948830">"Melding over gesprekskwaliteit"</string>
     <string name="notification_channel_sip_account" msgid="1261816025156179637">"Beëindigde SIP-accounts"</string>
+    <!-- Smart Divert Settings -->
+    <!-- Title for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_title">Smart-Divert</string>
+    <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_summary">CFNRc-instellingen</string>
 </resources>
