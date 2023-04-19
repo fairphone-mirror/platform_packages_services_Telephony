@@ -258,8 +258,8 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     // modify by T2M.zhangrenjie for FP4S-683 2022/10/13 end
     // modify by T2M.zhangrenjie for FP4S-767 2022/12/1 begin
     private static final String PROP_DT_OTA_UPDATE = "persist.ril.sim.dt_update";
-    // modify by T2M.zhangrenjie for FP4S-767 2022/12/1 end
     private boolean hasOTAUpdate = false;
+    // modify by T2M.zhangrenjie for FP4S-767 2022/12/1 end
     private static final String KEY_CID = "cid", KEY_MCC = "mcc", KEY_MNC = "mnc";
     private PersistableBundle mConfigFromDSDLocked = null;
     private static final int EVENT_DSD_BEGIN = 22; // same as last event EVENT_FETCH_DEFAULT_FOR_NO_SIM_CONFIG_TIMEOUT
@@ -679,6 +679,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                         }
                         // modify by T2M.zhangrenjie for FP4S-683 2022/10/13 end
 
+
                         // modify by T2M.zhangrenjie for FP4S-767 2022/12/1 begin
                         boolean hasDtRefresh = SystemProperties.getBoolean(PROP_DT_OTA_UPDATE, false);
                         if (!hasDtRefresh) {
@@ -692,6 +693,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                             clearCachedConfigForPackage(2095);//nl
                             clearCachedConfigForPackage(8);//hu
                             SystemProperties.set(PROP_DT_OTA_UPDATE, "true");
+                            hasOTAUpdate = true;
                         }
                         // modify by T2M.zhangrenjie for FP4S-767 2022/12/1 end
                         sharedPrefs
@@ -1394,8 +1396,9 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         File dir = mContext.getFilesDir();
         File[] packageFiles = dir.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String filename) {
+                logd("clearCachedConfigForPackage filename = " + filename);
                 if (carrierId != 0) {
-                    return filename.startsWith("carrierconfig-") && filename.contains("-"+String.valueOf(carrierId));
+                    return filename.startsWith("carrierconfig-") && filename.contains("-" + String.valueOf(carrierId) + ".xml");
                 } else {
                     return filename.startsWith("carrierconfig-");
                 }
