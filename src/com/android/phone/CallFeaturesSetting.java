@@ -553,7 +553,7 @@ public class CallFeaturesSetting extends PreferenceActivity
                 PhoneGlobals.getInstance().getCarrierConfigForSubId(mPhone.getSubId());
 
         mImsSettingsScreen = (PreferenceScreen) findPreference(BUTTON_IMS_SETTINGS_KEY);
-        if (isImsSettingsApkAvailable(mPhone.getContext())) {
+      /*if (isImsSettingsApkAvailable(mPhone.getContext())) {
             ImsManager imsManager = ImsManager.getInstance(mPhone.getContext(),
                     mPhone.getPhoneId());
             try {
@@ -577,9 +577,10 @@ public class CallFeaturesSetting extends PreferenceActivity
                 log("Exception when trying to get ImsServiceStatus: " + ex);
                 prefSet.removePreference(mImsSettingsScreen);
             }
-        } else {
+        } else {*/
+            //removed by Renjie.Zhang FP5-869 2023.5.4
             prefSet.removePreference(mImsSettingsScreen);
-        }
+      /*}*/
 
         boolean useWfcHomeModeForRoaming = carrierConfig.getBoolean(
                     CarrierConfigManager.KEY_USE_WFC_HOME_NETWORK_MODE_IN_ROAMING_NETWORK_BOOL,
