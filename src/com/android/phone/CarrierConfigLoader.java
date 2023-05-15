@@ -115,6 +115,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.HashSet;
 
 /**
  * CarrierConfigLoader binds to privileged carrier apps to fetch carrier config overlays.
@@ -260,6 +261,9 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private static final String PROP_DT_OTA_UPDATE = "persist.ril.sim.dt_update";
     private boolean hasOTAUpdate = false;
     // modify by T2M.zhangrenjie for FP4S-767 2022/12/1 end
+    // modify by T2M.zhangrenjie for FP4S-995 2023/05/15 begin
+    private static final String PROP_OPENMARKET_OTA_UPDATE = "persist.ril.sim.om_update";
+    // modify by T2M.zhangrenjie for FP4S-995 2023/05/15 end
     private static final String KEY_CID = "cid", KEY_MCC = "mcc", KEY_MNC = "mnc";
     private PersistableBundle mConfigFromDSDLocked = null;
     private static final int EVENT_DSD_BEGIN = 22; // same as last event EVENT_FETCH_DEFAULT_FOR_NO_SIM_CONFIG_TIMEOUT
@@ -668,6 +672,15 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                         //modify by T2M yubin.ying for FP4-3655 20220421
                         //clearCachedConfigForPackage(null);
                         //modify by T2M yubin.ying for FP4-3655 20220421
+
+                        // modify by T2M.zhangrenjie for FP4S-995 2023/05/15 begin
+                        boolean hasOMRefresh = SystemProperties.getBoolean(PROP_OPENMARKET_OTA_UPDATE, false);
+                        if (!hasOMRefresh) {
+                              clearCachedConfigOutOfWhiteList(initWhiteList());
+                              SystemProperties.set(PROP_OPENMARKET_OTA_UPDATE, "true");
+                              hasOTAUpdate = true;
+                        }
+                        // modify by T2M.zhangrenjie for FP4S-995 2023/05/15 end
                       
                       
                         // modify by T2M.zhangrenjie for FP4S-683 2022/10/13 begin
@@ -1412,6 +1425,90 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         return true;
     }
       // modify by T2M.zhangrenjie for FP4S-683 2022/10/13 end
+
+
+    // modify by T2M.zhangrenjie for FP4S-995 2023/05/15 begin
+
+    private Set<String> initWhiteList() {
+
+        // carrier id white list
+        Set<String> whiteList = new HashSet<>(Arrays.asList(
+            "2395", //de dt
+            "2092",//de congstar
+            "2394",//cz
+            "6", //cz
+            "4",//at
+            "5",//nl
+            "2468", //nl
+            "2095",//nl
+            "8",//hu
+            "7",//pl
+            "2367",//pl
+            "1881",//fet
+            "32",//ofr
+            "2369",//osp
+            "678",//osp
+            "1366",//obe
+            "2",//bt_ee
+            "2101",//bt_ee
+            "2102",//bt_ee
+            "2103",//bt_ee
+            "718",//bt_ee
+            "717",//virgin
+            "2360",//tef de
+            "1453",//tef de
+            "1492",//tef uk
+            "1365",//proximus
+            "1466",//3 dk
+            "1644",//kpn
+            "2139",//sky
+            "1475",//elisa
+            "1696",//tele2
+            "1695",//telenor se
+            "27",//sfr
+            "14",//A1
+            "1487",//bouygues
+            "28",//vdf uk
+            "25",//vdf de
+            "2397",//vdf de
+            "20",//vdf nl
+            "895",//post
+            "896",//tango
+            "16",//swisscom
+            "2366",//swisscom
+            "1413"));//Sunrise
+
+        return whiteList;
+    }
+
+    /**
+     * Clears cached carrier config not in List.
+     *
+     * @param whiteList operator list
+     *
+     */
+    private void clearCachedConfigOutOfWhiteList(Set<String> whiteList) {
+        File dir = mContext.getFilesDir();
+
+
+        for (File file : dir.listFiles()) {
+
+            boolean shouldKeep = false;
+            String filename = file.getName();
+            for (String carrierId : whiteList) {
+                if (filename.startsWith("carrierconfig-") && filename.contains("-" + carrierId + ".xml")) {
+                    shouldKeep = true;
+                    break;
+                }
+            }
+
+            if (!shouldKeep) {
+                logd("Deleting " + filename);
+                file.delete();
+            }
+        }
+    }
+      // modify by T2M.zhangrenjie for FP4S-995 2023/05/15 end
 
     // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
     private PersistableBundle restoreDSDLockedConfigFromXml() {
