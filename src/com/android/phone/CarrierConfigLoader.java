@@ -450,7 +450,11 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                                             saveConfigToXml(mPlatformCarrierConfigPackage, "", phoneId,
                                                     carrierId, config);
                                             mConfigFromDefaultApp[phoneId] = config;
-                                            updateSettingsProvider(phoneId, config);
+                                            if (hasOTAUpdate){
+                                                Log.i(LOG_TAG, "skip reset Settings when OTA first delete config file");
+                                            }else{
+                                                updateSettingsProvider(phoneId, config);
+                                            }
                                             updateModemSettings(phoneId, config);
                                             loadPredefineNetworks(config);
                                         //}
@@ -663,7 +667,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                     SharedPreferences sharedPrefs =
                             PreferenceManager.getDefaultSharedPreferences(mContext);
                     final String lastFingerprint = sharedPrefs.getString(KEY_FINGERPRINT, null);
-                    if (!Build.FINGERPRINT.equals(lastFingerprint)) {
+                    if (!Build.FINGERPRINT.equals(lastFingerprint) || SystemProperties.getBoolean("persist.ril.sim.ota_test", false)/*add a way to test*/) {
                         logd(
                                 "Build fingerprint changed. old: "
                                         + lastFingerprint
@@ -1433,6 +1437,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
         // carrier id white list
         Set<String> whiteList = new HashSet<>(Arrays.asList(
+            "nosim",//nosim
             "2395", //de dt
             "2092",//de congstar
             "2394",//cz
@@ -1493,12 +1498,16 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
         for (File file : dir.listFiles()) {
 
-            boolean shouldKeep = false;
+            boolean shouldKeep = true;
             String filename = file.getName();
-            for (String carrierId : whiteList) {
-                if (filename.startsWith("carrierconfig-") && filename.contains("-" + carrierId + ".xml")) {
-                    shouldKeep = true;
-                    break;
+            logd("Processing " + filename);
+            if(filename.startsWith("carrierconfig-")){
+                shouldKeep = false;
+                for (String carrierId : whiteList) {
+                    if (filename.contains("-" + carrierId + ".xml")) {
+                        shouldKeep = true;
+                        break;
+                    }
                 }
             }
 
@@ -1579,12 +1588,8 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     }
 
     private void updateSettingsProvider(int phoneId, PersistableBundle config) {
-        // modify by T2M.zhangrenjie for FP4S-767 2022/12/30 begin
-        if (hasOTAUpdate){
-            Log.i(LOG_TAG, "skip updateSettingsProvider when OTA first delete config file");
-            return;
-        }
-        // modify by T2M.zhangrenjie for FP4S-767 2022/12/30 end
+    
+        Log.i(LOG_TAG, "updateSettingsProvider phoneId = " + phoneId);
         ContentResolver resolver = mContext.getContentResolver();
         Phone phone = PhoneFactory.getPhone(phoneId);
         final ImsManager imsManager = ImsManager.getInstance(mContext, phoneId);
@@ -2070,12 +2075,6 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     }
 
     private void updateModemSettings(int phoneId, PersistableBundle config) {
-        // modify by T2M.zhangrenjie for FP4S-767 2022/12/30 begin
-        if (hasOTAUpdate){
-            Log.i(LOG_TAG, "skip updateModemSettings when OTA first delete config file");
-            return;
-        }
-        // modify by T2M.zhangrenjie for FP4S-767 2022/12/30 end
         Phone phone = PhoneFactory.getPhone(phoneId);
 
         String vm_number = config.getString(CarrierConfigManager.KEY_DEFAULT_VM_NUMBER_STRING, "");
@@ -2246,7 +2245,6 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         }
 
         int phoneId = SubscriptionManager.getPhoneId(subscriptionId);
-        logd("getConfigForSubIdWithFeature subid: " + subscriptionId + " phoneid: " + phoneId+" callingPackage: "+callingPackage);
         PersistableBundle retConfig = CarrierConfigManager.getDefaultConfig();
         if (SubscriptionManager.isValidPhoneId(phoneId)) {
             PersistableBundle config = mConfigFromDefaultApp[phoneId];
