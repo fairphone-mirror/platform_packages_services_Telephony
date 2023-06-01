@@ -268,6 +268,10 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private PersistableBundle mConfigFromDSDLocked = null;
     private static final int EVENT_DSD_BEGIN = 22; // same as last event EVENT_FETCH_DEFAULT_FOR_NO_SIM_CONFIG_TIMEOUT
     private static final int EVENT_DSD_REBOOT = EVENT_DSD_BEGIN + 1;
+
+    // add for FP4S-982
+    private static final int EVENT_DSD_SET_PNT = EVENT_DSD_BEGIN + 2;
+
     private EuiccManager mEuiccManager;
     private WifiManager mWifiManager;
     private SysRilCmd mSysRil;
@@ -457,6 +461,10 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                                             }
                                             updateModemSettings(phoneId, config);
                                             loadPredefineNetworks(config);
+                                            // add for FP4S-982
+                                            sendMessageDelayed(
+                                                    obtainMessage(
+                                                            EVENT_DSD_SET_PNT, phoneId, -1), 2000);
                                         //}
                                     }
                                     // modify by T2M.dengxiangyu for FP4-61 2021-04-14 end
@@ -862,6 +870,19 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                     pm.reboot(null);
                     break;
                 // add by T2M.dengxiangyu for FP4-61 2021-04-14 end
+
+                // add for FP4S-982, should set PNT after isAllowedNetworkTypesLoadedFromDb begin
+                case EVENT_DSD_SET_PNT:
+                    Phone phone = PhoneFactory.getPhone(phoneId);
+                    if (phone.isAllowedNetworkTypesLoadedFromDb()) {
+                        updatePreferredNetworkType(phoneId, mConfigFromDefaultApp[phoneId]);
+                    } else {
+                        sendMessageDelayed(
+                                obtainMessage(
+                                        EVENT_DSD_SET_PNT, phoneId, -1), 2000);
+                    }
+                    break;
+                // add for FP4S-982 end
             }
         }
     }
@@ -1588,8 +1609,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     }
 
     private void updateSettingsProvider(int phoneId, PersistableBundle config) {
-    
-        Log.i(LOG_TAG, "updateSettingsProvider phoneId = " + phoneId);
+        Log.d(LOG_TAG, "updateSettingsProvider config[" + phoneId + "]: " + config);
         ContentResolver resolver = mContext.getContentResolver();
         Phone phone = PhoneFactory.getPhone(phoneId);
         final ImsManager imsManager = ImsManager.getInstance(mContext, phoneId);
@@ -1639,6 +1659,8 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                     subIds[0],
                     data_roaming_enabled);
 
+            // delete for FP4S-982
+            /*
             logd("update default network mode for phone: " + phoneId + ", subId: " + subIds[0]);
             // modify by T2M.zhang renjie for FP4S-349 22-7-16 begin
             new Thread(new Runnable() {
@@ -1651,6 +1673,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
             }).start();
 
             // modify by T2M.zhang renjie for FP4S-349 22-7-16 end
+            */
 
         }
 
@@ -2154,6 +2177,38 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
             }
         }
     }
+
+    // add for FP4S-982 begin
+    private void updatePreferredNetworkType(int phoneId, PersistableBundle config) {
+        if (hasOTAUpdate){
+            Log.i(LOG_TAG, "skip updatePreferredNetworkType when OTA first delete config file");
+            return;
+        }
+
+        Log.d(LOG_TAG, "updatePreferredNetworkType config[" + phoneId + "]: " + config);
+        Phone phone = PhoneFactory.getPhone(phoneId);
+        final TelephonyManager telephonyManager = TelephonyManager.from(mContext).createForSubscriptionId(phone.getSubId());
+        int[] subIds = SubscriptionManager.getSubId(phoneId);
+        int default_nwmode = config.getInt(CarrierConfigManager.KEY_DEFAULT_NETWORK_MODE, TelephonyProperties.default_network().get(phoneId));
+        logd("update default_nwmode[" + phoneId + "]: " + default_nwmode);
+
+        if (subIds != null && subIds.length > 0) {
+            logd("update default network mode for phone: " + phoneId + ", subId: " + subIds[0]);
+            // modify by T2M.zhang renjie for FP4S-349 22-7-16 begin
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    telephonyManager.setAllowedNetworkTypesForReason(
+                            TelephonyManager.ALLOWED_NETWORK_TYPES_REASON_USER,
+                            RadioAccessFamily.getRafFromNetworkType(default_nwmode));
+                }
+            }).start();
+
+            // modify by T2M.zhang renjie for FP4S-349 22-7-16 end
+
+        }
+    }
+    // add for FP4S-982 end
 
     private QcRilHookCallback mQcrilHookCb = new QcRilHookCallback() {
         @Override
