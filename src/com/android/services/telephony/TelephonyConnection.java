@@ -1592,7 +1592,7 @@ abstract class TelephonyConnection extends Connection implements Holdable,
      */
     protected final void updateConnectionProperties() {
         int newProperties = buildConnectionProperties();
-
+        Log.i(this, "updateConnectionProperties: hasHighDefAudioProperty = " + hasHighDefAudioProperty());
         newProperties = changeBitmask(newProperties, PROPERTY_HIGH_DEF_AUDIO,
                 hasHighDefAudioProperty());
         newProperties = changeBitmask(newProperties, PROPERTY_WIFI, isWifi() && !isCrossSimCall());
@@ -2976,6 +2976,7 @@ abstract class TelephonyConnection extends Connection implements Holdable,
     public void setAudioQuality(int audioQuality) {
         mHasHighDefAudio = audioQuality ==
                 com.android.internal.telephony.Connection.AUDIO_QUALITY_HIGH_DEFINITION;
+         Log.i(this, "setAudioQuality: mHasHighDefAudio = " + mHasHighDefAudio);
         updateConnectionProperties();
     }
 
