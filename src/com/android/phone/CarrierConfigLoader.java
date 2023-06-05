@@ -675,7 +675,8 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                     SharedPreferences sharedPrefs =
                             PreferenceManager.getDefaultSharedPreferences(mContext);
                     final String lastFingerprint = sharedPrefs.getString(KEY_FINGERPRINT, null);
-                    if (!Build.FINGERPRINT.equals(lastFingerprint) || SystemProperties.getBoolean("persist.ril.sim.ota_test", false)/*add a way to test*/) {
+                    if ((lastFingerprint != null && !Build.FINGERPRINT.equals(lastFingerprint))
+                            || SystemProperties.getBoolean("persist.ril.sim.ota_test", false)/*add a way to test*/) {
                         logd(
                                 "Build fingerprint changed. old: "
                                         + lastFingerprint
