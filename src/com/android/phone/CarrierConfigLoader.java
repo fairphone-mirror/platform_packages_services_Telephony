@@ -1501,17 +1501,18 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                     data_roaming_enabled);
 
             logd("update default network mode for phone: " + phoneId + ", subId: " + subIds[0]);
-            // modify by T2M.zhang renjie for FP4S-349 22-7-16 begin
+            // modify by T2M.zhang renjie for FP4T-367 23-6-9 begin
+            phone.loadAllowedNetworksFromSubscriptionDatabase();
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     telephonyManager.setAllowedNetworkTypesForReason(
-                            TelephonyManager.ALLOWED_NETWORK_TYPES_REASON_CARRIER,
+                            TelephonyManager.ALLOWED_NETWORK_TYPES_REASON_USER,
                             RadioAccessFamily.getRafFromNetworkType(default_nwmode));
                 }
             }).start();
 
-            // modify by T2M.zhang renjie for FP4S-349 22-7-16 end
+            // modify by T2M.zhang renjie for FP4T-367 23-6-9 end
 
         }
 
