@@ -261,13 +261,6 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private static final String PROP_COUNTRY = "persist.radio.sim.country";
     private static final String PROP_MCC_MNC = "persist.radio.sim.mcc.mnc";
     private static final String PROP_GID1 = "persist.radio.sim.gid1";
-    // modify by T2M.zhangrenjie for FP4S-683 2022/10/13 begin
-    private static final String PROP_FET_OTA_UPDATE = "persist.ril.sim.fet_update";
-    // modify by T2M.zhangrenjie for FP4S-683 2022/10/13 end
-    // modify by T2M.zhangrenjie for FP4S-767 2022/12/1 begin
-    private static final String PROP_DT_OTA_UPDATE = "persist.ril.sim.dt_update";
-    private boolean hasOTAUpdate = false;
-    // modify by T2M.zhangrenjie for FP4S-767 2022/12/1 end
     private static final String KEY_CID = "cid", KEY_MCC = "mcc", KEY_MNC = "mnc";
     private PersistableBundle mConfigFromDSDLocked = null;
     private static final int EVENT_DSD_BEGIN = 22; // same as last event EVENT_FETCH_DEFAULT_FOR_NO_SIM_CONFIG_TIMEOUT
@@ -670,36 +663,6 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                         //modify by T2M yubin.ying for FP4-3655 20220421
                         //clearCachedConfigForPackage(null);
                         //modify by T2M yubin.ying for FP4-3655 20220421
-
-
-                        // modify by T2M.zhangrenjie for FP4S-683 2022/10/13 begin
-                        /*
-                        boolean hasRefresh = SystemProperties.getBoolean(PROP_FET_OTA_UPDATE, false);
-                        if (!hasRefresh) {
-                              clearCachedConfigForPackage(1881);
-                              SystemProperties.set(PROP_FET_OTA_UPDATE, "true");
-                              hasOTAUpdate = true;
-                        }
-                        // modify by T2M.zhangrenjie for FP4S-683 2022/10/13 end
-
-
-                        // modify by T2M.zhangrenjie for FP4S-767 2022/12/1 begin
-                        boolean hasDtRefresh = SystemProperties.getBoolean(PROP_DT_OTA_UPDATE, false);
-                        if (!hasDtRefresh) {
-                            clearCachedConfigForPackage(2395);//de
-                            clearCachedConfigForPackage(2092);//de congstar
-                            clearCachedConfigForPackage(2394);//cz
-                            clearCachedConfigForPackage(6);//cz
-                            clearCachedConfigForPackage(4);//at
-                            clearCachedConfigForPackage(5);//nl
-                            clearCachedConfigForPackage(2468);//nl
-                            clearCachedConfigForPackage(2095);//nl
-                            clearCachedConfigForPackage(8);//hu
-                            SystemProperties.set(PROP_DT_OTA_UPDATE, "true");
-                            hasOTAUpdate = true;
-                        }
-                        */
-                        // modify by T2M.zhangrenjie for FP4S-767 2022/12/1 end
                         sharedPrefs
                                 .edit()
                                 .putString(KEY_FINGERPRINT, Build.FINGERPRINT)
@@ -1418,36 +1381,6 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         return true;
     }
 
-    // modify by T2M.zhangrenjie for FP4S-683 2022/10/13 begin
-    /**
-     * Clears cached carrier config.
-     * This deletes all saved XML files associated with the given carrier id. If carrierId is
-     * null, then it deletes all saved XML files.
-     *
-     * @param carrierId operator carrier id
-     *
-     * @return true iff one or more files were deleted.
-     */
-    private boolean clearCachedConfigForPackage(int carrierId) {
-        File dir = mContext.getFilesDir();
-        File[] packageFiles = dir.listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String filename) {
-                if (carrierId != 0) {
-                    return filename.startsWith("carrierconfig-") && filename.contains("-"+String.valueOf(carrierId));
-                } else {
-                    return filename.startsWith("carrierconfig-");
-                }
-            }
-        });
-        if (packageFiles == null || packageFiles.length < 1) return false;
-        for (File f : packageFiles) {
-            logd("Deleting " + f.getName());
-            f.delete();
-        }
-        return true;
-    }
-      // modify by T2M.zhangrenjie for FP4S-683 2022/10/13 end
-
     // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
     private PersistableBundle restoreDSDLockedConfigFromXml() {
         PersistableBundle restoredBundle = null;
@@ -1517,12 +1450,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     }
 
     private void updateSettingsProvider(int phoneId, PersistableBundle config) {
-        // modify by T2M.zhangrenjie for FP4S-767 2022/12/30 begin
-        if (hasOTAUpdate){
-            Log.i(LOG_TAG, "skip updateSettingsProvider when OTA first delete config file");
-            return;
-        }
-        // modify by T2M.zhangrenjie for FP4S-767 2022/12/30 end
+
         ContentResolver resolver = mContext.getContentResolver();
         Phone phone = PhoneFactory.getPhone(phoneId);
         final ImsManager imsManager = ImsManager.getInstance(mContext, phoneId);
@@ -1573,17 +1501,18 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                     data_roaming_enabled);
 
             logd("update default network mode for phone: " + phoneId + ", subId: " + subIds[0]);
-            // modify by T2M.zhang renjie for FP4S-349 22-7-16 begin
+            // modify by T2M.zhang renjie for FP4T-367 23-6-9 begin
+            phone.loadAllowedNetworksFromSubscriptionDatabase();
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     telephonyManager.setAllowedNetworkTypesForReason(
-                            TelephonyManager.ALLOWED_NETWORK_TYPES_REASON_CARRIER,
+                            TelephonyManager.ALLOWED_NETWORK_TYPES_REASON_USER,
                             RadioAccessFamily.getRafFromNetworkType(default_nwmode));
                 }
             }).start();
 
-            // modify by T2M.zhang renjie for FP4S-349 22-7-16 end
+            // modify by T2M.zhang renjie for FP4T-367 23-6-9 end
 
         }
 
@@ -1618,12 +1547,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     }
 
     private void updateModemSettings(int phoneId, PersistableBundle config) {
-        // modify by T2M.zhangrenjie for FP4S-767 2022/12/30 begin
-        if (hasOTAUpdate){
-            Log.i(LOG_TAG, "skip updateModemSettings when OTA first delete config file");
-            return;
-        }
-        // modify by T2M.zhangrenjie for FP4S-767 2022/12/30 end
+
         Phone phone = PhoneFactory.getPhone(phoneId);
 
         String vm_number = config.getString(CarrierConfigManager.KEY_DEFAULT_VM_NUMBER_STRING, "");
