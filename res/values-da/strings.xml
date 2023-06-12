@@ -919,4 +919,5 @@
     <string name="call_quality_notification_bluetooth_details" msgid="8348950331707346711">"Dit Bluetooth-signal er svagt. Prøv at skifte til medhør."</string>
     <string name="call_quality_notification_name" msgid="3476828289553948830">"Notifikation om opkaldskvalitet"</string>
     <string name="notification_channel_sip_account" msgid="1261816025156179637">"Udfasede SIP-konti"</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibreren for udgående opkald accepteret</string>
 </resources>

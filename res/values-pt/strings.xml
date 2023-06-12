@@ -919,4 +919,5 @@
     <string name="call_quality_notification_bluetooth_details" msgid="8348950331707346711">"O sinal do Bluetooth está fraco. Mude para o viva-voz."</string>
     <string name="call_quality_notification_name" msgid="3476828289553948830">"Notificação sobre a qualidade da chamada"</string>
     <string name="notification_channel_sip_account" msgid="1261816025156179637">"Contas SIP suspensas"</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibração para camada realizada aceite</string>
 </resources>
