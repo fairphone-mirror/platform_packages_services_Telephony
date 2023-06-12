@@ -919,4 +919,8 @@
     <string name="call_quality_notification_bluetooth_details" msgid="8348950331707346711">"Das Bluetooth-Signal ist schwach. Verwende die Freisprechfunktion."</string>
     <string name="call_quality_notification_name" msgid="3476828289553948830">"Benachrichtigung zu Anrufqualität"</string>
     <string name="notification_channel_sip_account" msgid="1261816025156179637">"Eingestellte SIP-Konten"</string>
+    <string name="call_forward_option">"Optionen zur Anrufweiterleitung."</string>
+    <string name="labelCFVoice">"Sprache"</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibration für ausgehenden Anruf aktiviert.</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Aktivieren Sie den Vibrationsmodus für ausgehende Anrufe angenommen</string>
 </resources>
