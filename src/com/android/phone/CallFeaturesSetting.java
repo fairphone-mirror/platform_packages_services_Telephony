@@ -427,6 +427,7 @@ public class CallFeaturesSetting extends PreferenceActivity
         Preference fdnButton = prefSet.findPreference(BUTTON_FDN_KEY);
         fdnButton.setIntent(mSubscriptionInfoHelper.getIntent(FdnSetting.class));
         if (carrierConfig.getBoolean(CarrierConfigManager.KEY_WORLD_PHONE_BOOL)) {
+            prefSet.removePreference(cdmaOptions);
             if (carrierConfig.getBoolean("config_common_callsettings_support_bool")) {
                 prefSet.removePreference(cdmaOptions);
                 prefSet.removePreference(gsmOptions);
@@ -560,6 +561,7 @@ public class CallFeaturesSetting extends PreferenceActivity
                 PhoneGlobals.getInstance().getCarrierConfigForSubId(mPhone.getSubId());
 
         mImsSettingsScreen = (PreferenceScreen) findPreference(BUTTON_IMS_SETTINGS_KEY);
+
       /*if (isImsSettingsApkAvailable(mPhone.getContext())) {
             ImsManager imsManager = ImsManager.getInstance(mPhone.getContext(),
                     mPhone.getPhoneId());
