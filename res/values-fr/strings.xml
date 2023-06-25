@@ -933,6 +933,15 @@
     <string name="install_messages_on_work_profile_action_str" msgid="3773440996395152903">"Installer une application de chat professionnelle"</string>
     <string name="call_forward_option">"Options de renvoi d'appel"</string>
     <string name="labelCFVoice">"Voix"</string>
-    <string name="vibrating_for_outgoing_call_accepted_title">Vibrations pour appel sortant acceptées</string>
-    <string name="vibrating_for_outgoing_call_accepted_summary">Activer le mode vibreur pour les appels sortants acceptés</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibration pour appel sortant acceptée</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Activer la vibration pour appel sortant accepté</string>
+    <!-- Smart Divert Settings -->
+    <!-- Title for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_title">Smart-divert</string>
+    <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_summary">Paramètres CFNRc</string>
+    <string name="labelCommonMore">Paramètres d’appel</string>
+    <string name="labelCommonMore_with_label">Paramètres d’appel (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)</string>
+    <string name="sum_common_call_settings">Paramètres d’appel supplémentaires</string>
+
 </resources>

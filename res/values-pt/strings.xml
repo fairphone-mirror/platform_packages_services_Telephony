@@ -931,5 +931,17 @@
     <string name="send_from_work_profile_cancel" msgid="177746511030381711">"Cancelar"</string>
     <string name="send_from_work_profile_action_str" msgid="6892775562934243337">"Mudar para o perfil de trabalho"</string>
     <string name="install_messages_on_work_profile_action_str" msgid="3773440996395152903">"Instalar um app de mensagens de trabalho"</string>
-    <string name="vibrating_for_outgoing_call_accepted_title">Vibração para camada realizada aceite</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibração para chamada de saída aceite</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Ativar o modo de vibração para chamadas de saída aceites</string>
+    <!-- Smart Divert Settings -->
+    <!-- Title for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_title">Desvio inteligente</string>
+    <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_summary">Definições CFNRc</string>
+    <string name="labelCommonMore">Definições de chamada</string>
+    <string name="labelCommonMore_with_label">Definições de chamada (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)</string>
+    <string name="sum_common_call_settings">Definições de chamadas adicionais</string>
+    <string name="labelCFVoice">Voz</string>
+    <string name="call_forward_option">"Opções de reencaminhamento de chamadas"</string>
+
 </resources>
