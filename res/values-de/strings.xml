@@ -919,8 +919,17 @@
     <string name="call_quality_notification_bluetooth_details" msgid="8348950331707346711">"Das Bluetooth-Signal ist schwach. Verwende die Freisprechfunktion."</string>
     <string name="call_quality_notification_name" msgid="3476828289553948830">"Benachrichtigung zu Anrufqualität"</string>
     <string name="notification_channel_sip_account" msgid="1261816025156179637">"Eingestellte SIP-Konten"</string>
-    <string name="call_forward_option">"Optionen zur Anrufweiterleitung."</string>
-    <string name="labelCFVoice">"Sprache"</string>
-    <string name="vibrating_for_outgoing_call_accepted_title">Vibration für ausgehenden Anruf aktiviert.</string>
-    <string name="vibrating_for_outgoing_call_accepted_summary">Aktivieren Sie den Vibrationsmodus für ausgehende Anrufe angenommen</string>
+    <string name="call_forward_option">"Anrufweiterleitung Optionen"</string>
+    <string name="labelCFVoice">"Stimme"</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibration für Annahme von ausgehendem Anruf.</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Vibration für Annahme von ausgehendem Anruf deaktivieren</string>
+    <!-- Smart Divert Settings -->
+    <!-- Title for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_title">Smart-Divert</string>
+    <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_summary">CFNRc-Einstellungen</string>
+    <string name="labelCommonMore">Anrufeinstellungen</string>
+    <string name="labelCommonMore_with_label">Anrufeinstellungen (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)</string>
+    <string name="sum_common_call_settings">Zusätzliche Anrufeinstellungen</string>
+
 </resources>

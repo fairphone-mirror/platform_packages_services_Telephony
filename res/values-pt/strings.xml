@@ -919,5 +919,17 @@
     <string name="call_quality_notification_bluetooth_details" msgid="8348950331707346711">"O sinal do Bluetooth está fraco. Mude para o viva-voz."</string>
     <string name="call_quality_notification_name" msgid="3476828289553948830">"Notificação sobre a qualidade da chamada"</string>
     <string name="notification_channel_sip_account" msgid="1261816025156179637">"Contas SIP suspensas"</string>
-    <string name="vibrating_for_outgoing_call_accepted_title">Vibração para camada realizada aceite</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibração para chamada de saída aceite</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Ativar o modo de vibração para chamadas de saída aceites</string>
+    <!-- Smart Divert Settings -->
+    <!-- Title for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_title">Desvio inteligente</string>
+    <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_summary">Definições CFNRc</string>
+    <string name="labelCommonMore">Definições de chamada</string>
+    <string name="labelCommonMore_with_label">Definições de chamada (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)</string>
+    <string name="sum_common_call_settings">Definições de chamadas adicionais</string>
+    <string name="labelCFVoice">Voz</string>
+    <string name="call_forward_option">"Opções de reencaminhamento de chamadas"</string>
+
 </resources>

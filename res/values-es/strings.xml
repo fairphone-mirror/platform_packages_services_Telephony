@@ -920,4 +920,16 @@
     <string name="call_quality_notification_name" msgid="3476828289553948830">"Notificación de calidad de la llamada"</string>
     <string name="notification_channel_sip_account" msgid="1261816025156179637">"Cuentas SIP obsoletas"</string>
     <string name="vibrating_for_outgoing_call_accepted_title">Vibración para llamada saliente aceptada.</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Activar el modo de vibración para llamadas salientes aceptadas</string>
+    <!-- Smart Divert Settings -->
+    <!-- Title for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_title">Smart-divert</string>
+    <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_summary">Ajustes CFNRc</string>
+    <string name="labelCommonMore">Ajustes de llamada</string>
+    <string name="labelCommonMore_with_label">Ajustes de llamada (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)</string>
+    <string name="sum_common_call_settings">Ajustes de llamada adicionales</string>
+    <string name="labelCFVoice">Voz</string>
+    <string name="call_forward_option">"Opciones de desvío de llamadas"</string>
+
 </resources>

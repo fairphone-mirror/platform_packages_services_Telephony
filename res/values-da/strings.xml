@@ -920,4 +920,16 @@
     <string name="call_quality_notification_name" msgid="3476828289553948830">"Notifikation om opkaldskvalitet"</string>
     <string name="notification_channel_sip_account" msgid="1261816025156179637">"Udfasede SIP-konti"</string>
     <string name="vibrating_for_outgoing_call_accepted_title">Vibreren for udgående opkald accepteret</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Aktivering af vibration for udgående opkald accepteret</string>
+    <!-- Smart Divert Settings -->
+    <!-- Title for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_title">Smart-divert</string>
+    <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_summary">CFNRc-indstillinger</string>
+    <string name="labelCommonMore">Opkaldsindstillinger</string>
+    <string name="labelCommonMore_with_label">Opkaldsindstillinger (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)</string>
+    <string name="sum_common_call_settings">Yderligere opkaldsindstillinger</string>
+    <string name="labelCFVoice">Stemme</string>
+    <string name="call_forward_option">"Indstillinger for viderestilling af opkald"</string>
+
 </resources>

@@ -920,7 +920,16 @@
     <string name="call_quality_notification_name" msgid="3476828289553948830">"Melding over gesprekskwaliteit"</string>
     <string name="notification_channel_sip_account" msgid="1261816025156179637">"Beëindigde SIP-accounts"</string>
     <string name="call_forward_option">"Opties voor doorschakelen."</string>
-    <string name="labelCFVoice">"Stem"</string>
-    <string name="vibrating_for_outgoing_call_accepted_title">Trillen voor uitgaand telefoongesprek geaccepteerd.</string>
-    <string name="vibrating_for_outgoing_call_accepted_summary">Activeer trilmodus voor uitgaand gesprek geaccepteerd</string>
+    <string name="labelCFVoice">"Spraak"</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Trillen wanneer uitgaande oproepen worden beantwoord.</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Trillen wanneer uitgaande oproepen worden beantwoord inschakelen</string>
+    <!-- Smart Divert Settings -->
+    <!-- Title for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_title">Smart-Divert</string>
+    <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_summary">CFNRc-instellingen</string>
+    <string name="labelCommonMore">Oproepinstellingen</string>
+    <string name="labelCommonMore_with_label">Oproepinstellingen (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)</string>
+    <string name="sum_common_call_settings">Aanvullende oproepinstellingen</string>
+
 </resources>

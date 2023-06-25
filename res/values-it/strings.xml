@@ -919,5 +919,17 @@
     <string name="call_quality_notification_bluetooth_details" msgid="8348950331707346711">"Il segnale del Bluetooth è debole. Prova a passare al vivavoce."</string>
     <string name="call_quality_notification_name" msgid="3476828289553948830">"Notifica sulla qualità della chiamata"</string>
     <string name="notification_channel_sip_account" msgid="1261816025156179637">"Account SIP deprecati"</string>
-    <string name="vibrating_for_outgoing_call_accepted_title">Vibrazione per chiamata in uscita accettata.</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibrazione per le chiamate in uscita accettata.</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Abilitazione della modalità vibrazione per le chiamate in uscita accettata</string>
+    <!-- Smart Divert Settings -->
+    <!-- Title for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_title">Smart-Divert</string>
+    <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_summary">Impostazioni CFNRC</string>
+    <string name="labelCommonMore">Impostazioni di chiamata</string>
+    <string name="labelCommonMore_with_label">Impostazioni di chiamata (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)</string>
+    <string name="sum_common_call_settings">Impostazioni di chiamata aggiuntive</string>
+    <string name="labelCFVoice">Voce</string>
+    <string name="call_forward_option">"Opzioni di trasferimento chiamata"</string>
+
 </resources>

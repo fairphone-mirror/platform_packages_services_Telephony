@@ -919,5 +919,17 @@
     <string name="call_quality_notification_bluetooth_details" msgid="8348950331707346711">"Svag Bluetooth-signal. Försök med att växla till högtalartelefon."</string>
     <string name="call_quality_notification_name" msgid="3476828289553948830">"Avisering om samtalskvalitet"</string>
     <string name="notification_channel_sip_account" msgid="1261816025156179637">"Utfasade SIP-konton"</string>
-    <string name="vibrating_for_outgoing_call_accepted_title">Vibrerande för utgående samtal accepteras</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibration för utgående samtal godkänt</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Aktivering av vibrerande läge för utgående samtal godkänt</string>
+    <!-- Smart Divert Settings -->
+    <!-- Title for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_title">Smart vidarekoppling</string>
+    <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_summary">CFNRc-inställningar</string>
+    <string name="labelCommonMore">Samtalsinställningar</string>
+    <string name="labelCommonMore_with_label">Samtalsinställningar (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)</string>
+    <string name="sum_common_call_settings">Ytterligare samtalsinställningar</string>
+    <string name="labelCFVoice">Röst</string>
+    <string name="call_forward_option">"Alternativ för vidarekoppling"</string>
+
 </resources>
