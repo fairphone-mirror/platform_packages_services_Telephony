@@ -928,8 +928,8 @@
     <string name="smart_divert_title">Smart-divert</string>
     <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
     <string name="smart_divert_summary">Paramètres CFNRc</string>
-    <string name="labelCommonMore">Paramètres d’appel</string>
-    <string name="labelCommonMore_with_label">Paramètres d’appel (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)</string>
-    <string name="sum_common_call_settings">Paramètres d’appel supplémentaires</string>
+    <string name="labelCommonMore">"Paramètres d’appel"</string>
+    <string name="labelCommonMore_with_label">"Paramètres d’appel (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)"</string>
+    <string name="sum_common_call_settings">"Paramètres d’appel supplémentaires"</string>
 
 </resources>
