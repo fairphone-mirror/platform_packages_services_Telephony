@@ -4301,7 +4301,16 @@ public class PhoneInterfaceManager extends ITelephony.Stub {
             if (!isActiveSubscription(subId)) {
                 return TelephonyManager.NETWORK_SELECTION_MODE_UNKNOWN;
             }
-            return (int) sendRequest(CMD_GET_NETWORK_SELECTION_MODE, null /* argument */, subId);
+
+            //[BUG]-Modify-Begin by shaopan.tang 2023-06-30 FP5-2084 ANR occur when changing Preferred NW type
+            //return (int) sendRequest(CMD_GET_NETWORK_SELECTION_MODE, null /* argument */, subId);
+            int mode = Settings.Global.getInt(getDefaultPhone().getContext().getContentResolver(),
+                                              "network_selection_mode" + subId,
+                                              TelephonyManager.NETWORK_SELECTION_MODE_AUTO);
+
+            log("getNetworkSelectionMode: " + mode);
+            return mode;
+            //[BUG]-Modify-End by shaopan.tang
         } finally {
             Binder.restoreCallingIdentity(identity);
         }
