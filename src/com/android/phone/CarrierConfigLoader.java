@@ -263,6 +263,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     // modify by T2M.zhangrenjie for FP4S-767 2022/12/1 end
     // modify by T2M.zhangrenjie for FP4S-995 2023/05/15 begin
     private static final String PROP_OPENMARKET_OTA_UPDATE = "persist.ril.sim.om_update";
+    private static final String PROP_TW_OTA_UPDATE = "persist.ril.sim.tw_update";// modify by T2M.zhangrenjie for FP4S-982 2023/8/1
     // modify by T2M.zhangrenjie for FP4S-995 2023/05/15 end
     private static final String KEY_CID = "cid", KEY_MCC = "mcc", KEY_MNC = "mnc";
     private PersistableBundle mConfigFromDSDLocked = null;
@@ -722,6 +723,22 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                             hasOTAUpdate = true;
                         }
                         // modify by T2M.zhangrenjie for FP4S-767 2022/12/1 end
+                        // modify by T2M.zhangrenjie for FP4S-982 2023/8/1 begin
+                        boolean hasTwRefresh = SystemProperties.getBoolean(PROP_TW_OTA_UPDATE, false);
+                        if (!hasTwRefresh) {
+                            clearCachedConfigForPackage(1881);//fet
+                            clearCachedConfigForPackage(1882);//APT
+                            clearCachedConfigForPackage(1883);//tuntex
+                            clearCachedConfigForPackage(1884);//chuangwa
+                            clearCachedConfigForPackage(1886);//t star
+                            clearCachedConfigForPackage(1887);//Mobitai
+                            clearCachedConfigForPackage(1888);//taiwan telecom
+                            clearCachedConfigForPackage(1889);//transasia
+                            clearCachedConfigForPackage(2408);//vmax
+                            SystemProperties.set(PROP_DT_OTA_UPDATE, "true");
+                            hasOTAUpdate = true;
+                        }
+                        // modify by T2M.zhangrenjie for FP4S-982 2023/8/1 end
                         sharedPrefs
                                 .edit()
                                 .putString(KEY_FINGERPRINT, Build.FINGERPRINT)
