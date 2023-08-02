@@ -676,6 +676,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                     SharedPreferences sharedPrefs =
                             PreferenceManager.getDefaultSharedPreferences(mContext);
                     final String lastFingerprint = sharedPrefs.getString(KEY_FINGERPRINT, null);
+                    logd("EVENT_CHECK_SYSTEM_UPDATE debug mode =" + SystemProperties.getBoolean("persist.ril.sim.ota_test", false));
                     if ((lastFingerprint != null && !Build.FINGERPRINT.equals(lastFingerprint))
                             || SystemProperties.getBoolean("persist.ril.sim.ota_test", false)/*add a way to test*/) {
                         logd(
@@ -735,7 +736,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                             clearCachedConfigForPackage(1888);//taiwan telecom
                             clearCachedConfigForPackage(1889);//transasia
                             clearCachedConfigForPackage(2408);//vmax
-                            SystemProperties.set(PROP_DT_OTA_UPDATE, "true");
+                            SystemProperties.set(PROP_TW_OTA_UPDATE, "true");
                             hasOTAUpdate = true;
                         }
                         // modify by T2M.zhangrenjie for FP4S-982 2023/8/1 end
