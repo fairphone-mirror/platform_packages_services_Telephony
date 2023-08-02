@@ -610,7 +610,10 @@ public class CallFeaturesSetting extends PreferenceActivity
         } else if (!mImsMgr.isWfcEnabledByPlatform() || !mImsMgr.isWfcProvisionedOnDevice()) {
             prefSet.removePreference(mButtonWifiCalling);
         } else {
-            String title = getResourcesForSubId().getString(R.string.wifi_calling);
+            String title = carrierConfig.getString(CarrierConfigManager.KEY_WIFI_CALLING_TITLE);
+            if ("".equals(title)) {
+                title = getResourcesForSubId().getString(R.string.wifi_calling_settings_title);
+            }
             mButtonWifiCalling.setTitle(title);
 
             int resId = com.android.internal.R.string.wifi_calling_off_summary;
@@ -635,7 +638,8 @@ public class CallFeaturesSetting extends PreferenceActivity
                         if (DBG) log("Unexpected WFC mode value: " + wfcMode);
                 }
             }
-            mButtonWifiCalling.setSummary(getResourcesForSubId().getString(resId));
+            boolean showSummary = carrierConfig.getBoolean("show_wifi_calling_summary_bool",true);
+            if(showSummary) mButtonWifiCalling.setSummary(getResourcesForSubId().getString(resId));
             Intent intent = mButtonWifiCalling.getIntent();
             if (intent != null) {
                 intent.putExtra(Settings.EXTRA_SUB_ID, mPhone.getSubId());
