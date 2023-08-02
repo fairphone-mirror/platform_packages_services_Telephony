@@ -1,3 +1,4 @@
+
 revision: 2
 countries {
   iso_code: "AD"
@@ -505,22 +506,6 @@ countries {
   }
   eccs {
     phone_number: "118"
-    types: FIRE
-  }
-  ecc_fallback: "112"
-}
-countries {
-  iso_code: "CN"
-  eccs {
-    phone_number: "110"
-    types: POLICE
-  }
-  eccs {
-    phone_number: "120"
-    types: AMBULANCE
-  }
-  eccs {
-    phone_number: "119"
     types: FIRE
   }
   ecc_fallback: "112"
