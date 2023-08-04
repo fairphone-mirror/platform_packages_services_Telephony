@@ -19,7 +19,7 @@
     <!-- Do not translate. Title for setting to select Wi-Fi call manager account -->
     <string name="wifi_calling">Wi-Fi calling</string>
     <!-- Do not translate. Mobile network settings screen, title of Wi-Fi calling setting -->
-    <string name="wifi_calling_settings_title">WiFi call</string>
+    <string name="wifi_calling_settings_title">"WiFi Calling"</string>
     <!-- Do not translate. Status hint label for a call being made over a wifi network. [CHAR LIMIT=25] -->
     <string name="status_hint_label_wifi_call">Wi-Fi call</string>
 </resources>

@@ -310,7 +310,7 @@
     <string name="sim_selection_required_pref" msgid="6985901872978341314">"É necessário selecionar uma opção"</string>
     <string name="sim_change_data_title" msgid="9142726786345906606">"Alterar SIM para dados móveis?"</string>
     <string name="sim_change_data_message" msgid="3567358694255933280">"Usar <xliff:g id="NEW_SIM">%1$s</xliff:g> em vez de <xliff:g id="OLD_SIM">%2$s</xliff:g> para dados móveis?"</string>
-    <string name="wifi_calling_settings_title" msgid="5800018845662016507">"Chamadas por Wi-Fi"</string>
+    <string name="wifi_calling_settings_title" msgid="5800018845662016507">"Chamada WI-FI"</string>
     <string name="video_calling_settings_title" msgid="342829454913266078">"Videochamadas via operadora"</string>
     <string name="gsm_umts_options" msgid="4968446771519376808">"Opções GSM/UMTS"</string>
     <string name="cdma_options" msgid="3669592472226145665">"Opções CDMA"</string>
