@@ -309,7 +309,7 @@
     <string name="sim_selection_required_pref" msgid="6985901872978341314">"Selectie vereist"</string>
     <string name="sim_change_data_title" msgid="9142726786345906606">"Sim voor gegevens wijzigen?"</string>
     <string name="sim_change_data_message" msgid="3567358694255933280">"<xliff:g id="NEW_SIM">%1$s</xliff:g> in plaats van <xliff:g id="OLD_SIM">%2$s</xliff:g> gebruiken voor mobiele data?"</string>
-    <string name="wifi_calling_settings_title" msgid="5800018845662016507">"Bellen via wifi"</string>
+    <string name="wifi_calling_settings_title" msgid="5800018845662016507">"Bellen via Wi-Fi"</string>
     <string name="video_calling_settings_title" msgid="342829454913266078">"Provider videogesprekken"</string>
     <string name="gsm_umts_options" msgid="4968446771519376808">"GSM-/UMTS-opties"</string>
     <string name="cdma_options" msgid="3669592472226145665">"CDMA-opties"</string>

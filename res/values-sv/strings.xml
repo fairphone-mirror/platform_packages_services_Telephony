@@ -309,7 +309,7 @@
     <string name="sim_selection_required_pref" msgid="6985901872978341314">"Du måste välja något"</string>
     <string name="sim_change_data_title" msgid="9142726786345906606">"Vill du ändra data-SIM?"</string>
     <string name="sim_change_data_message" msgid="3567358694255933280">"Vill du använda <xliff:g id="NEW_SIM">%1$s</xliff:g> i stället för <xliff:g id="OLD_SIM">%2$s</xliff:g> för mobildata?"</string>
-    <string name="wifi_calling_settings_title" msgid="5800018845662016507">"wifi-samtal"</string>
+    <string name="wifi_calling_settings_title" msgid="5800018845662016507">"WIFI-samtal"</string>
     <string name="video_calling_settings_title" msgid="342829454913266078">"Videosamtal via operatören"</string>
     <string name="gsm_umts_options" msgid="4968446771519376808">"Alternativ för GSM/UMTS"</string>
     <string name="cdma_options" msgid="3669592472226145665">"CDMA-alternativ"</string>
