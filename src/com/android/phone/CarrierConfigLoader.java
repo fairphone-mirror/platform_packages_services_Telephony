@@ -2212,8 +2212,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
             case ExtTelephonyManager.SIM_STATE_ESSENTIAL_RECORDS_LOADED:
                 mIsEssentialSimRecordsLoaded[phoneId] = true;
-                // modify for FP4T-371
-                //updateConfigForPhoneId(phoneId);
+                updateConfigForPhoneId(phoneId);
                 break;
         }
     }
