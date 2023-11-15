@@ -261,6 +261,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private static final String PROP_COUNTRY = "persist.radio.sim.country";
     private static final String PROP_MCC_MNC = "persist.radio.sim.mcc.mnc";
     private static final String PROP_GID1 = "persist.radio.sim.gid1";
+    private static final String DSDLOCKED_REBOOT = "persist.radio.dsd.locked.reboot";
     private static final String KEY_CID = "cid", KEY_MCC = "mcc", KEY_MNC = "mnc";
     private PersistableBundle mConfigFromDSDLocked = null;
     private static final int EVENT_DSD_BEGIN = 22; // same as last event EVENT_FETCH_DEFAULT_FOR_NO_SIM_CONFIG_TIMEOUT
@@ -807,6 +808,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
                 // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
                 case EVENT_DSD_REBOOT:
+                    SystemProperties.set(DSDLOCKED_REBOOT, "1");
                     PowerManager pm = (PowerManager)mContext.getSystemService(Context.POWER_SERVICE);
                     pm.reboot(null);
                     break;
