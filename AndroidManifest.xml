@@ -707,6 +707,8 @@
         <uses-library android:name="com.qualcomm.sysrilcmd"/>
         <uses-library android:name="com.qualcomm.qcrilhook"/>
 
+
+<!--
         <receiver
             android:name=".CiWlanNotificationReceiver"
             android:exported="true"
@@ -716,5 +718,6 @@
                 <action android:name="org.codeaurora.intent.action.RADIO_POWER_STATE" />
             </intent-filter>
         </receiver>
+-->
     </application>
 </manifest>
