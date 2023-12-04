@@ -2303,4 +2303,5 @@
     <string name="c_iwlan_exit_notification_positive_button">OPEN SETTINGS</string>
     <string name="c_iwlan_exit_notification_negative_button">DISMISS</string>
     <string name="c_iwlan_channel_name">C_IWLAN</string>
+    <string name="dsd_rebooting">"Setting up your phone. Be patient while it reboots"</string>
 </resources>
