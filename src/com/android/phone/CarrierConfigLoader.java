@@ -73,6 +73,8 @@ import android.widget.Toast;
 import android.os.PowerManager;
 import android.sysprop.TelephonyProperties;
 
+import com.android.ims.FeatureConnector;
+import com.android.ims.ImsException;
 import com.android.ims.ImsManager;
 import com.android.internal.telephony.GlobalSettingsHelper;
 import com.android.internal.annotations.VisibleForTesting;
@@ -452,8 +454,10 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                                             saveConfigToXml(mPlatformCarrierConfigPackage, "", phoneId,
                                                     carrierId, config);
                                             mConfigFromDefaultApp[phoneId] = config;
+                                            mDefaultConfigReceived[phoneId] = true;
                                             updateSettingsProvider(phoneId, config);
                                             updateModemSettings(phoneId, config);
+                                            updateImsSettings(phoneId, config);
                                         //}
                                     }
                                     // modify by T2M.dengxiangyu for FP4-61 2021-04-14 end
@@ -784,8 +788,10 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                                     //if (!m_dsd_locked) {
                                         saveNoSimConfigToXml(mPlatformCarrierConfigPackage, config);
                                         mNoSimConfig = config;
+                                        mDefaultConfigReceived[phoneId] = true;
                                         updateSettingsProvider(phoneId, config);
                                         updateModemSettings(phoneId, config);
+                                        updateImsSettings(phoneId, config);
                                     //}
                                     // modify by T2M.dengxiangyu for FP4-61 2021-06-25 end
 
@@ -822,6 +828,13 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                     pm.reboot(null);
                     break;
                 // add by T2M.dengxiangyu for FP4-61 2021-04-14 end
+
+                // add for FP5U-14 register listener for ImsService begin
+                case EVENT_IMS_SERVICE_CONNECT_READY:
+                    mImsServiceConnected[phoneId] = true;
+                    updateImsSettings(phoneId, mConfigFromDefaultApp[phoneId]);
+                    break;
+                // add for FP5U-14 register listener for ImsService begin
             }
         }
     }
@@ -844,6 +857,8 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         context.registerReceiver(mSystemBroadcastReceiver, systemEventsFilter);
 
         mNumPhones = TelephonyManager.from(context).getActiveModemCount();
+        mImsServiceConnected = new boolean[mNumPhones];
+        mDefaultConfigReceived = new boolean[mNumPhones];
         mConfigFromDefaultApp = new PersistableBundle[mNumPhones];
         mConfigFromCarrierApp = new PersistableBundle[mNumPhones];
         mPersistentOverrideConfigs = new PersistableBundle[mNumPhones];
@@ -861,6 +876,22 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
             mCarrierServiceChangeCallbacks[phoneId] = new CarrierServiceChangeCallback(phoneId);
             TelephonyManager.from(context).registerCarrierPrivilegesCallback(phoneId,
                     new HandlerExecutor(mHandler), mCarrierServiceChangeCallbacks[phoneId]);
+
+            // add for FP5U-14 register listener for ImsService check it in getOrThrowExceptionIfServiceUnavailable begin
+            mFeatureConnector = ImsManager.getConnector(context, phoneId, LOG_TAG,
+                    new FeatureConnector.Listener<ImsManager>() {
+                @Override
+                public void connectionReady(ImsManager manager, int subId) throws ImsException {
+                    mHandler.sendMessage(mHandler.obtainMessage(
+                            EVENT_IMS_SERVICE_CONNECT_READY, SubscriptionManager.getPhoneId(subId), -1));
+                }
+
+                @Override
+                public void connectionUnavailable(int reason) {
+                }
+            }, context.getMainExecutor());
+            mFeatureConnector.connect();
+            // add for FP5U-14 register listener for ImsService check it in getOrThrowExceptionIfServiceUnavailable end
         }
         logd("CarrierConfigLoader has started");
 
@@ -1531,7 +1562,6 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     }
 
     private void updateSettingsProvider(int phoneId, PersistableBundle config) {
-
         ContentResolver resolver = mContext.getContentResolver();
         Phone phone = PhoneFactory.getPhone(phoneId);
         final ImsManager imsManager = ImsManager.getInstance(mContext, phoneId);
@@ -1545,33 +1575,11 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                 mConfigFromDSDLocked.getBoolean(CarrierConfigManager.KEY_BLUETOOTH_DEFAULT_ON, false) :
                 config.getBoolean(CarrierConfigManager.KEY_BLUETOOTH_DEFAULT_ON, false);
 
-        // VOLTE settings
-        boolean enhancedLteDefault = config.getBoolean(CarrierConfigManager.KEY_ENHANCED_4G_LTE_ON_BY_DEFAULT_BOOL, false);
-
-        // VILTE settings
-        boolean vtEnabledByUser = config.getBoolean(CarrierConfigManager.KEY_VT_IMS_ENABLED_BOOLEAN, false);
-
-        // WFC settings
-        boolean wfcEnabledByUser = config.getBoolean(CarrierConfigManager.KEY_CARRIER_DEFAULT_WFC_IMS_ENABLED_BOOL, false);
-        boolean wfc_editable = config.getBoolean(CarrierConfigManager.KEY_EDITABLE_WFC_MODE_BOOL, false);
-        boolean wfc_roaming_editable = config.getBoolean(CarrierConfigManager.KEY_EDITABLE_WFC_ROAMING_MODE_BOOL, false);
-        int wfc_default_mode = config.getInt(CarrierConfigManager.KEY_CARRIER_DEFAULT_WFC_IMS_MODE_INT, 1);
-        int wfc_roaming_default_mode = config.getInt(CarrierConfigManager.KEY_CARRIER_DEFAULT_WFC_IMS_ROAMING_MODE_INT, 1);
-        boolean voWifiRoamingEnabled = config.getBoolean(CarrierConfigManager.KEY_EDITABLE_WFC_ROAMING_MODE_BOOL, false);
-
-        logd("update settings or phone: " + phoneId
+        logd("update settings[" + phoneId + "]"
                 + " data_roaming_enabled: " + data_roaming_enabled
                 + " default_nwmode: " + default_nwmode
                 + " time_format: " + time_format
                 + " bluetooth_on: " + bluetooth_on
-                + " enhancedLteDefault: " + enhancedLteDefault
-                + " vtEnabledByUser: " + vtEnabledByUser
-                + " wfcEnabledByUser: " + wfcEnabledByUser
-                + " wfc_editable: " + wfc_editable
-                + " wfc_default_mode: " + wfc_default_mode
-                + " wfc_roaming_editable: " + wfc_roaming_editable
-                + " wfc_roaming_default_mode: " + wfc_roaming_default_mode
-                + " voWifiRoamingEnabled: " + voWifiRoamingEnabled
         );
 
         if (subIds != null && subIds.length > 0) {
@@ -1607,23 +1615,10 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         Settings.System.putString(resolver, Settings.System.TIME_12_24, time_format);
 
         BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetooth_on) btAdapter.enable();
-        else btAdapter.disable();
-
-        if (imsManager != null && subIds != null && subIds.length > 0) {
-            imsManager.setEnhanced4gLteModeSetting(enhancedLteDefault);
-            imsManager.setVtSetting(vtEnabledByUser);
-
-            if (wfc_editable) {
-                imsManager.setWfcMode(wfc_default_mode, false);
-            }
-
-            if (wfc_roaming_editable) {
-                imsManager.setWfcMode(wfc_roaming_default_mode, true);
-            }
-
-            imsManager.setWfcSetting(wfcEnabledByUser);
-            imsManager.setWfcRoamingSetting(voWifiRoamingEnabled);
+        if (bluetooth_on) {
+            btAdapter.enable();
+        } else {
+            btAdapter.disable();
         }
     }
 
@@ -2539,6 +2534,10 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                 return "EVENT_BIND_DEFAULT_FOR_NO_SIM_CONFIG_TIMEOUT";
             case EVENT_FETCH_DEFAULT_FOR_NO_SIM_CONFIG_TIMEOUT:
                 return "EVENT_FETCH_DEFAULT_FOR_NO_SIM_CONFIG_TIMEOUT";
+            case EVENT_DSD_REBOOT:
+                return "EVENT_DSD_REBOOT";
+            case EVENT_IMS_SERVICE_CONNECT_READY:
+                return "EVENT_IMS_SERVICE_CONNECT_READY";
             default:
                 return "UNKNOWN(" + code + ")";
         }
@@ -2561,4 +2560,68 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         Log.e(LOG_TAG, msg);
         mCarrierConfigLoadingLog.log(msg);
     }
+
+    // add for FP5U-14 register listener for ImsService begin
+    private boolean[] mImsServiceConnected;
+    private boolean[] mDefaultConfigReceived;
+    private final static int EVENT_IMS_SERVICE_CONNECT_READY = EVENT_DSD_BEGIN + 2;
+    private FeatureConnector<ImsManager> mFeatureConnector;
+
+    private void updateImsSettings(int phoneId, PersistableBundle config) {
+        if (!mImsServiceConnected[phoneId]) {
+            logd("ims service[" + phoneId + "] not connected, return");
+            return;
+        }
+
+        if (!mDefaultConfigReceived[phoneId]) {
+            logd("default carrier config[" + phoneId + "] is null, return");
+            return;
+        }
+
+        final ImsManager imsManager = ImsManager.getInstance(mContext, phoneId);
+        if (imsManager == null) {
+            logd("imsmanager[" + phoneId + "] is null, weird");
+            return;
+        }
+
+        // VOLTE settings
+        boolean enhancedLteDefault = config.getBoolean(CarrierConfigManager.KEY_ENHANCED_4G_LTE_ON_BY_DEFAULT_BOOL, false);
+
+        // VILTE settings
+        boolean vtEnabledByUser = config.getBoolean(CarrierConfigManager.KEY_VT_IMS_ENABLED_BOOLEAN, false);
+
+        // WFC settings
+        boolean wfcEnabledByUser = config.getBoolean(CarrierConfigManager.KEY_CARRIER_DEFAULT_WFC_IMS_ENABLED_BOOL, false);
+        boolean wfc_editable = config.getBoolean(CarrierConfigManager.KEY_EDITABLE_WFC_MODE_BOOL, false);
+        boolean wfc_roaming_editable = config.getBoolean(CarrierConfigManager.KEY_EDITABLE_WFC_ROAMING_MODE_BOOL, false);
+        int wfc_default_mode = config.getInt(CarrierConfigManager.KEY_CARRIER_DEFAULT_WFC_IMS_MODE_INT, 1);
+        int wfc_roaming_default_mode = config.getInt(CarrierConfigManager.KEY_CARRIER_DEFAULT_WFC_IMS_ROAMING_MODE_INT, 1);
+        boolean voWifiRoamingEnabled = config.getBoolean(CarrierConfigManager.KEY_EDITABLE_WFC_ROAMING_MODE_BOOL, false);
+
+        logd("update ims settings[" + phoneId + "]"
+                + " enhancedLteDefault: " + enhancedLteDefault
+                + " vtEnabledByUser: " + vtEnabledByUser
+                + " wfcEnabledByUser: " + wfcEnabledByUser
+                + " wfc_editable: " + wfc_editable
+                + " wfc_default_mode: " + wfc_default_mode
+                + " wfc_roaming_editable: " + wfc_roaming_editable
+                + " wfc_roaming_default_mode: " + wfc_roaming_default_mode
+                + " voWifiRoamingEnabled: " + voWifiRoamingEnabled
+        );
+
+        imsManager.setEnhanced4gLteModeSetting(enhancedLteDefault);
+        imsManager.setVtSetting(vtEnabledByUser);
+
+        if (wfc_editable) {
+            imsManager.setWfcMode(wfc_default_mode, false);
+        }
+
+        if (wfc_roaming_editable) {
+            imsManager.setWfcMode(wfc_roaming_default_mode, true);
+        }
+
+        imsManager.setWfcSetting(wfcEnabledByUser);
+        imsManager.setWfcRoamingSetting(voWifiRoamingEnabled);
+    }
+    // add for FP5U-14 register listener for ImsService end
 }
