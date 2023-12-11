@@ -2624,4 +2624,17 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         imsManager.setWfcRoamingSetting(voWifiRoamingEnabled);
     }
     // add for FP5U-14 register listener for ImsService end
+
+
+    @Override
+    @NonNull
+    public PersistableBundle getConfigLocked(int subId, String callingPackage) {
+        logd("getConfigLocked~~ m_dsd_locked:"+m_dsd_locked + " mConfigFromDSDLocked != null :" + (mConfigFromDSDLocked != null));
+        if (m_dsd_locked && mConfigFromDSDLocked != null) {
+            return mConfigFromDSDLocked;
+        }
+        return getConfigForSubId(subId, callingPackage);
+
+    }
+
 }
