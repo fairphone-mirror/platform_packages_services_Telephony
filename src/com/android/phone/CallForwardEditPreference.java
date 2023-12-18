@@ -274,10 +274,19 @@ public class CallForwardEditPreference extends EditPhoneNumberPreference {
             if (reason == CommandsInterface.CF_REASON_NO_REPLY) {
                 PersistableBundle carrierConfig = PhoneGlobals.getInstance()
                         .getCarrierConfigForSubId(mPhone.getSubId());
+            //Modify for FP4T-864 set CFNRy timer to 40s begin
+            TelephonyManager telephonyManager =
+                    (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
+            String mccmnc = telephonyManager.getSimOperator(mPhone.getSubId());
                 if (carrierConfig.getBoolean(
                         CarrierConfigManager.KEY_SUPPORT_NO_REPLY_TIMER_FOR_CFNRY_BOOL, true)) {
                     time = 20;
+                    if (!TextUtils.isEmpty(mccmnc) && mccmnc.equals("46601")) {
+                        time = 40;
+                    }
                 }
+            Log.d(LOG_TAG, "mccmnc is : " + mccmnc + ", time = " + time);
+            //Modify for FP4T-864 set CFNRy timer to 40s end
             }
             final String number = getPhoneNumber();
 
