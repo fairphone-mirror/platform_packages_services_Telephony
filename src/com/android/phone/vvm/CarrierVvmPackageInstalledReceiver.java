@@ -55,13 +55,17 @@ public class CarrierVvmPackageInstalledReceiver extends BroadcastReceiver {
      */
     private static final String ACTION_CARRIER_VVM_PACKAGE_INSTALLED =
             "com.android.internal.telephony.CARRIER_VVM_PACKAGE_INSTALLED";
+    //Add-BEGIN for FP5-2997 [FP5 CR#7][Sky] Enable VVM,12/22/2023
+    private static final String ACTION_CARRIER_VVM_PACKAGE_REMOVED =
+            "com.android.internal.telephony.CARRIER_VVM_PACKAGE_REMOVED";
 
     public void register(Context context) {
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_PACKAGE_ADDED);
+        intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
         intentFilter.addDataScheme("package");
         context.registerReceiver(this, intentFilter);
     }
-
+    //Add-END for FP5-2997 [FP5 CR#7][Sky] Enable VVM,12/22/2023
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getData() == null) {
@@ -99,6 +103,11 @@ public class CarrierVvmPackageInstalledReceiver extends BroadcastReceiver {
 
             VvmLog.i(TAG, "sending broadcast to " + vvmPackage);
             Intent broadcast = new Intent(ACTION_CARRIER_VVM_PACKAGE_INSTALLED);
+            //Add-BEGIN for FP5-2997 [FP5 CR#7][Sky] Enable VVM,12/22/2023
+            if (Intent.ACTION_PACKAGE_REMOVED.equals(intent.getAction())) {
+                broadcast = new Intent(ACTION_CARRIER_VVM_PACKAGE_REMOVED);
+            }
+            //Add-END for FP5-2997 [FP5 CR#7][Sky] Enable VVM,12/22/2023
             broadcast.putExtra(Intent.EXTRA_PACKAGE_NAME, packageName);
             broadcast.setPackage(vvmPackage);
             context.sendBroadcast(broadcast);
