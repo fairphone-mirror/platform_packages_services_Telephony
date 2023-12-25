@@ -2045,7 +2045,8 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
                     if ((state_esim == TelephonyManager.SIM_STATE_READY // use it first if ESIM exist
                             && phoneId == phoneid_esim)
-                            || (state_esim != TelephonyManager.SIM_STATE_READY // use physical SIM if ESIM is none
+                            || ((state_esim == TelephonyManager.SIM_STATE_NOT_READY
+                            || state_esim == TelephonyManager.SIM_STATE_ABSENT) // use physical SIM if ESIM is none
                             && phoneId != phoneid_esim)) {
                         String operator = teleManager.getSimOperatorNameForPhone(phoneId);
                         String country = teleManager.getSimCountryIsoForPhone(phoneId);
