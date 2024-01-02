@@ -57,8 +57,8 @@
     <string name="unlock_failed" msgid="7103543844840661366">"網路解鎖失敗。"</string>
     <string name="unlock_success" msgid="32681089371067565">"網路解鎖成功。"</string>
     <string name="mobile_network_settings_not_available" msgid="8678168497517090039">"這位使用者無法修改行動網路設定"</string>
-    <string name="labelGSMMore" msgid="7354182269461281543">"GSM 通話設定"</string>
-    <string name="labelGsmMore_with_label" msgid="3206015314393246224">"GSM 通話設定 (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
+    <string name="labelGSMMore" msgid="7354182269461281543">"通話設定"</string>
+    <string name="labelGsmMore_with_label" msgid="3206015314393246224">"通話設定 (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
     <string name="labelCDMAMore" msgid="7937441382611224632">"CDMA 通話設定"</string>
     <string name="labelCdmaMore_with_label" msgid="7759692829160238152">"CDMA 通話設定 (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
     <string name="apn_settings" msgid="1978652203074756623">"存取點名稱 (APN)"</string>
@@ -937,4 +937,8 @@
     <string name="send_from_work_profile_cancel" msgid="177746511030381711">"取消"</string>
     <string name="send_from_work_profile_action_str" msgid="6892775562934243337">"切換至工作資料夾"</string>
     <string name="install_messages_on_work_profile_action_str" msgid="3773440996395152903">"安裝工作訊息應用程式"</string>
+    <string name="call_forward_option">"來電轉接選項"</string>
+    <string name="labelCFVoice">"語音"</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">"撥出電話接通時震動"</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">"當撥出電話接通時, 啟動震動模式"</string>
 </resources>
