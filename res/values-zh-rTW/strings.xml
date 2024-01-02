@@ -57,8 +57,8 @@
     <string name="unlock_failed" msgid="7103543844840661366">"網路解鎖失敗。"</string>
     <string name="unlock_success" msgid="32681089371067565">"網路解鎖成功。"</string>
     <string name="mobile_network_settings_not_available" msgid="8678168497517090039">"這位使用者無法修改行動網路設定"</string>
-    <string name="labelGSMMore" msgid="7354182269461281543">"GSM 通話設定"</string>
-    <string name="labelGsmMore_with_label" msgid="3206015314393246224">"GSM 通話設定 (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
+    <string name="labelGSMMore" msgid="7354182269461281543">"通話設定"</string>
+    <string name="labelGsmMore_with_label" msgid="3206015314393246224">"通話設定 (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
     <string name="labelCDMAMore" msgid="7937441382611224632">"CDMA 通話設定"</string>
     <string name="labelCdmaMore_with_label" msgid="7759692829160238152">"CDMA 通話設定 (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
     <string name="apn_settings" msgid="1978652203074756623">"存取點名稱 (APN)"</string>
@@ -919,4 +919,9 @@
     <string name="call_quality_notification_bluetooth_details" msgid="8348950331707346711">"你的藍牙訊號微弱，建議你改用擴音模式。"</string>
     <string name="call_quality_notification_name" msgid="3476828289553948830">"通話品質通知"</string>
     <string name="notification_channel_sip_account" msgid="1261816025156179637">"不適用的 SIP 帳戶"</string>
+    <string name="call_forward_option">"來電轉接選項"</string>
+    <string name="labelCFVoice">"語音"</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">"撥出電話接通時震動"</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">"當撥出電話接通時, 啟動震動模式"</string>
+
 </resources>
