@@ -1874,16 +1874,9 @@ public class TelephonyConnectionService extends ConnectionService {
                     }
                 case ServiceState.STATE_POWER_OFF:
                     // Don't disconnect if radio is power off because the device is on Bluetooth.
-                    Log.d(this, "onCreateOutgoingConnection STATE_POWER_OFF");
                     if (isRadioPowerDownOnBluetooth()) {
                         break;
                     }
-                    //Modify begin by renjie.zhang FP4T-944 2024/1/2
-                    if (phone.isUtEnabled() && number.endsWith("#")) {
-                        Log.d(this, "onCreateOutgoingConnection  STATE_POWER_OFF dial for UT");
-                        break;
-                    }
-                    //Modify end by renjie.zhang FP4T-944 2024/1/2
                     return Connection.createFailedConnection(
                             mDisconnectCauseFactory.toTelecomDisconnectCause(
                                     android.telephony.DisconnectCause.POWER_OFF,
