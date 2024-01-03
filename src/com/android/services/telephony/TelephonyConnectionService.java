@@ -66,6 +66,7 @@ import com.android.internal.telephony.imsphone.ImsExternalCallTracker;
 import com.android.internal.telephony.imsphone.ImsPhone;
 import com.android.internal.telephony.imsphone.ImsPhoneCallTracker;
 import com.android.internal.telephony.imsphone.ImsPhoneConnection;
+import com.android.internal.telephony.imsphone.ImsPhoneMmiCode;
 import com.android.phone.FrameworksUtils;
 import com.android.phone.MMIDialogActivity;
 import com.android.phone.PhoneUtils;
@@ -94,6 +95,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 import org.codeaurora.ims.QtiCallConstants;
+
 
 /**
  * Service for making GSM and CDMA connections.
@@ -1382,11 +1384,19 @@ public class TelephonyConnectionService extends ConnectionService {
                                         phone.getPhoneId()));
                     }
                 case ServiceState.STATE_POWER_OFF:
+                    Log.d(this, "onCreateOutgoingConnection  STATE_POWER_OFF");
                     // Don't disconnect if radio is power off because the device is on Bluetooth.
                     if (isRadioPowerDownOnBluetooth()) {
                         break;
                     }
-                    return Connection.createFailedConnection(
+                    //Modify begin by renjie.zhang FP4T-944 2024/1/3
+                    boolean isSuppServiceCode = ImsPhoneMmiCode.isSuppServiceCodes(number, phone);
+                    if (isSuppServiceCode) {
+                        Log.d(this, "onCreateOutgoingConnection  STATE_POWER_OFF dial for UT");
+                        break;
+                    }
+                    //Modify end by renjie.zhang FP4T-944 2024/1/3
+                    return Connection.createFailedConnection
                             mDisconnectCauseFactory.toTelecomDisconnectCause(
                                     android.telephony.DisconnectCause.POWER_OFF,
                                     "ServiceState.STATE_POWER_OFF",
