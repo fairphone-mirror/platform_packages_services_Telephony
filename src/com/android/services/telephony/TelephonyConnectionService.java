@@ -1396,7 +1396,7 @@ public class TelephonyConnectionService extends ConnectionService {
                         break;
                     }
                     //Modify end by renjie.zhang FP4T-944 2024/1/3
-                    return Connection.createFailedConnection
+                    return Connection.createFailedConnection(
                             mDisconnectCauseFactory.toTelecomDisconnectCause(
                                     android.telephony.DisconnectCause.POWER_OFF,
                                     "ServiceState.STATE_POWER_OFF",
