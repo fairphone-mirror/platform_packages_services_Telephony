@@ -1390,8 +1390,16 @@ public class TelephonyConnectionService extends ConnectionService {
                         break;
                     }
                     //Modify begin by renjie.zhang FP4T-944 2024/1/3
+                    boolean allowNonUTSuppServiceCode = false;
+                    CarrierConfigManager cfgManager = (CarrierConfigManager)
+                            phone.getContext().getSystemService(Context.CARRIER_CONFIG_SERVICE);
+                    if (cfgManager != null) {
+                        allowNonUTSuppServiceCode = cfgManager.getConfigForSubId(phone.getSubId())
+                            .getBoolean("allow_ussd_via_non_ut_bool",false);
+                    }
+
                     boolean isSuppServiceCode = ImsPhoneMmiCode.isSuppServiceCodes(number, phone);
-                    if (isSuppServiceCode) {
+                    if (isSuppServiceCode && allowNonUTSuppServiceCode) {
                         Log.d(this, "onCreateOutgoingConnection  STATE_POWER_OFF dial for UT");
                         break;
                     }
