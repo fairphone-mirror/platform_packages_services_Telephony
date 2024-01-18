@@ -2705,7 +2705,9 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private String m_client_id = "";
     private String m_boot_id = "";
 
-    private int getESimPhoneId() {
+    //[BUG]-Modify-Begin by shaopan.tang 2024-01-18 FP5U-147 GTS testCarrierConfigManagerUpdateConfigForPhoneId failed
+    // For esim, its slot id should always be 1, no need to read from uicccardinfo again
+    /*private int getESimPhoneId() {
         String eID = null;
         int phoneid_esim = 1; // ESIM always in slot2
         TelephonyManager teleManager = TelephonyManager.from(mContext);
@@ -2728,7 +2730,8 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         }
 
         return phoneid_esim;
-    }
+    }*/
+    //[BUG]-Modify-End by shaopan.tang
 
     private boolean doSimNextAction(int phoneId) {
         boolean ret = false;
@@ -2737,7 +2740,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         TelephonyManager teleManager = TelephonyManager.from(mContext);
 
         logd("Sim[" + phoneId + "] NextAction");
-        phoneid_esim = getESimPhoneId();
+        //phoneid_esim = getESimPhoneId();//[BUG]-Modify by shaopan.tang 2024-01-18 FP5U-147 GTS testCarrierConfigManagerUpdateConfigForPhoneId failed
         state_esim = teleManager.getSimState(phoneid_esim);
         logd("esim state: " + TelephonyManager.simStateToString(state_esim));
 
