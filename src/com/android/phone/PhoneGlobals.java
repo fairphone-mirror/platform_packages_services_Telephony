@@ -914,6 +914,10 @@ public class PhoneGlobals extends ContextWrapper {
             } else if (action.equals(CarrierConfigManager.ACTION_CARRIER_CONFIG_CHANGED)) {
                 // Roaming status could be overridden by carrier config, so we need to update it.
                 if (VDBG) Log.v(LOG_TAG, "carrier config changed.");
+                //[BUG]-Modify-Begin by shaopan.tang 2024-01-24 FP5U-166 Phone services notification always present when turn off data roaming
+                mDefaultDataSubId = SubscriptionManager.getDefaultDataSubscriptionId();
+                registerSettingsObserver();
+                //[BUG]-Modify-Begin by shaopan.tang
                 updateDataRoamingStatus();
                 updateLimitedSimFunctionForDualSim();
                 int subId = intent.getIntExtra(SubscriptionManager.EXTRA_SUBSCRIPTION_INDEX,
@@ -960,6 +964,18 @@ public class PhoneGlobals extends ContextWrapper {
         return state;
     }
 
+    //[BUG]-Modify-Begin by shaopan.tang 2024-01-24 FP5U-166 Phone services notification always present when turn off data roaming
+    /**
+     * @return whether or not we should show a notification when connecting to data roaming if the
+     * user has data roaming enabled
+     */
+    private boolean shouldShowDataConnectedRoaming(int subId) {
+        PersistableBundle config = getCarrierConfigForSubId(subId);
+        return config.getBoolean(CarrierConfigManager
+                .KEY_SHOW_DATA_CONNECTED_ROAMING_NOTIFICATION_BOOL);
+    }
+    //[BUG]-Modify-End by shaopan.tang
+
     /**
      * When roaming, if mobile data cannot be established due to data roaming not enabled, we need
      * to notify the user so they can enable it through settings. Vise versa if the condition
@@ -977,7 +993,8 @@ public class PhoneGlobals extends ContextWrapper {
      *                               the current roaming operator numeric didn't change.
      */
     private void updateDataRoamingStatus(@Nullable String roamingOperatorNumeric) {
-        if (VDBG) Log.v(LOG_TAG, "updateDataRoamingStatus");
+        if (VDBG) Log.v(LOG_TAG, "updateDataRoamingStatus mDefaultDataSubId= " + mDefaultDataSubId);
+        mDefaultDataSubId = SubscriptionManager.getDefaultDataSubscriptionId();
         Phone phone = getPhone(mDefaultDataSubId);
         if (phone == null) {
             Log.w(LOG_TAG, "Can't get phone with sub id = " + mDefaultDataSubId);
@@ -1016,11 +1033,8 @@ public class PhoneGlobals extends ContextWrapper {
             Message msg = mHandler.obtainMessage(EVENT_DATA_ROAMING_DISCONNECTED);
             msg.arg1 = mDefaultDataSubId;
             msg.sendToTarget();
-        } else if (dataAllowed && dataIsNowRoaming(mDefaultDataSubId)) {
-            boolean isShowRoamingNotificationEnabled = getCarrierConfigForSubId(mDefaultDataSubId)
-                    .getBoolean(CarrierConfigManager
-                            .KEY_SHOW_DATA_CONNECTED_ROAMING_NOTIFICATION_BOOL);
-            if (!isShowRoamingNotificationEnabled) return;
+        } else if (dataAllowed && dataIsNowRoaming(mDefaultDataSubId)
+               && shouldShowDataConnectedRoaming(mDefaultDataSubId)) {//[BUG]-Modify by shaopan.tang 2024-01-24 FP5U-166 Phone services notification always present when turn off data roaming
             // Don't show roaming notification if we've already shown for this MccMnc
             if (roamingOperatorNumeric != null
                     && !mPrevRoamingOperatorNumerics.add(roamingOperatorNumeric)) {
