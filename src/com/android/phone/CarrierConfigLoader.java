@@ -2813,9 +2813,12 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         for (phoneId = 0; phoneId < mNumPhones; phoneId++) {
             logd("SIM[" + phoneId + "] state: " + m_sim_status[phoneId]);
             if (m_sim_status[phoneId].equalsIgnoreCase(IccCardConstants.INTENT_VALUE_ICC_UNKNOWN)
-                    // If the DSD Priority SIM is locked, then wait for it to unlock
-                    || (m_sim_status[phoneId].equalsIgnoreCase(IccCardConstants.INTENT_VALUE_ICC_LOCKED)
-                    && phoneId == m_slotid_dsd_priority)) {
+                    // If SIM is locked, then wait for it to unlock
+                    || m_sim_status[phoneId].equalsIgnoreCase(IccCardConstants.INTENT_VALUE_ICC_LOCKED)
+                    // ESSENTIAL_RECORDS_LOADED reports fast, perhaps the status of all SIMs has not been updated yet
+                    // example: SIM1 is NOT_READY(next state is LOCKED but later, or always NOT_READY)
+                    // SIM2 is ESSENTIAL_RECORDS_LOADED at the same time
+                    || m_sim_status[phoneId].equalsIgnoreCase(ExtTelephonyManager.SIM_STATE_ESSENTIAL_RECORDS_LOADED)) {
                 break;
             }
         }
@@ -2859,10 +2862,9 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         boolean isDsdLockConfigDone = getDsdLocked();
         boolean isBootCarrierConfigDone = !getBootCarrierId().isEmpty();
 
-        // Do DSD check when SIM ready
-        if (m_sim_status[phoneId].equalsIgnoreCase(ExtTelephonyManager.SIM_STATE_ESSENTIAL_RECORDS_LOADED) == false
-                && m_sim_status[phoneId].equalsIgnoreCase(IccCardConstants.INTENT_VALUE_ICC_LOADED) == false) {
-            logd("doDSD[" + phoneId + "] when SIM ready, currently: " + m_sim_status[phoneId]);
+        // Do DSD check when SIM loaded
+        if (m_sim_status[phoneId].equalsIgnoreCase(IccCardConstants.INTENT_VALUE_ICC_LOADED) == false) {
+            logd("doDSD[" + phoneId + "] when SIM loaded, currently: " + m_sim_status[phoneId]);
             return;
         }
 
