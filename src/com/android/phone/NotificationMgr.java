@@ -411,6 +411,18 @@ public class NotificationMgr {
                 }
             }
         } else {
+            // modify begin by T2M.zhang renjie for FP5U-205 24-01-31
+            List<UserHandle> users = getUsersExcludeDying();
+            for (UserHandle userHandle : users) {
+                if (!hasUserRestriction(
+                        UserManager.DISALLOW_OUTGOING_CALLS, userHandle)
+                        && !mUserManager.isManagedProfile(userHandle.getIdentifier())) {
+                    maybeSendVoicemailNotificationUsingDefaultDialer(phone, 0, null, null,
+                            false, userHandle, isRefresh, subId);
+
+                }
+            }
+            // modify end by T2M.zhang renjie for FP5U-205 24-01-31
             cancelAsUser(Integer.toString(subId) /* tag */, VOICEMAIL_NOTIFICATION, UserHandle.ALL);
         }
     }
