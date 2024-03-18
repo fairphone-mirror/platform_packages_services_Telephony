@@ -877,16 +877,6 @@ countries {
     routing: NORMAL
   }
   eccs {
-    phone_number: "024"
-    types: TYPE_UNSPECIFIED
-    routing: NORMAL
-  }
-  eccs {
-      phone_number: "016"
-      types: TYPE_UNSPECIFIED
-      routing: NORMAL
-  }
-  eccs {
         phone_number: "017"
         types: TYPE_UNSPECIFIED
         routing: NORMAL
@@ -898,11 +888,6 @@ countries {
   }
   eccs {
       phone_number: "116111"
-      types: TYPE_UNSPECIFIED
-      routing: NORMAL
-  }
-  eccs {
-      phone_number: "900018018"
       types: TYPE_UNSPECIFIED
       routing: NORMAL
   }
@@ -980,21 +965,6 @@ countries {
     types: AMBULANCE
     types: FIRE
     routing: EMERGENCY
-  }
-  eccs {
-    phone_number: "15"
-    types: AMBULANCE
-    routing: NORMAL
-  }
-  eccs {
-    phone_number: "17"
-    types: POLICE
-    routing: NORMAL
-  }
-  eccs {
-    phone_number: "18"
-    types: FIRE
-    routing: NORMAL
   }
   eccs {
     phone_number: "115"
