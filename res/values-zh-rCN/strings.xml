@@ -57,8 +57,8 @@
     <string name="unlock_failed" msgid="7103543844840661366">"网络解锁请求失败。"</string>
     <string name="unlock_success" msgid="32681089371067565">"网络解锁成功。"</string>
     <string name="mobile_network_settings_not_available" msgid="8678168497517090039">"此用户无法修改移动网络设置"</string>
-    <string name="labelGSMMore" msgid="7354182269461281543">"GSM 通话设置"</string>
-    <string name="labelGsmMore_with_label" msgid="3206015314393246224">"GSM 通话设置（<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>）"</string>
+    <string name="labelGSMMore" msgid="7354182269461281543">"通话设置"</string>
+    <string name="labelGsmMore_with_label" msgid="3206015314393246224">"通话设置（<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>）"</string>
     <string name="labelCDMAMore" msgid="7937441382611224632">"CDMA 通话设置"</string>
     <string name="labelCdmaMore_with_label" msgid="7759692829160238152">"CDMA 通话设置（<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>）"</string>
     <string name="apn_settings" msgid="1978652203074756623">"接入点名称 (APN)"</string>
@@ -88,7 +88,7 @@
     <string name="call_settings" msgid="3677282690157603818">"通话设置"</string>
     <string name="additional_gsm_call_settings" msgid="1561980168685658846">"其他设置"</string>
     <string name="additional_gsm_call_settings_with_label" msgid="7973920539979524908">"其他设置 (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
-    <string name="sum_gsm_call_settings" msgid="7964692601608878138">"其他仅适用于 GSM 通话的设置"</string>
+    <string name="sum_gsm_call_settings" msgid="7964692601608878138">"附加通话设置"</string>
     <string name="additional_cdma_call_settings" msgid="2178016561980611304">"其他 CDMA 通话设置"</string>
     <string name="sum_cdma_call_settings" msgid="3185825305136993636">"仅适用于 CDMA 的其他通话设置"</string>
     <string name="labelNwService" msgid="6015891883487125120">"网络服务设置"</string>
