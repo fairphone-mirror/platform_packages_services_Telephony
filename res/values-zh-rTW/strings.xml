@@ -88,7 +88,7 @@
     <string name="call_settings" msgid="3677282690157603818">"通話設定"</string>
     <string name="additional_gsm_call_settings" msgid="1561980168685658846">"其他設定"</string>
     <string name="additional_gsm_call_settings_with_label" msgid="7973920539979524908">"其他設定 (<xliff:g id="SUBSCRIPTIONLABEL">%s</xliff:g>)"</string>
-    <string name="sum_gsm_call_settings" msgid="7964692601608878138">"其他 GSM 僅限通話設定"</string>
+    <string name="sum_gsm_call_settings" msgid="7964692601608878138">"附加通話設定"</string>
     <string name="additional_cdma_call_settings" msgid="2178016561980611304">"其他 CDMA 通話設定"</string>
     <string name="sum_cdma_call_settings" msgid="3185825305136993636">"其他 CDMA 僅限通話設定"</string>
     <string name="labelNwService" msgid="6015891883487125120">"網路服務設定"</string>

@@ -205,7 +205,7 @@
     <!-- GSM Call settings screen, setting option name, with label identifying the SIM the settings are for. -->
     <string name="additional_gsm_call_settings_with_label">Additional settings (<xliff:g id="subscriptionlabel" example="Verizon">%s</xliff:g>)</string>
     <!-- GSM-only Call settings screen, setting option name-->
-    <string name="sum_gsm_call_settings">Additional GSM only call settings</string>
+    <string name="sum_gsm_call_settings">Additional call settings</string>
     <!-- CDMA Call settings screen, setting option name -->
     <string name="additional_cdma_call_settings">Additional CDMA call settings</string>
     <!-- CDMA-only Call settings screen, setting option name-->

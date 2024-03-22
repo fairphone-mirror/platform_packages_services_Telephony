@@ -26,7 +26,7 @@
     <string name="call_settings" msgid="8152058602760531097">"通话设置"</string>
     <string name="labelCF" msgid="2140733390678280443">"来电转接"</string>
     <string name="labelCallBarring" msgid="8300927675522420184">"通话限制"</string>
-    <string name="labelGSMMore" msgid="4048734049263392253">"GSM 通话设置"</string>
+    <string name="labelGSMMore" msgid="4048734049263392253">"通话设置"</string>
     <string name="fdn" msgid="1080701466751913822">"固定拨号"</string>
     <string name="get_pin2" msgid="5519152040805796508">"输入 PIN2 码"</string>
     <string name="delete_fdn_contact" msgid="4232462795352020296">"删除固定拨号联系人"</string>
