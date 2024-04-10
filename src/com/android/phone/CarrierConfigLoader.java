@@ -457,7 +457,10 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                                             mDefaultConfigReceived[phoneId] = true;
                                             updateSettingsProvider(phoneId, config);
                                             updateModemSettings(phoneId, config);
-                                            updateImsSettings(phoneId, config);
+                                            //[BUG]-Modify-Begin by shaopan.tang 2024-04-10 FP5U-469 VoWiFi should be ON after switch SIM
+                                            //updateImsSettings(phoneId, config);
+                                            listenIMSFeatureConnector(phoneId);
+                                            //[BUG]-Modify-End
                                         //}
                                     }
                                     // modify by T2M.dengxiangyu for FP4-61 2021-04-14 end
@@ -793,7 +796,10 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                                         mDefaultConfigReceived[phoneId] = true;
                                         updateSettingsProvider(phoneId, config);
                                         updateModemSettings(phoneId, config);
-                                        updateImsSettings(phoneId, config);
+                                        //[BUG]-Modify-Begin by shaopan.tang 2024-04-10 FP5U-469 VoWiFi should be ON after switch SIM
+                                        //updateImsSettings(phoneId, config);
+                                        listenIMSFeatureConnector(phoneId);
+                                        //[BUG]-Modify-End
                                     //}
                                     // modify by T2M.dengxiangyu for FP4-61 2021-06-25 end
 
@@ -883,22 +889,6 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
             m_sim_status[phoneId] = IccCardConstants.INTENT_VALUE_ICC_UNKNOWN;
             TelephonyManager.from(context).registerCarrierPrivilegesCallback(phoneId,
                     new HandlerExecutor(mHandler), mCarrierServiceChangeCallbacks[phoneId]);
-
-            // add for FP5U-14 register listener for ImsService check it in getOrThrowExceptionIfServiceUnavailable begin
-            mFeatureConnector = ImsManager.getConnector(context, phoneId, LOG_TAG,
-                    new FeatureConnector.Listener<ImsManager>() {
-                @Override
-                public void connectionReady(ImsManager manager, int subId) throws ImsException {
-                    mHandler.sendMessage(mHandler.obtainMessage(
-                            EVENT_IMS_SERVICE_CONNECT_READY, SubscriptionManager.getPhoneId(subId), -1));
-                }
-
-                @Override
-                public void connectionUnavailable(int reason) {
-                }
-            }, context.getMainExecutor());
-            mFeatureConnector.connect();
-            // add for FP5U-14 register listener for ImsService check it in getOrThrowExceptionIfServiceUnavailable end
         }
         logd("CarrierConfigLoader has started");
 
@@ -2631,6 +2621,24 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private boolean[] mDefaultConfigReceived;
     private final static int EVENT_IMS_SERVICE_CONNECT_READY = EVENT_DSD_BEGIN + 2;
     private FeatureConnector<ImsManager> mFeatureConnector;
+
+    //[BUG]-Modify-Begin by shaopan.tang 2024-04-10 FP5U-469 VoWiFi should be ON after switch SIM
+    private void listenIMSFeatureConnector(int phoneId) {
+        mFeatureConnector = ImsManager.getConnector(mContext, phoneId, LOG_TAG,
+                new FeatureConnector.Listener<ImsManager>() {
+                    @Override
+                    public void connectionReady(ImsManager manager, int subId) throws ImsException {
+                        mHandler.sendMessage(mHandler.obtainMessage(
+                                    EVENT_IMS_SERVICE_CONNECT_READY, SubscriptionManager.getPhoneId(subId), -1));
+                    }
+
+                    @Override
+                    public void connectionUnavailable(int reason) {
+                    }
+                }, mContext.getMainExecutor());
+        mFeatureConnector.connect();
+    }
+    //[BUG]-Modify-End
 
     private void updateImsSettings(int phoneId, PersistableBundle config) {
         if (!mImsServiceConnected[phoneId]) {
