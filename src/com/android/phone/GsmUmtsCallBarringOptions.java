@@ -104,6 +104,10 @@ public class GsmUmtsCallBarringOptions extends TimeConsumingPreferenceActivity
     private String mNewPassword;
     private int mPwChangeDialogStrId;
 
+    // Determines whether network requires password to be sent with setCallBarring request.
+    // Value comes from getCallBarring response for IMS
+    private boolean mPasswordRequiredOverIms = true;
+
     private static final int PW_CHANGE_OLD = 0;
     private static final int PW_CHANGE_NEW = 1;
     private static final int PW_CHANGE_REENTER = 2;
@@ -760,6 +764,18 @@ public class GsmUmtsCallBarringOptions extends TimeConsumingPreferenceActivity
         String message = (String)this.getResources()
             .getText(R.string.mobile_data_alert);
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    // Since this method will be called once per get_call_barring response, compare with current
+    // enable value to avoid multiple calls to UI framework APIs
+    void setChangePasswordPreference(boolean passwordRequired) {
+        if (mPasswordRequiredOverIms != passwordRequired) {
+            mPasswordRequiredOverIms = passwordRequired;
+            mButtonChangePW.setEnabled(passwordRequired);
+            if (!passwordRequired) {
+                mButtonChangePW.setSummary(R.string.call_barring_change_pwd_description_disabled);
+            }
+        }
     }
 
     private void showSwitchDdsDialog(int slotId) {
