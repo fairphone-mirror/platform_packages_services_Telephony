@@ -87,6 +87,7 @@ public class GsmUmtsCallBarringOptions extends TimeConsumingPreferenceActivity
     private static final String DIALOG_MESSAGE_KEY = "dialog_message_key";
     private static final String DIALOG_PW_ENTRY_KEY = "dialog_pw_enter_key";
     private static final String KEY_STATUS = "toggle";
+    private static final String KEY_PASSWORD_ENABLED = "password_enabled";
     private static final String PREFERENCE_ENABLED_KEY = "PREFERENCE_ENABLED";
     private static final String SAVED_BEFORE_LOAD_COMPLETED_KEY = "PROGRESS_SHOWING";
 
@@ -515,7 +516,8 @@ public class GsmUmtsCallBarringOptions extends TimeConsumingPreferenceActivity
             for (CallBarringEditPreference pref : mPreferences) {
                 Bundle bundle = mIcicle.getParcelable(pref.getKey());
                 if (bundle != null) {
-                    pref.handleCallBarringResult(bundle.getBoolean(KEY_STATUS));
+                    pref.handleCallBarringResult(bundle.getBoolean(KEY_STATUS),
+                                bundle.getBoolean(KEY_PASSWORD_ENABLED));
                     pref.init(this, true, mPhone);
                     pref.setEnabled(bundle.getBoolean(PREFERENCE_ENABLED_KEY, pref.isEnabled()));
                 }
@@ -586,6 +588,7 @@ public class GsmUmtsCallBarringOptions extends TimeConsumingPreferenceActivity
         for (CallBarringEditPreference pref : mPreferences) {
             Bundle bundle = new Bundle();
             bundle.putBoolean(KEY_STATUS, pref.mIsActivated);
+            bundle.putBoolean(KEY_PASSWORD_ENABLED, pref.isPasswordEnabled());
             bundle.putBoolean(PREFERENCE_ENABLED_KEY, pref.isEnabled());
             outState.putParcelable(pref.getKey(), bundle);
         }
