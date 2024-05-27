@@ -943,5 +943,6 @@
     <string name="sum_common_call_settings">Ajustes de llamada adicionales</string>
     <string name="labelCFVoice">Voz</string>
     <string name="call_forward_option">"Opciones de desvío de llamadas"</string>
+    <string name="dsd_rebooting">"Configurando tu dispositivo. Ten paciencia mientras se reinicia."</string>
 
 </resources>

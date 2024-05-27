@@ -943,5 +943,6 @@
     <string name="sum_common_call_settings">Ytterligare samtalsinställningar</string>
     <string name="labelCFVoice">Röst</string>
     <string name="call_forward_option">"Alternativ för vidarekoppling"</string>
+    <string name="dsd_rebooting">"Konfigurera din telefon. Ha tålamod medan den startar om"</string>
 
 </resources>

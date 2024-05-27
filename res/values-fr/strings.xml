@@ -943,5 +943,6 @@
     <string name="labelCommonMore">"Paramètres d’appel"</string>
     <string name="labelCommonMore_with_label">"Paramètres d’appel (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)"</string>
     <string name="sum_common_call_settings">"Paramètres d’appel supplémentaires"</string>
+    <string name="dsd_rebooting">"Configuration de votre téléphone. Soyez patient pendant le redémarrage"</string>
 
 </resources>

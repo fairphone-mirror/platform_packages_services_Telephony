@@ -943,5 +943,6 @@
     <string name="sum_common_call_settings">Yderligere opkaldsindstillinger</string>
     <string name="labelCFVoice">Stemme</string>
     <string name="call_forward_option">"Indstillinger for viderestilling af opkald"</string>
+    <string name="dsd_rebooting">"Opsætning af din telefon. Vær tålmodig, mens den genstarter"</string>
 
 </resources>

@@ -943,5 +943,6 @@
     <string name="sum_common_call_settings">Impostazioni di chiamata aggiuntive</string>
     <string name="labelCFVoice">Voce</string>
     <string name="call_forward_option">"Opzioni di trasferimento chiamata"</string>
+    <string name="dsd_rebooting">"Configurazione del telefono in corso, attendere..."</string>
 
 </resources>

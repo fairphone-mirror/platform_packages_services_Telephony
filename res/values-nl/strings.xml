@@ -943,5 +943,6 @@
     <string name="labelCommonMore">Oproepinstellingen</string>
     <string name="labelCommonMore_with_label">Oproepinstellingen (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)</string>
     <string name="sum_common_call_settings">Aanvullende oproepinstellingen</string>
+    <string name="dsd_rebooting">"Moment geduld, we stellen je telefoon in en starten het opnieuw op."</string>
 
 </resources>
