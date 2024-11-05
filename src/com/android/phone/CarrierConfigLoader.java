@@ -229,6 +229,8 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private static final String UUID_NOTIFY_CONFIG_CHANGED_WITH_INVALID_PHONE =
             "d81cef11-c2f1-4d76-955d-7f50e8590c48";
 
+    private static final String CUSTOMER_CARRIER_CONFIG_PACKAGE = "com.fp.customercarrierconfig";
+
     // Handler to process various events.
     //
     // For each phoneId, the event sequence should be:
@@ -714,8 +716,10 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
             @NonNull FeatureFlags featureFlags) {
         super(PermissionEnforcer.fromContext(context));
         mContext = context;
-        mPlatformCarrierConfigPackage =
+        /* add by zhangrenjie for FP5V-13 begin */
+        mPlatformCarrierConfigPackage = useCustomerCarrierConfig(context) ? CUSTOMER_CARRIER_CONFIG_PACKAGE :
                 mContext.getString(R.string.platform_carrier_config_package);
+        /* add by zhangrenjie for FP5V-13 end */
         mHandler = new ConfigHandler(looper);
 
         IntentFilter systemEventsFilter = new IntentFilter();
@@ -752,6 +756,25 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
         mHandler.sendEmptyMessage(EVENT_CHECK_SYSTEM_UPDATE);
     }
+    /* add by zhangrenjie for FP5V-13 begin */
+
+    private boolean useCustomerCarrierConfig(Context context){
+        try {
+            PackageManager manager = context.getPackageManager();
+            manager.getPackageInfo(CUSTOMER_CARRIER_CONFIG_PACKAGE, 0);
+            return !isFP5();
+        } catch (PackageManager.NameNotFoundException e) {
+            loge("No "+ CUSTOMER_CARRIER_CONFIG_PACKAGE + " existed.");
+            return false;
+        }
+    }
+
+    private boolean isFP5(){
+        String mBuildProduct = SystemProperties.get("ro.build.product");
+        logd("Build Product = " + mBuildProduct + ".");
+        return "FP5".equals(mBuildProduct);
+    }
+    /* add by zhangrenjie for FP5V-13 end */
 
     /**
      * Initialize the singleton CarrierConfigLoader instance.
