@@ -1026,6 +1026,10 @@ public class PhoneGlobals extends ContextWrapper {
             } else if (action.equals(CarrierConfigManager.ACTION_CARRIER_CONFIG_CHANGED)) {
                 // Roaming status could be overridden by carrier config, so we need to update it.
                 if (VDBG) Log.v(LOG_TAG, "carrier config changed.");
+                //[BUG]-Modify-Begin by shaopan.tang 2024-01-24 FP5U-166 Phone services notification always present when turn off data roaming
+                mDefaultDataSubId = SubscriptionManager.getDefaultDataSubscriptionId();
+                registerSettingsObserver();
+                //[BUG]-Modify-Begin by shaopan.tang
                 if (mFeatureFlags.reorganizeRoamingNotification()) {
                     updateDataRoamingStatus(ROAMING_NOTIFICATION_REASON_CARRIER_CONFIG_CHANGED);
                 } else {
@@ -1084,6 +1088,18 @@ public class PhoneGlobals extends ContextWrapper {
         }
         return state;
     }
+
+    //[BUG]-Modify-Begin by shaopan.tang 2024-01-24 FP5U-166 Phone services notification always present when turn off data roaming
+    /**
+     * @return whether or not we should show a notification when connecting to data roaming if the
+     * user has data roaming enabled
+     */
+    private boolean shouldShowDataConnectedRoaming(int subId) {
+        PersistableBundle config = getCarrierConfigForSubId(subId);
+        return config.getBoolean(CarrierConfigManager
+                .KEY_SHOW_DATA_CONNECTED_ROAMING_NOTIFICATION_BOOL);
+    }
+    //[BUG]-Modify-End by shaopan.tang
 
     /**
      * When roaming, if mobile data cannot be established due to data roaming not enabled, we need
@@ -1144,7 +1160,8 @@ public class PhoneGlobals extends ContextWrapper {
     private void updateDataRoamingStatus(@RoamingNotificationReason int notificationReason,
             List<DataDisallowedReason> disallowReasons, ServiceState serviceState) {
 
-        if (VDBG) Log.v(LOG_TAG, "updateDataRoamingStatus");
+        if (VDBG) Log.v(LOG_TAG, "updateDataRoamingStatus mDefaultDataSubId= " + mDefaultDataSubId);
+        mDefaultDataSubId = SubscriptionManager.getDefaultDataSubscriptionId();
         String roamingNumeric = serviceState.getOperatorNumeric();
         String roamingNumericReason = "RoamingNumeric=" + roamingNumeric;
         String callingReason = "CallingReason=" + notificationReason;
@@ -1201,7 +1218,7 @@ public class PhoneGlobals extends ContextWrapper {
                     updateDataRoamingNotification(ROAMING_NOTIFICATION_NO_NOTIFICATION);
                 }
             }
-        } else if (dataAllowed && dataIsNowRoaming) {
+        } else if (dataAllowed && dataIsNowRoaming && shouldShowDataConnectedRoaming(mDefaultDataSubId)) {
             if (!shownInThisNumeric && roamingNumeric != null) {
                 mShownNotificationReasons.add(roamingNumericReason);
             }
