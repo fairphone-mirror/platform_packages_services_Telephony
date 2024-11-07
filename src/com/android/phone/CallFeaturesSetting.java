@@ -110,7 +110,7 @@ public class CallFeaturesSetting extends PreferenceActivity
 
     private static final String ENABLE_VIDEO_CALLING_KEY = "button_enable_video_calling";
     private static final String BUTTON_VP_KEY = "button_voice_privacy_key";
-
+    private static final String BUTTON_IMS_SETTINGS_KEY   = "ims_settings_key";
     private static final String BUTTON_VIBRATING_KEY =
             "button_vibrating_for_outgoing_call_accepted_key";
 
@@ -437,6 +437,7 @@ public class CallFeaturesSetting extends PreferenceActivity
         Preference fdnButton = prefSet.findPreference(BUTTON_FDN_KEY);
         fdnButton.setIntent(mSubscriptionInfoHelper.getIntent(FdnSetting.class));
         if (carrierConfig.getBoolean(CarrierConfigManager.KEY_WORLD_PHONE_BOOL)) {
+            prefSet.removePreference(cdmaOptions);
             if (carrierConfig.getBoolean("config_common_callsettings_support_bool")) {
                 prefSet.removePreference(cdmaOptions);
                 prefSet.removePreference(gsmOptions);
@@ -569,6 +570,8 @@ public class CallFeaturesSetting extends PreferenceActivity
         PersistableBundle carrierConfig =
                 PhoneGlobals.getInstance().getCarrierConfigForSubId(mPhone.getSubId());
 
+        mImsSettingsScreen = (PreferenceScreen) findPreference(BUTTON_IMS_SETTINGS_KEY);
+            prefSet.removePreference(mImsSettingsScreen);
         boolean useWfcHomeModeForRoaming = carrierConfig.getBoolean(
                     CarrierConfigManager.KEY_USE_WFC_HOME_NETWORK_MODE_IN_ROAMING_NETWORK_BOOL,
                     false);
@@ -638,7 +641,8 @@ public class CallFeaturesSetting extends PreferenceActivity
                         if (DBG) log("Unexpected WFC mode value: " + wfcMode);
                 }
             }
-            mButtonWifiCalling.setSummary(getResourcesForSubId().getString(resId));
+            boolean showSummary = carrierConfig.getBoolean("show_wifi_calling_summary_bool",true);/* add by T2M.zhangrenjie for FP5-1630 */
+            if(showSummary) mButtonWifiCalling.setSummary(getResourcesForSubId().getString(resId));
             Intent intent = mButtonWifiCalling.getIntent();
             if (intent != null) {
                 intent.putExtra(Settings.EXTRA_SUB_ID, mPhone.getSubId());
