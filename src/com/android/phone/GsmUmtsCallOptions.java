@@ -25,6 +25,11 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.provider.Settings;
 import android.telephony.CarrierConfigManager;
+//Modify by huan.sun for FP5V-223 Porting from FP5-1634 at 20230727 begin
+import android.telephony.ims.stub.ImsRegistrationImplBase;
+import android.telephony.TelephonyManager;
+import android.text.TextUtils;
+//Modify by huan.sun for FP5-1634 at 20230727 end
 import android.util.Log;
 import android.view.MenuItem;
 
@@ -77,8 +82,11 @@ public class GsmUmtsCallOptions extends PreferenceActivity {
 
     public static void init(PreferenceScreen prefScreen, SubscriptionInfoHelper subInfoHelper) {
         PersistableBundle b = null;
+       //Modify by huan.sun for FP5V-223 Porting from FP5-1634 at 20230727 begin
+        int subId = -1;
         if (subInfoHelper.hasSubId()) {
             b = PhoneGlobals.getInstance().getCarrierConfigForSubId(subInfoHelper.getSubId());
+            subId = subInfoHelper.getSubId();
         } else {
             b = PhoneGlobals.getInstance().getCarrierConfig();
         }
@@ -103,6 +111,16 @@ public class GsmUmtsCallOptions extends PreferenceActivity {
                     + "forwarding, additional call settings, and call options.");
         }
 
+        int regTech = ImsRegistrationImplBase.REGISTRATION_TECH_NONE;
+        String operator = "";
+        TelephonyManager tm = (TelephonyManager)
+                         subInfoHelper.getPhone().getContext().getSystemService(Context.TELEPHONY_SERVICE);
+        if (tm != null) {
+            regTech = tm.getImsRegTechnologyForMmTel();
+            operator = tm.getSimOperatorNumeric(subId);
+        }
+        Log.d(LOG_TAG, "regTech = " + regTech + ",operator = " + operator + ", subId = " + subId + ",regTech = " + regTech);
+
         Preference callForwardingPref = prefScreen.findPreference(CALL_FORWARDING_KEY);
         if (callForwardingPref != null) {
             if (b != null && b.getBoolean(
@@ -111,7 +129,12 @@ public class GsmUmtsCallOptions extends PreferenceActivity {
                             !mobileNetworkConfigsRestricted)) {
                 callForwardingPref.setIntent(
                         subInfoHelper.getIntent(CallForwardType.class));
-                callForwardingPref.setEnabled(isAirplaneModeOff);
+                if (operator != null && !TextUtils.isEmpty(operator) && operator.equals("20408") && regTech == ImsRegistrationImplBase.REGISTRATION_TECH_IWLAN) {
+                    callForwardingPref.setEnabled(false);
+                } else {
+                    callForwardingPref.setEnabled(isAirplaneModeOff);
+                }
+        //Modify by huan.sun for FP5-1634 at 20230727 end
             } else {
                 prefScreen.removePreference(callForwardingPref);
             }
