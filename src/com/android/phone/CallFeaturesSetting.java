@@ -610,7 +610,10 @@ public class CallFeaturesSetting extends PreferenceActivity
         } else if (!mImsMgr.isWfcEnabledByPlatform() || !mImsMgr.isWfcProvisionedOnDevice()) {
             prefSet.removePreference(mButtonWifiCalling);
         } else {
-            String title = getResourcesForSubId().getString(R.string.wifi_calling);
+            String title = carrierConfig.getString(CarrierConfigManager.KEY_WIFI_CALLING_TITLE);/* add by T2M.zhangrenjie for FP5-1630 */
+            if ("".equals(title)) {
+                title = getResourcesForSubId().getString(R.string.wifi_calling_settings_title);
+            }
             mButtonWifiCalling.setTitle(title);
 
             int resId = com.android.internal.R.string.wifi_calling_off_summary;
