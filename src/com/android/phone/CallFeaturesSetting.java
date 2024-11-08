@@ -125,6 +125,7 @@ public class CallFeaturesSetting extends PreferenceActivity
     private SwitchPreference mEnableVideoCalling;
     private Preference mButtonWifiCalling;
     private boolean mDisallowedConfig = false;
+    private PreferenceScreen mImsSettingsScreen;
 
     private SwitchPreference mButtonVibratingForMoCallAccepted;
 
