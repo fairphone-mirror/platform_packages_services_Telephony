@@ -201,6 +201,9 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private static final int EVENT_FETCH_DEFAULT_FOR_NO_SIM_CONFIG_TIMEOUT = 22;
     // NOTE: any new EVENT_* values must be added to method eventToString().
 
+    private PersistableBundle mConfigFromDSDLocked = null;
+    private boolean m_dsd_locked = false;
+
     private static final int BIND_TIMEOUT_MILLIS = 30000;
 
     // Keys used for saving and restoring config bundle from file.
@@ -2145,5 +2148,15 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private void loge(@NonNull String msg) {
         Log.e(LOG_TAG, msg);
         mCarrierConfigLoadingLog.log(msg);
+    }
+
+    @Override
+    @NonNull
+    public PersistableBundle getConfigLocked(int subId, String callingPackage) {
+        logd("getConfigLocked~~ m_dsd_locked:"+m_dsd_locked + " mConfigFromDSDLocked != null :" + (mConfigFromDSDLocked != null));
+        if (m_dsd_locked && mConfigFromDSDLocked != null) {
+            return mConfigFromDSDLocked;
+        }
+        return getConfigForSubId(subId, callingPackage);
     }
 }
