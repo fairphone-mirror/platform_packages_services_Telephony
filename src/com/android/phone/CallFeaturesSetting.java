@@ -110,7 +110,6 @@ public class CallFeaturesSetting extends PreferenceActivity
 
     private static final String ENABLE_VIDEO_CALLING_KEY = "button_enable_video_calling";
     private static final String BUTTON_VP_KEY = "button_voice_privacy_key";
-    private static final String BUTTON_IMS_SETTINGS_KEY   = "ims_settings_key";
     private static final String BUTTON_VIBRATING_KEY =
             "button_vibrating_for_outgoing_call_accepted_key";
 
@@ -570,9 +569,6 @@ public class CallFeaturesSetting extends PreferenceActivity
                 .createForSubscriptionId(mPhone.getSubId());
         PersistableBundle carrierConfig =
                 PhoneGlobals.getInstance().getCarrierConfigForSubId(mPhone.getSubId());
-
-        mImsSettingsScreen = (PreferenceScreen) findPreference(BUTTON_IMS_SETTINGS_KEY);
-            prefSet.removePreference(mImsSettingsScreen);
         boolean useWfcHomeModeForRoaming = carrierConfig.getBoolean(
                     CarrierConfigManager.KEY_USE_WFC_HOME_NETWORK_MODE_IN_ROAMING_NETWORK_BOOL,
                     false);
