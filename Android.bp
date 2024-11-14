@@ -33,8 +33,6 @@ android_app {
          "extphonelib",
         "ims-ext-common",
         "org.apache.http.legacy",
-        "qcrilhook",
-        "sysrilcmd",
     ],
     enforce_uses_libs: false,
 
@@ -55,6 +53,10 @@ android_app {
         "satellite-s2storage-ro",
         "s2-geometry-library-java",
         "dropbox_flags_lib",
+
+        // Fairphone dependencies
+        "qcrilhook-class",
+        "sysrilcmd-class",
     ],
 
     srcs: [
