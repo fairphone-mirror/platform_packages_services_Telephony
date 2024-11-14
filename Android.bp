@@ -33,8 +33,6 @@ android_app {
          "extphonelib",
         "ims-ext-common",
         "org.apache.http.legacy",
-        "qcrilhook",
-        "sysrilcmd",
     ],
     enforce_uses_libs: false,
 
@@ -50,7 +48,9 @@ android_app {
         "PlatformProperties",
         "modules-utils-os",
         "nist-sip",
-        "service-entitlement"
+        "service-entitlement",
+        "qcrilhook_class",
+        "sysrilcmd_class",
     ],
 
     srcs: [
