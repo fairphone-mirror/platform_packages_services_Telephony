@@ -957,9 +957,9 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     }
 
     private boolean isFP5(){
-        String mBuildProduct = SystemProperties.get("ro.build.product");
-        logd("Build Product = " + mBuildProduct + ".");
-        return "FP5".equals(mBuildProduct);
+        String fingerprint = SystemProperties.get("ro.build.fingerprint" , "");
+        logd("Build product's fingerprint= " + fingerprint + ".");
+        return fingerprint.contains("FP5");
     }
     /* add by zhangrenjie for FP5V-13 end */
 
