@@ -124,7 +124,6 @@ public class CallFeaturesSetting extends PreferenceActivity
     private SwitchPreference mEnableVideoCalling;
     private Preference mButtonWifiCalling;
     private boolean mDisallowedConfig = false;
-    private PreferenceScreen mImsSettingsScreen;
 
     private SwitchPreference mButtonVibratingForMoCallAccepted;
 
@@ -569,7 +568,6 @@ public class CallFeaturesSetting extends PreferenceActivity
                 .createForSubscriptionId(mPhone.getSubId());
         PersistableBundle carrierConfig =
                 PhoneGlobals.getInstance().getCarrierConfigForSubId(mPhone.getSubId());
-            prefSet.removePreference(mImsSettingsScreen);
         boolean useWfcHomeModeForRoaming = carrierConfig.getBoolean(
                     CarrierConfigManager.KEY_USE_WFC_HOME_NETWORK_MODE_IN_ROAMING_NETWORK_BOOL,
                     false);
