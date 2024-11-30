@@ -8592,6 +8592,20 @@ public class PhoneInterfaceManager extends ITelephony.Stub {
         }
         long defaultNetworkType = RadioAccessFamily.getRafFromNetworkType(
                 RILConstants.PREFERRED_NETWORK_MODE);
+       // modify Begin by T2M.zhangrenjie for FPS-228 2024-03-14
+        CarrierConfigManager configManager =
+                (CarrierConfigManager) mApp.getSystemService(Context.CARRIER_CONFIG_SERVICE);
+        if (configManager != null) {
+            PersistableBundle pb = configManager.getConfigForSubId(subId);
+            if (pb != null) {
+                 int carrierConfigNetworkType= pb.getInt(CarrierConfigManager.KEY_DEFAULT_NETWORK_MODE, -1);
+                 log("carrierConfigNetworkType = " + carrierConfigNetworkType);
+                 if(carrierConfigNetworkType != -1)
+                 defaultNetworkType = RadioAccessFamily.getRafFromNetworkType(carrierConfigNetworkType);
+            }
+        }
+        log("cleanUpAllowedNetworkTypes, defaultNetworkType = " + defaultNetworkType);
+        // modify End by T2M.zhangrenjie for FPS-228 2024-03-14
         SubscriptionManager.setSubscriptionProperty(subId,
                 SubscriptionManager.ALLOWED_NETWORK_TYPES,
                 "user=" + defaultNetworkType);
