@@ -99,6 +99,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import android.bluetooth.BluetoothHeadset;
+import android.net.wifi.WifiManager;
+
 /**
  * Global state for the telephony subsystem when running in the primary
  * phone process.
@@ -256,6 +259,8 @@ public class PhoneGlobals extends ContextWrapper {
     private PowerManager.WakeLock mWakeLock;
     private PowerManager.WakeLock mPartialWakeLock;
     private KeyguardManager mKeyguardManager;
+
+    private final SetSarReceiver mSarReceiver = new SetSarReceiver();
 
     private int mDefaultDataSubId = SubscriptionManager.INVALID_SUBSCRIPTION_ID;
     private final LocalLog mDataRoamingNotifLog = new LocalLog(50);
@@ -754,6 +759,8 @@ public class PhoneGlobals extends ContextWrapper {
                             ? SettingsConstants.HAC_VAL_ON : SettingsConstants.HAC_VAL_OFF));
         }
 
+        mSarReceiver.init(this);
+
         // Start tracking Binder latency for the phone process.
         mBinderCallsSettingsObserver = new BinderCallsStats.SettingsObserver(
             getApplicationContext(),
@@ -762,6 +769,12 @@ public class PhoneGlobals extends ContextWrapper {
                     com.android.internal.os.BinderLatencyProto.Dims.TELEPHONY));
 
 // QTI_BEGIN: 2021-02-10: Telephony: Move IExtTelephony to IExtPhone
+
+        IntentFilter sarIntentFilter = new IntentFilter(Intent.ACTION_BOOT_COMPLETED);
+        sarIntentFilter.addAction(WifiManager.WIFI_AP_STATE_CHANGED_ACTION);
+        sarIntentFilter.addAction(AudioManager.STREAM_DEVICES_CHANGED_ACTION);
+        registerReceiver(mSarReceiver, sarIntentFilter);
+
         PhoneUtils.connectExtTelephonyManager(this);
 // QTI_END: 2021-02-10: Telephony: Move IExtTelephony to IExtPhone
     }

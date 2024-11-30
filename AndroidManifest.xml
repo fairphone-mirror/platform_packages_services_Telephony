@@ -1064,5 +1064,7 @@
 <!-- QTI_BEGIN: 2021-02-10: Telephony: Move IExtTelephony to IExtPhone-->
 <!-- QTI_END: 2021-02-10: Telephony: Move IExtTelephony to IExtPhone-->
         <uses-library android:name="com.qti.extphone.extphonelib"/>
+        <uses-library android:name="com.qualcomm.sysrilcmd"/>
+        <uses-library android:name="com.qualcomm.qcrilhook"/>
     </application>
 </manifest>
