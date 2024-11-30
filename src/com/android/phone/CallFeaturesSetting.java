@@ -480,6 +480,7 @@ public class CallFeaturesSetting extends PreferenceActivity
         if (!Flags.phoneTypeCleanup()
                 && carrierConfig.getBoolean(CarrierConfigManager.KEY_WORLD_PHONE_BOOL)) {
 // QTI_BEGIN: 2019-04-28: Telephony: FR54939: Common call setting for specific operator
+            prefSet.removePreference(cdmaOptions);
             if (carrierConfig.getBoolean("config_common_callsettings_support_bool")) {
                 prefSet.removePreference(cdmaOptions);
                 prefSet.removePreference(gsmOptions);
@@ -595,7 +596,10 @@ public class CallFeaturesSetting extends PreferenceActivity
         } else if (!mImsMgr.isWfcEnabledByPlatform() || !mImsMgr.isWfcProvisionedOnDevice()) {
             prefSet.removePreference(mButtonWifiCalling);
         } else {
-            String title = getResourcesForSubId().getString(R.string.wifi_calling);
+            String title = carrierConfig.getString(CarrierConfigManager.KEY_WIFI_CALLING_TITLE);/* add by T2M.zhangrenjie for FPS-251 */
+            if ("".equals(title)) {
+                title = getResourcesForSubId().getString(R.string.wifi_calling_settings_title);
+            }
             mButtonWifiCalling.setTitle(title);
 
             int resId = com.android.internal.R.string.wifi_calling_off_summary;
@@ -624,7 +628,8 @@ public class CallFeaturesSetting extends PreferenceActivity
                         if (DBG) log("Unexpected WFC mode value: " + wfcMode);
                 }
             }
-            mButtonWifiCalling.setSummary(getResourcesForSubId().getString(resId));
+            boolean showSummary = carrierConfig.getBoolean("show_wifi_calling_summary_bool",true);/* add by T2M.zhangrenjie for FPS-251 */
+            if(showSummary) mButtonWifiCalling.setSummary(getResourcesForSubId().getString(resId));
             Intent intent = mButtonWifiCalling.getIntent();
             if (intent != null) {
                 intent.putExtra(Settings.EXTRA_SUB_ID, mPhone.getSubId());
