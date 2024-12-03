@@ -40,6 +40,11 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.provider.Settings;
 import android.telephony.CarrierConfigManager;
+//Modify by huan.sun for FPS-260 at 20230727 begin
+import android.telephony.ims.stub.ImsRegistrationImplBase;
+import android.telephony.TelephonyManager;
+import android.text.TextUtils;
+//Modify by huan.sun at 20230727 end
 import android.util.Log;
 import android.view.MenuItem;
 // QTI_BEGIN: 2024-11-06: Telephony: Fix the issues related to UT service in airplane mode am: e74f539a23 am: e74f539a23
@@ -151,8 +156,11 @@ public class GsmUmtsCallOptions extends PreferenceActivity {
 
     public static void init(PreferenceScreen prefScreen, SubscriptionInfoHelper subInfoHelper) {
         PersistableBundle b = null;
+       //Modify by huan.sun for FPS-260 at 20230727 begin
+        int subId = -1;
         if (subInfoHelper.hasSubId()) {
             b = PhoneGlobals.getInstance().getCarrierConfigForSubId(subInfoHelper.getSubId());
+            subId = subInfoHelper.getSubId();
         } else {
             b = PhoneGlobals.getInstance().getCarrierConfig();
         }
@@ -167,6 +175,16 @@ public class GsmUmtsCallOptions extends PreferenceActivity {
             Log.i(LOG_TAG, "Mobile network configs are restricted, hiding GSM call "
                     + "forwarding, additional call settings, and call options.");
         }
+
+        int regTech = ImsRegistrationImplBase.REGISTRATION_TECH_NONE;
+        String operator = "";
+        TelephonyManager tm = (TelephonyManager)
+                         subInfoHelper.getPhone().getContext().getSystemService(Context.TELEPHONY_SERVICE);
+        if (tm != null) {
+            regTech = tm.getImsRegTechnologyForMmTel();
+            operator = tm.getSimOperatorNumeric(subId);
+        }
+        Log.d(LOG_TAG, "regTech = " + regTech + ",operator = " + operator + ", subId = " + subId + ",regTech = " + regTech);
 
         Preference callForwardingPref = prefScreen.findPreference(CALL_FORWARDING_KEY);
         if (callForwardingPref != null) {
