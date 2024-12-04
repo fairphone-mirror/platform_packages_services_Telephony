@@ -98,7 +98,7 @@ public class PhoneAccountSettingsFragment extends PreferenceFragment
     private AccountSelectionPreference mDefaultOutgoingAccount;
     private Preference mAllCallingAccounts;
 // QTI_BEGIN: 2019-04-04: Telephony: Fix to show Xdivert option in CallSettings.
-    private Preference mSmartDivertPref;
+    // private Preference mSmartDivertPref;
 // QTI_END: 2019-04-04: Telephony: Fix to show Xdivert option in CallSettings.
 
     private PreferenceCategory mMakeAndReceiveCallsCategory;
@@ -190,7 +190,7 @@ public class PhoneAccountSettingsFragment extends PreferenceFragment
                 getPreferenceScreen().findPreference(DEFAULT_OUTGOING_ACCOUNT_KEY);
         mAllCallingAccounts = getPreferenceScreen().findPreference(ALL_CALLING_ACCOUNTS_KEY);
 // QTI_BEGIN: 2019-04-04: Telephony: Fix to show Xdivert option in CallSettings.
-        mSmartDivertPref = getPreferenceScreen().findPreference(BUTTON_SMART_DIVERT_KEY);
+        // mSmartDivertPref = getPreferenceScreen().findPreference(BUTTON_SMART_DIVERT_KEY);
 // QTI_END: 2019-04-04: Telephony: Fix to show Xdivert option in CallSettings.
 
         mMakeAndReceiveCallsCategory = (PreferenceCategory) getPreferenceScreen().findPreference(
@@ -431,12 +431,12 @@ public class PhoneAccountSettingsFragment extends PreferenceFragment
             }
 // QTI_BEGIN: 2021-05-11: Telephony: Fix missing XDivert option in PhoneAccountSettings.
 
-            if (isXdivertAvailable) {
-                if (mSmartDivertPref != null) {
-                    Log.d(LOG_TAG, "Add smart divert preference");
-                    mAccountList.addPreference(mSmartDivertPref);
-                }
-            }
+            // if (isXdivertAvailable) {
+            //     if (mSmartDivertPref != null) {
+            //         Log.d(LOG_TAG, "Add smart divert preference");
+            //         mAccountList.addPreference(mSmartDivertPref);
+            //     }
+            // }
 // QTI_END: 2021-05-11: Telephony: Fix missing XDivert option in PhoneAccountSettings.
         }
     }

@@ -311,7 +311,7 @@
     <string name="sim_selection_required_pref" msgid="6985901872978341314">"É necessário selecionar uma opção"</string>
     <string name="sim_change_data_title" msgid="9142726786345906606">"Alterar SIM para dados móveis?"</string>
     <string name="sim_change_data_message" msgid="3567358694255933280">"Usar <xliff:g id="NEW_SIM">%1$s</xliff:g> em vez de <xliff:g id="OLD_SIM">%2$s</xliff:g> para dados móveis?"</string>
-    <string name="wifi_calling_settings_title" msgid="5800018845662016507">"Ligação pelo Wi-Fi"</string>
+    <string name="wifi_calling_settings_title" msgid="5800018845662016507">"Ligação pelo WI-FI"</string>
     <string name="video_calling_settings_title" msgid="342829454913266078">"Videochamadas via operadora"</string>
     <string name="gsm_umts_options" msgid="4968446771519376808">"Opções GSM/UMTS"</string>
     <string name="cdma_options" msgid="3669592472226145665">"Opções CDMA"</string>
@@ -952,4 +952,17 @@
     <string name="satellite_config_country_code_label" msgid="1389520866423113166">"códigos de países:"</string>
     <string name="satellite_config_size_of_sats2_dat_label" msgid="671746449054349967">"tamanho do arquivo sats2.dat:"</string>
     <string name="satellite_config_json_label" msgid="4577292884014824105">"arquivo JSON de configuração do acesso a satélite:"</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibração para chamada de saída aceite</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Ativar o modo de vibração para chamadas de saída aceites</string>
+    <!-- Smart Divert Settings -->
+    <!-- Title for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_title">Desvio inteligente</string>
+    <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_summary">Definições CFNRc</string>
+    <string name="labelCommonMore">Definições de chamada</string>
+    <string name="labelCommonMore_with_label">Definições de chamada (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)</string>
+    <string name="sum_common_call_settings">Definições de chamadas adicionais</string>
+    <string name="labelCFVoice">Voz</string>
+    <string name="call_forward_option">"Opções de reencaminhamento de chamadas"</string>
+    <string name="dsd_rebooting">"A configurar o seu telefone. Por favor, aguarde até reiniciar."</string>
 </resources>

@@ -20,4 +20,5 @@
     <string name="status_hint_label_incoming_wifi_call">WLAN Call from</string>
     <!-- Status hint label for a call being made over a wifi network. DO NOT TRANSLATE. -->
     <string name="status_hint_label_wifi_call">WLAN Call</string>
+    <string name="wifi_calling_settings_title">WLAN Call</string>
 </resources>
