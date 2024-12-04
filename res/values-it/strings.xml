@@ -311,7 +311,7 @@
     <string name="sim_selection_required_pref" msgid="6985901872978341314">"Fai una scelta"</string>
     <string name="sim_change_data_title" msgid="9142726786345906606">"Cambiare la SIM per i dati?"</string>
     <string name="sim_change_data_message" msgid="3567358694255933280">"Utilizzare <xliff:g id="NEW_SIM">%1$s</xliff:g> anziché <xliff:g id="OLD_SIM">%2$s</xliff:g> per i dati mobili?"</string>
-    <string name="wifi_calling_settings_title" msgid="5800018845662016507">"Chiamate Wi-Fi"</string>
+    <string name="wifi_calling_settings_title" msgid="5800018845662016507">"Chiamata WiFi"</string>
     <string name="video_calling_settings_title" msgid="342829454913266078">"Videochiamata dell\'operatore"</string>
     <string name="gsm_umts_options" msgid="4968446771519376808">"Opzioni GSM/UMTS"</string>
     <string name="cdma_options" msgid="3669592472226145665">"Opzioni CDMA"</string>
@@ -937,4 +937,17 @@
     <string name="send_from_work_profile_cancel" msgid="177746511030381711">"Annulla"</string>
     <string name="send_from_work_profile_action_str" msgid="6892775562934243337">"Passa al profilo di lavoro"</string>
     <string name="install_messages_on_work_profile_action_str" msgid="3773440996395152903">"Installa un\'app di messaggistica di lavoro"</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibrazione per le chiamate in uscita accettata.</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Abilitazione della modalità vibrazione per le chiamate in uscita accettata</string>
+    <!-- Smart Divert Settings -->
+    <!-- Title for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_title">Smart-Divert</string>
+    <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_summary">Impostazioni CFNRC</string>
+    <string name="labelCommonMore">Impostazioni di chiamata</string>
+    <string name="labelCommonMore_with_label">Impostazioni di chiamata (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)</string>
+    <string name="sum_common_call_settings">Impostazioni di chiamata aggiuntive</string>
+    <string name="labelCFVoice">Voce</string>
+    <string name="call_forward_option">"Opzioni di trasferimento chiamata"</string>
+    <string name="dsd_rebooting">"Configurazione del telefono in corso, attendere..."</string>
 </resources>
