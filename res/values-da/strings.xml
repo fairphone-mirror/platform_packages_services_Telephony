@@ -311,7 +311,7 @@
     <string name="sim_selection_required_pref" msgid="6985901872978341314">"Du har ikke valgt endnu"</string>
     <string name="sim_change_data_title" msgid="9142726786345906606">"Skift SIM-kortet til data?"</string>
     <string name="sim_change_data_message" msgid="3567358694255933280">"Vil du bruge <xliff:g id="NEW_SIM">%1$s</xliff:g> i stedet for <xliff:g id="OLD_SIM">%2$s</xliff:g> til mobildata?"</string>
-    <string name="wifi_calling_settings_title" msgid="5800018845662016507">"Wi-Fi-opkald"</string>
+    <string name="wifi_calling_settings_title" msgid="5800018845662016507">"WIFI-opkald"</string>
     <string name="video_calling_settings_title" msgid="342829454913266078">"Videoopkald via mobilnetværk"</string>
     <string name="gsm_umts_options" msgid="4968446771519376808">"Indstillinger for GSM/UMTS"</string>
     <string name="cdma_options" msgid="3669592472226145665">"Indstillinger for CDMA"</string>
@@ -937,4 +937,17 @@
     <string name="send_from_work_profile_cancel" msgid="177746511030381711">"Annuller"</string>
     <string name="send_from_work_profile_action_str" msgid="6892775562934243337">"Skift til arbejdsprofil"</string>
     <string name="install_messages_on_work_profile_action_str" msgid="3773440996395152903">"Installer en app til arbejdsbeskeder"</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibreren for udgående opkald accepteret</string>
+    <string name="vibrating_for_outgoing_call_accepted_summary">Aktivering af vibration for udgående opkald accepteret</string>
+    <!-- Smart Divert Settings -->
+    <!-- Title for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_title">Smart-divert</string>
+    <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
+    <string name="smart_divert_summary">CFNRc-indstillinger</string>
+    <string name="labelCommonMore">Opkaldsindstillinger</string>
+    <string name="labelCommonMore_with_label">Opkaldsindstillinger (<xliff:g id="subscriptionlabel" example="T-Mobile">%s</xliff:g>)</string>
+    <string name="sum_common_call_settings">Yderligere opkaldsindstillinger</string>
+    <string name="labelCFVoice">Stemme</string>
+    <string name="call_forward_option">"Indstillinger for viderestilling af opkald"</string>
+    <string name="dsd_rebooting">"Opsætning af din telefon. Vær tålmodig, mens den genstarter"</string>
 </resources>
