@@ -162,8 +162,13 @@ public class GsmUmtsCallOptions extends PreferenceActivity {
             if (b != null && b.getBoolean(CarrierConfigManager.KEY_CALL_BARRING_VISIBILITY_BOOL) &&
                     (!Flags.ensureAccessToCallSettingsIsRestricted() ||
                             !mobileNetworkConfigsRestricted)) {
-                callBarringPref.setIntent(subInfoHelper.getIntent(GsmUmtsCallBarringOptions.class));
-                callBarringPref.setEnabled(isAirplaneModeOff);
+                // add for FP5-2419 by T2M.dengxiangyu 2023-08-02
+                if (operator != null && !TextUtils.isEmpty(operator) && operator.equals("20408") && regTech == ImsRegistrationImplBase.REGISTRATION_TECH_IWLAN) {
+                    callBarringPref.setEnabled(false);
+                } else {
+                    callBarringPref.setIntent(subInfoHelper.getIntent(GsmUmtsCallBarringOptions.class));
+                    callBarringPref.setEnabled(isAirplaneModeOff);
+                }
             } else {
                 prefScreen.removePreference(callBarringPref);
             }
