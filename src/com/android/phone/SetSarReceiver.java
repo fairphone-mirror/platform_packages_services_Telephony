@@ -45,7 +45,7 @@ public class SetSarReceiver extends BroadcastReceiver {
             Log.d(TAG," onQcRilHookReady");
             mRilHookReady = true;
             try {
-                changeSar(1);
+                changeSar(0);
             } catch (Exception e) {}
         }
         @Override
@@ -61,19 +61,8 @@ public class SetSarReceiver extends BroadcastReceiver {
 
     private void processAction() {
         Log.d(TAG," receiverOn = " + receiverOn+",wifiSpotOn = "+wifiSpotOn);
-        if(receiverOn){
-            if(wifiSpotOn){
-                changeSar(4);
-            }else{
-                changeSar(3);
-            }
-        }else{
-            if(wifiSpotOn){
-                changeSar(2);
-            }else{
-                changeSar(1);
-            }
-        }
+        int sarValue = (receiverOn ? (wifiSpotOn ? 3 : 2) : (wifiSpotOn ? 1 : 0));
+        changeSar(sarValue);
     }
 
     private void changeSar(int val) {
@@ -101,7 +90,7 @@ public class SetSarReceiver extends BroadcastReceiver {
 
          if (ACTION_BOOT_COMPLETED.equals(action)) {
             try {
-                changeSar(1);
+                changeSar(0);
             } catch (Exception e) {}
             return;
         }
