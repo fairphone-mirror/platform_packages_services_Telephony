@@ -2343,4 +2343,5 @@
     <!-- Satellite config viewer screen. satellite access config json file -->
     <string name="satellite_config_json_label">satellite access config json: </string>
 
+    <string name="dsd_rebooting">"Setting up your phone. Be patient while it reboots"</string>
 </resources>
