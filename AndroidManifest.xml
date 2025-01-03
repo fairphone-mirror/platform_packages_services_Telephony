@@ -744,5 +744,27 @@
         <uses-library android:name="com.qti.extphone.extphonelib"/>
         <uses-library android:name="com.qualcomm.sysrilcmd"/>
         <uses-library android:name="com.qualcomm.qcrilhook"/>
+
+        <activity android:name="com.android.phone.settings.BandCombination"
+            android:exported="true"
+            android:label="@string/band_info_title"
+            android:theme="@style/Theme.AppCompat.DayNight">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEVELOPMENT_PREFERENCE" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.android.phone.settings.BandSelection"
+            android:label="@string/band_selection_title"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.DayNight">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEVELOPMENT_PREFERENCE" />
+            </intent-filter>
+        </activity>
+
     </application>
 </manifest>

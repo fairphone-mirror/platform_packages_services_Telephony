@@ -2315,4 +2315,10 @@
     <string name="sum_common_call_settings">Additional call settings</string>
     <string name="ut_unavailable_to_set_video_cf_toast">UT is unavailable to set call forwarding for video, please close this page and exit.</string>
     <string name="dsd_rebooting">"Setting up your phone. Be patient while it reboots"</string>
+
+    <string name="bandcomb">Band Comb</string>
+    <string name="bandreg">Band Info</string>
+    <string name="band_info_title">Band Infomation</string>
+    <string name="band_selection_title">Band Selection</string>
+
 </resources>
