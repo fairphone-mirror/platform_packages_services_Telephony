@@ -2344,4 +2344,10 @@
     <string name="satellite_config_json_label">satellite access config json: </string>
 
     <string name="dsd_rebooting">"Setting up your phone. Be patient while it reboots"</string>
+
+    <string name="bandcomb">Band Comb</string>
+    <string name="bandreg">Band Info</string>
+    <string name="band_info_title">Band Infomation</string>
+    <string name="band_selection_title">Band Selection</string>
+
 </resources>
