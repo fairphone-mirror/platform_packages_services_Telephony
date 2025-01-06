@@ -14,9 +14,18 @@
  * limitations under the License.
  */
 
+/**
+* Changes from Qualcomm Innovation Center, Inc. are provided under the following license:
+* Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+* SPDX-License-Identifier: BSD-3-Clause-Clear
+*/
+
 package com.android.phone;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.os.UserManager;
@@ -32,9 +41,11 @@ import android.text.TextUtils;
 //Modify by huan.sun at 20230727 end
 import android.util.Log;
 import android.view.MenuItem;
-
+import com.android.internal.telephony.Phone;
 import com.android.internal.telephony.PhoneConstants;
 import com.android.internal.telephony.flags.Flags;
+
+import java.util.ArrayList;
 
 public class GsmUmtsCallOptions extends PreferenceActivity {
     private static final String LOG_TAG = "GsmUmtsCallOptions";
@@ -45,6 +56,27 @@ public class GsmUmtsCallOptions extends PreferenceActivity {
     public static final String ADDITIONAL_GSM_SETTINGS_KEY = "additional_gsm_call_settings_key";
 
     private boolean mCommon = false;
+
+    private Phone mPhone;
+    private IntentFilter mIntentFilter;
+    private static ArrayList<Preference> mPreferences = new ArrayList<Preference> ();
+
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(Intent.ACTION_AIRPLANE_MODE_CHANGED) && mPhone != null) {
+                setPreferencesState(PhoneUtils.isSuppServiceAllowedInAirplaneMode(mPhone));
+            }
+        }
+    };
+
+    private void setPreferencesState (boolean state) {
+        for (Preference pref : mPreferences) {
+            pref.setEnabled(state);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -64,10 +96,24 @@ public class GsmUmtsCallOptions extends PreferenceActivity {
                 mCommon ? R.string.labelCommonMore_with_label : R.string.labelGsmMore_with_label);
 
         init(getPreferenceScreen(), subInfoHelper);
+        mPhone = subInfoHelper.getPhone();
+        if (mPhone != null) {
+            setPreferencesState(PhoneUtils.isSuppServiceAllowedInAirplaneMode(mPhone));
+        }
         if (subInfoHelper.getPhone().getPhoneType() != PhoneConstants.PHONE_TYPE_GSM) {
             //disable the entire screen
             getPreferenceScreen().setEnabled(false);
         }
+        mIntentFilter = new IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+        registerReceiver(mBroadcastReceiver, mIntentFilter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mBroadcastReceiver);
+        mPreferences.clear();
+        mIntentFilter = null;
     }
 
     @Override
@@ -89,15 +135,6 @@ public class GsmUmtsCallOptions extends PreferenceActivity {
             subId = subInfoHelper.getSubId();
         } else {
             b = PhoneGlobals.getInstance().getCarrierConfig();
-        }
-
-        boolean isAirplaneModeOff = true;
-        if (b != null && b.getBoolean(
-                CarrierConfigManager.KEY_DISABLE_SUPPLEMENTARY_SERVICES_IN_AIRPLANE_MODE_BOOL)) {
-            int airplaneMode = Settings.Global.getInt(
-                    subInfoHelper.getPhone().getContext().getContentResolver(),
-                    Settings.Global.AIRPLANE_MODE_ON, PhoneGlobals.AIRPLANE_OFF);
-            isAirplaneModeOff = PhoneGlobals.AIRPLANE_ON != airplaneMode;
         }
 
         // If mobile network configs are restricted, then hide the GsmUmtsCallForwardOptions,
@@ -132,7 +169,7 @@ public class GsmUmtsCallOptions extends PreferenceActivity {
                 if (operator != null && !TextUtils.isEmpty(operator) && operator.equals("20408") && regTech == ImsRegistrationImplBase.REGISTRATION_TECH_IWLAN) {
                     callForwardingPref.setEnabled(false);
                 } else {
-                    callForwardingPref.setEnabled(isAirplaneModeOff);
+                    mPreferences.add(callForwardingPref);
                 }
         //Modify by huan.sun for FP5-1634 at 20230727 end
             } else {
@@ -151,7 +188,7 @@ public class GsmUmtsCallOptions extends PreferenceActivity {
                             !mobileNetworkConfigsRestricted)) {
                 additionalGsmSettingsPref.setIntent(
                         subInfoHelper.getIntent(GsmUmtsAdditionalCallOptions.class));
-                additionalGsmSettingsPref.setEnabled(isAirplaneModeOff);
+                mPreferences.add(additionalGsmSettingsPref);
             } else {
                 prefScreen.removePreference(additionalGsmSettingsPref);
             }
@@ -167,7 +204,7 @@ public class GsmUmtsCallOptions extends PreferenceActivity {
                     callBarringPref.setEnabled(false);
                 } else {
                     callBarringPref.setIntent(subInfoHelper.getIntent(GsmUmtsCallBarringOptions.class));
-                    callBarringPref.setEnabled(isAirplaneModeOff);
+                    mPreferences.add(callBarringPref);
                 }
             } else {
                 prefScreen.removePreference(callBarringPref);
