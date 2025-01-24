@@ -115,7 +115,7 @@
 <!-- QTI_END: 2018-03-27: Telephony: IMS: Call forward unconditional timer-->
 <!-- QTI_BEGIN: 2018-07-06: Telephony: Skip reading the CLIR over Ut-->
 <!-- QTI_END: 2018-07-06: Telephony: Skip reading the CLIR over Ut-->
-    <bool name="hac_enabled">false</bool>
+    <bool name="hac_enabled">true</bool>
 
     <!-- Flag indicating if dtmf tone type is enabled -->
     <!-- DEPRECATED: Use CarrierConfigManager#KEY_DTMF_TYPE_ENABLED_BOOL -->
