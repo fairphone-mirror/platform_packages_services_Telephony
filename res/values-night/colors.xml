@@ -25,4 +25,9 @@
     <color name="emergency_shortcut_confirm_phone_type_icon_color">#f28b82</color>
     <color name="emergency_call_icon_color">#e8eaed</color>
     <color name="emergency_dialpad_fab_tint_color">#f28b82</color>
+
+   <color name="disable_button_text_color">#D3D0D0</color>
+   <color name="enable_button_text_color">#FFFFFF</color>
+   <color name="stander_accent_primary">#99ACD9</color>
+   <color name="stander_accent_primary_disable">#454C5E</color>
 </resources>

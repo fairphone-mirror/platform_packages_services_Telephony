@@ -71,4 +71,9 @@
     <color name="emergency_call_icon_color">#3c4043</color>
     <color name="emergency_dialpad_fab_tint_color">@null</color>
     <color name="white_70_percent">#b3ffffff</color>
+
+    <color name="disable_button_text_color">#5f6368</color>
+    <color name="enable_button_text_color">#A0000000</color>
+    <color name="stander_accent_primary">#4C72BF</color>
+    <color name="stander_accent_primary_disable">#BBC9E7</color>
 </resources>
