@@ -377,4 +377,9 @@
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">@dimen/emergency_shortcut_tap_hint_text_size</item>
     </style>
+
+    <style name="CustomButtonStyle">
+       <item name="android:background">@drawable/button_background</item>
+        <item name="android:textColor">@color/button_text_color</item>
+    </style>
 </resources>
