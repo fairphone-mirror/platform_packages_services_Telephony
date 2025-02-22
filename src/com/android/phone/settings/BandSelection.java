@@ -249,8 +249,10 @@ public class BandSelection extends Activity {
             switch (msg.what) {
                 case EVENT_QCRIL_HOOK_READY:
                     Log.d(TAG, "EVENT_QCRIL_HOOK_READY");
-                    getSysPrefBand();
-                    CreateDialog();
+                    new Thread(() -> {
+                        getSysPrefBand();
+                        runOnUiThread(() -> CreateDialog());
+                    }).start();
                     break;
                 default:
                     Log.d(TAG, "Unexpected event:" + msg.what);
@@ -291,8 +293,10 @@ public class BandSelection extends Activity {
                 })
                 .setPositiveButton("SAVE", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        setSysPrefBand();
-                        finish();
+                        new Thread(() -> {
+                            setSysPrefBand();
+                            runOnUiThread(() -> finish());
+                        }).start();
                     }
                 })
                 .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
