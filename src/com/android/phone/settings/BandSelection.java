@@ -25,6 +25,9 @@ import android.widget.Toast;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 import java.util.List;
 
 public class BandSelection extends Activity {
@@ -222,6 +225,12 @@ public class BandSelection extends Activity {
 
     private boolean[] mItemChecked;
 
+    private Executor mExecutor = Executors.newSingleThreadExecutor();
+    private Consumer<Boolean> mCallback = result -> {
+        Log.d(TAG, "band selection done");
+        runOnUiThread(() -> finish());
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -295,7 +304,6 @@ public class BandSelection extends Activity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         new Thread(() -> {
                             setSysPrefBand();
-                            runOnUiThread(() -> finish());
                         }).start();
                     }
                 })
@@ -422,7 +430,7 @@ public class BandSelection extends Activity {
         if (disabledAllBands) {
             Toast.makeText(this, "At least one band to be selected", Toast.LENGTH_SHORT).show();
         } else {
-            telephonyManager.setSystemSelectionChannels(band_list);
+            telephonyManager.setSystemSelectionChannels(band_list, mExecutor, mCallback);
             return true;
         }
 
