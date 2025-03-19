@@ -7792,6 +7792,7 @@ public class PhoneInterfaceManager extends ITelephony.Stub {
         }
     }
 
+    //[FEATURE]-Add-Begin by shaopan.tang 2025-03-17 FP5U-791 Implement RTT function
     /**
      * Determines whether the user has turned on RTT. If the carrier wants to ignore the user-set
      * RTT setting, will return true if the device and carrier both support RTT.
@@ -7800,15 +7801,17 @@ public class PhoneInterfaceManager extends ITelephony.Stub {
     public boolean isRttEnabled(int subscriptionId) {
         final long identity = Binder.clearCallingIdentity();
         try {
-            boolean isRttSupported = isRttSupported(subscriptionId);
+            /*boolean isRttSupported = isRttSupported(subscriptionId);
             boolean isUserRttSettingOn = isUserRttSettingOn(subscriptionId);
             boolean shouldIgnoreUserRttSetting = mApp.getCarrierConfigForSubId(subscriptionId)
                     .getBoolean(CarrierConfigManager.KEY_IGNORE_RTT_MODE_SETTING_BOOL);
-            return isRttSupported && (isUserRttSettingOn || shouldIgnoreUserRttSetting);
+            return isRttSupported && (isUserRttSettingOn || shouldIgnoreUserRttSetting);*/
+            return isRttSupported(subscriptionId);
         } finally {
             Binder.restoreCallingIdentity(identity);
         }
     }
+    //[FEATURE]-Add-End by shaopan.tang
 
     private boolean isUserRttSettingOn(int subscriptionId) {
         int phoneId = SubscriptionManager.getPhoneId(subscriptionId);

@@ -180,8 +180,9 @@ public class AccessibilitySettingsFragment extends PreferenceFragment {
             int rttMode = mButtonRtt.isChecked() ? 1 : 0;
             Settings.Secure.putInt(mContext.getContentResolver(), Settings.Secure.RTT_CALLING_MODE,
                     rttMode);
+            //[FEATURE]-Add-Begin by shaopan.tang 2025-03-17 FP5U-791 Implement RTT function
             // Update RTT config with IMS Manager if the always-on carrier config isn't set to true.
-            CarrierConfigManager configManager = (CarrierConfigManager) mContext.getSystemService(
+            /*CarrierConfigManager configManager = (CarrierConfigManager) mContext.getSystemService(
                             Context.CARRIER_CONFIG_SERVICE);
             int[] activeSubIds = SubscriptionManagerService.getInstance().getActiveSubIdList(true);
 
@@ -192,7 +193,8 @@ public class AccessibilitySettingsFragment extends PreferenceFragment {
                     ImsManager imsManager = ImsManager.getInstance(getContext(), phoneId);
                     imsManager.setRttEnabled(mButtonRtt.isChecked());
                 }
-            }
+            }*/
+            //[FEATURE]-Add-End by shaopan.tang
             return true;
         }
 

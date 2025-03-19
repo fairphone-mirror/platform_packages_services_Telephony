@@ -1028,7 +1028,7 @@ public class TelecomAccountRegistry {
                         R.array.config_simless_emergency_rtt_supported_countries);
                 if ((supportedCountries == null || Arrays.stream(supportedCountries).noneMatch(
                         Predicate.isEqual(country))) || !(QtiImsUtils.isSimLessRttSupported(
-                        mPhone.getPhoneId(), mPhone.getContext()) && isUserRttSettingOn())) {
+                        mPhone.getPhoneId(), mPhone.getContext()))) {// && isUserRttSettingOn()
                     Log.i(this, "isRttCurrentlySupported -- emergency acct and"
                             + " not supported in this country: " + country);
                     return false;
@@ -1041,7 +1041,7 @@ public class TelecomAccountRegistry {
 
             boolean isRttSupported = PhoneGlobals.getInstance().phoneMgr
                     .isRttEnabled(mPhone.getSubId());
-            boolean isUserRttSettingOn = isUserRttSettingOn();
+            //boolean isUserRttSettingOn = isUserRttSettingOn();
 
             boolean isRoaming = mTelephonyManager.isNetworkRoaming(mPhone.getSubId());
             boolean isOnWfc = mPhone.getImsRegistrationTech()
@@ -1056,22 +1056,22 @@ public class TelecomAccountRegistry {
             Log.i(this, "isRttCurrentlySupported -- regular acct,"
                     + " hasVoiceAvailability: " + hasVoiceAvailability + "\n"
                     + " isRttSupported: " + isRttSupported + "\n"
-                    + " isUserRttSettingOn: " + isUserRttSettingOn + "\n"
+                   // + " isUserRttSettingOn: " + isUserRttSettingOn + "\n"
                     + " alwaysAllowWhileRoaming: " + alwaysAllowWhileRoaming + "\n"
                     + " isRoaming: " + isRoaming + "\n"
                     + " isOnWfc: " + isOnWfc + "\n");
 
-            return hasVoiceAvailability && isRttSupported && !shouldDisableBecauseRoamingOffWfc
-                    && isUserRttSettingOn;
+            return hasVoiceAvailability && isRttSupported && !shouldDisableBecauseRoamingOffWfc;
+                    //&& isUserRttSettingOn
         }
 
-        private boolean isUserRttSettingOn() {
+        /*private boolean isUserRttSettingOn() {
             int rttSetting = Settings.Secure.getInt(
                     mContext.getContentResolver(),
                     Settings.Secure.RTT_CALLING_MODE
                     + convertRttPhoneId(mPhone.getPhoneId()) , 0);
             return rttSetting != 0;
-        }
+        }*/
 
         /**
          * Indicates whether this account supports pausing video calls.
