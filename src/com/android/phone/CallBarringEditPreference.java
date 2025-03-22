@@ -45,6 +45,7 @@ import android.telephony.TelephonyManager;
 import android.telephony.ims.ImsReasonInfo;
 import android.telephony.ims.stub.ImsUtImplBase;
 // QTI_END: 2021-05-28: Telephony: Add CallForwarding and CallBarring expectMore support.
+import android.telephony.ims.stub.ImsRegistrationImplBase;
 import android.text.method.DigitsKeyListener;
 import android.text.method.PasswordTransformationMethod;
 import android.util.AttributeSet;
@@ -247,7 +248,8 @@ public class CallBarringEditPreference extends EditPinPreference {
         if (!skipReading) {
             // Query call barring status
 // QTI_BEGIN: 2021-05-28: Telephony: Add CallForwarding and CallBarring expectMore support.
-            if (!mPhone.isUtEnabled()) {
+            Log.d(LOG_TAG, "init: mPhone.getImsRegistrationTech() = " + mPhone.getImsRegistrationTech());
+            if (!(mPhone.isUtEnabled() && (mPhone.getImsRegistrationTech() != ImsRegistrationImplBase.REGISTRATION_TECH_NONE))) {//[BUG]-Modify by shaopan.tang FPS-1444 Callbarring should not via ims when in 2G
                 if (mPhone.getPhoneType() == TelephonyManager.PHONE_TYPE_GSM &&
                         PhoneUtils.isBacktoBackSSFeatureSupported()) {
                     getCallBarringWithExpectMore();
