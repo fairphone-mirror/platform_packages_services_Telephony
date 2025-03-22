@@ -37,6 +37,7 @@ import android.telephony.CarrierConfigManager;
 import android.telephony.TelephonyManager;
 import android.telephony.ims.ImsReasonInfo;
 import android.telephony.ims.stub.ImsUtImplBase;
+import android.telephony.ims.stub.ImsRegistrationImplBase;
 import android.text.method.DigitsKeyListener;
 import android.text.method.PasswordTransformationMethod;
 import android.util.AttributeSet;
@@ -203,7 +204,8 @@ public class CallBarringEditPreference extends EditPinPreference {
         mTcpListener = listener;
         if (!skipReading) {
             // Query call barring status
-            if (!mPhone.isUtEnabled()) {
+            Log.d(LOG_TAG, "init: mPhone.getImsRegistrationTech() = " + mPhone.getImsRegistrationTech());
+            if (!(mPhone.isUtEnabled() && (mPhone.getImsRegistrationTech() != ImsRegistrationImplBase.REGISTRATION_TECH_NONE))) {//[BUG]-Modify by shaopan.tang FPS-1444 Callbarring should not via ims when in 2G
                 if (mPhone.getPhoneType() == TelephonyManager.PHONE_TYPE_GSM &&
                         PhoneUtils.isBacktoBackSSFeatureSupported()) {
                     getCallBarringWithExpectMore();
