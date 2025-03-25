@@ -142,6 +142,8 @@ import javax.annotation.Nullable;
 
 import org.codeaurora.ims.QtiCallConstants;
 
+import com.android.internal.telephony.imsphone.ImsPhoneMmiCode;
+
 /**
  * Service for making GSM and CDMA connections.
  */
@@ -2053,6 +2055,23 @@ public class TelephonyConnectionService extends ConnectionService {
                     if (isRadioPowerDownOnBluetooth()) {
                         break;
                     }
+                    
+                    //Modify begin by renjie.zhang FPS-1422 2025/3/23
+                    boolean allowNonUTSuppServiceCode = false;
+                    CarrierConfigManager cfgManager = (CarrierConfigManager)
+                            phone.getContext().getSystemService(Context.CARRIER_CONFIG_SERVICE);
+                    if (cfgManager != null) {
+                        allowNonUTSuppServiceCode = cfgManager.getConfigForSubId(phone.getSubId())
+                            .getBoolean("allow_ussd_via_non_ut_bool",false);
+                    }
+
+                    boolean isSuppServiceCode = ImsPhoneMmiCode.isSuppServiceCodes(number, phone);
+                    if (isSuppServiceCode && allowNonUTSuppServiceCode) {
+                        Log.d(this, "onCreateOutgoingConnection  STATE_POWER_OFF dial for UT");
+                        break;
+                    }
+                    //Modify end by renjie.zhang FPS-1422 2025/3/23
+                    
                     return Connection.createFailedConnection(
                             mDisconnectCauseFactory.toTelecomDisconnectCause(
                                     android.telephony.DisconnectCause.POWER_OFF,
