@@ -1860,14 +1860,14 @@ if (mTelephonyManagerProxy.isConcurrentCallsPossible()
                     if (isRadioPowerDownOnBluetooth()) {
                         break;
                     }
-                    
+
                     //Modify begin by renjie.zhang FPS-1422 2025/3/23
                     boolean allowNonUTSuppServiceCode = false;
                     CarrierConfigManager cfgManager = (CarrierConfigManager)
                             phone.getContext().getSystemService(Context.CARRIER_CONFIG_SERVICE);
                     if (cfgManager != null) {
                         allowNonUTSuppServiceCode = cfgManager.getConfigForSubId(phone.getSubId())
-                            .getBoolean("allow_ussd_via_non_ut_bool",false);
+                            .getBoolean("allow_ussd_via_apm_ut_bool",true);
                     }
 
                     boolean isSuppServiceCode = ImsPhoneMmiCode.isSuppServiceCodes(number, phone);
@@ -1876,7 +1876,7 @@ if (mTelephonyManagerProxy.isConcurrentCallsPossible()
                         break;
                     }
                     //Modify end by renjie.zhang FPS-1422 2025/3/23
-                    
+
                     return Connection.createFailedConnection(
                             mDisconnectCauseFactory.toTelecomDisconnectCause(
                                     android.telephony.DisconnectCause.POWER_OFF,
