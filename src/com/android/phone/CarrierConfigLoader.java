@@ -272,6 +272,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private static final String PROP_COUNTRY = "persist.radio.sim.country";
     private static final String PROP_MCC_MNC = "persist.radio.sim.mcc.mnc";
     private static final String PROP_GID1 = "persist.radio.sim.gid1";
+    private static final String PROP_HAS_SKY = "persist.radio.sim.has_sky";
     private static final String DSDLOCKED_REBOOT = "persist.radio.dsd.locked.reboot";
     private static final String KEY_CID = "cid", KEY_MCC = "mcc", KEY_MNC = "mnc";
     private PersistableBundle mConfigFromDSDLocked = null;
@@ -2029,6 +2030,31 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         updateConfigForPhoneId(phoneId);
     }
 
+    /*modify begin for FPS-246 Different RATs are displayed when manual search of Networks target part */
+    private void checkHasSkySim(String simState){
+        logd("checkHasSkySim = "+simState);
+        if(IccCardConstants.INTENT_VALUE_ICC_LOADED.equals(simState) || IccCardConstants.INTENT_VALUE_ICC_ABSENT.equals(simState)){
+            int phoneCount = ((TelephonyManager) mContext.getSystemService(
+                Context.TELEPHONY_SERVICE)).getPhoneCount();
+            boolean hasSky = false;
+            for (int phoneId = 0; phoneId < phoneCount; phoneId++) {
+                CarrierIdentifier carrierId = getCarrierIdentifierForPhoneId(phoneId);
+                if(carrierId.getCarrierId() == 2139){
+                    hasSky = true;
+                    break;
+                }
+            }
+            boolean propVal = SystemProperties.getBoolean(PROP_HAS_SKY, false);
+            logd("checkHasSkySim propVal = "+propVal);
+            if(hasSky != propVal){
+                logd("checkHasSkySim PROP_HAS_SKY = " + hasSky);
+                SystemProperties.set(PROP_HAS_SKY, hasSky + "");
+            }
+        }
+
+    }
+    /*modify end for FPS-246 Different RATs are displayed when manual search of Networks target part */
+
     @android.annotation.EnforcePermission(android.Manifest.permission.MODIFY_PHONE_STATE)
     @Override
     public void updateConfigForPhoneId(int phoneId, @NonNull String simState) {
@@ -2068,6 +2094,8 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                 //updateConfigForPhoneId(phoneId);
                 break;
         }
+
+        checkHasSkySim(simState);    /*modify for FPS-246 Different RATs are displayed when manual search of Networks target part */
 
         // if DSD is done then follow the original code
         if (isDynamicSimDetectDone() == true) {
