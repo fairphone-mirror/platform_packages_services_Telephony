@@ -203,9 +203,9 @@ public class CallBarringEditPreference extends EditPinPreference {
 
         mTcpListener = listener;
         if (!skipReading) {
+            //[BUG]-Modify-Begin by shaopan.tang FPS-1444 Callbarring should not via ims when in 2G
             // Query call barring status
-            Log.d(LOG_TAG, "init: mPhone.getImsRegistrationTech() = " + mPhone.getImsRegistrationTech());
-            if (!(mPhone.isUtEnabled() && (mPhone.getImsRegistrationTech() != ImsRegistrationImplBase.REGISTRATION_TECH_NONE))) {//[BUG]-Modify by shaopan.tang FPS-1444 Callbarring should not via ims when in 2G
+            /*if (!mPhone.isUtEnabled()) {
                 if (mPhone.getPhoneType() == TelephonyManager.PHONE_TYPE_GSM &&
                         PhoneUtils.isBacktoBackSSFeatureSupported()) {
                     getCallBarringWithExpectMore();
@@ -218,7 +218,25 @@ public class CallBarringEditPreference extends EditPinPreference {
                 createQtiImsExtConnector(getContext());
                 //Connect will get the QtiImsExtManager instance.
                 mQtiImsExtConnector.connect();
+            }*/
+
+            // When in GSM/UMTS network, callbarring shall via cs
+            // Otherwise via ims if UT enabled
+            int voiceRadioTech = mPhone.getServiceState().getRilVoiceRadioTechnology();
+            Log.d(LOG_TAG, "init: voiceRadioTech = " + voiceRadioTech);
+            if ((voiceRadioTech == 16)//RIL_RADIO_TECHNOLOGY_GSM
+                           || (voiceRadioTech == 1)//RIL_RADIO_TECHNOLOGY_GPRS
+                           || (voiceRadioTech == 2)//RIL_RADIO_TECHNOLOGY_EDGE
+                           || (voiceRadioTech == 3)){//RIL_RADIO_TECHNOLOGY_UMTS
+                mPhone.getCallBarring(mFacility, "", mHandler.obtainMessage(
+                            MyHandler.MESSAGE_GET_CALL_BARRING),
+                            getServiceClassForCallBarring(mPhone));
+            } else if (mPhone.isUtEnabled()){
+                createQtiImsExtConnector(getContext());
+                //Connect will get the QtiImsExtManager instance.
+                mQtiImsExtConnector.connect();
             }
+            //[BUG]-Modify-End by shaopan.tang
             if (mTcpListener != null) {
                 mTcpListener.onStarted(this, true);
             }
