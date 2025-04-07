@@ -454,7 +454,7 @@
 <!-- QTI_END: 2018-03-27: Telephony: IMS: Call forward unconditional timer-->
 <!-- QTI_BEGIN: 2018-07-06: Telephony: Skip reading the CLIR over Ut-->
 <!-- QTI_END: 2018-07-06: Telephony: Skip reading the CLIR over Ut-->
-    <bool name="config_support_rtt">false</bool>
+    <bool name="config_support_rtt">true</bool>
 
     <!-- String indicating the package name of the device ImsService implementation for MMTEL. -->
 <!-- QTI_BEGIN: 2018-03-27: Telephony: IMS: Call forward unconditional timer-->
