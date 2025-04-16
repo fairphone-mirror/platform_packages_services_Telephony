@@ -931,4 +931,5 @@
     <string name="send_from_work_profile_cancel" msgid="177746511030381711">"Cancelar"</string>
     <string name="send_from_work_profile_action_str" msgid="6892775562934243337">"Cambiar al perfil de trabajo"</string>
     <string name="install_messages_on_work_profile_action_str" msgid="3773440996395152903">"Instalar una aplicación de mensajería de trabajo"</string>
+    <string name="limited_service_alert_dialog_description"><b>Llamadas de emergencia a través de WiFi</b>\nLas llamadas de emergencia no son posibles a través de WiFi.\n\nEl dispositivo cambia automáticamente a una red celular (2G/3G) para realizar una llamada de emergencia.\n\nLas llamadas de emergencia solo son posibles en áreas con cobertura celular.</string>
 </resources>
