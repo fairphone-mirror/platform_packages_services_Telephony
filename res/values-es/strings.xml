@@ -921,7 +921,8 @@
     <string name="notification_channel_sip_account" msgid="1261816025156179637">"Cuentas SIP obsoletas"</string>
     <!-- Smart Divert Settings -->
     <!-- Title for the Smart Divert Feature displayed in Call Settings -->
-    <string name="smart_divert_title">Smart-Divert</string>
+    <string name="smart_divert_title">Desvío inteligente</string>
     <!-- Summary for the Smart Divert Feature displayed in Call Settings -->
     <string name="smart_divert_summary">Configuración de CFNRc</string>
+    <string name="limited_service_alert_dialog_description"><b>Llamadas de emergencia a través de WiFi</b>\nLas llamadas de emergencia no son posibles a través de WiFi.\n\nEl dispositivo cambia automáticamente a una red celular (2G/3G) para realizar una llamada de emergencia.\n\nLas llamadas de emergencia solo son posibles en áreas con cobertura celular.</string>
 </resources>
