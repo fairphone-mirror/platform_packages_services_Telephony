@@ -730,7 +730,8 @@ public class CallForwardEditPreference extends EditPhoneNumberPreference {
             Log.d(LOG_TAG, "shouldCfutEnabled=" + mIsCfutEnabled);
 // QTI_END: 2024-04-23: Telephony: IMS-UT: Save/restore InstanceState during language changed for CFUT
 // QTI_BEGIN: 2021-12-16: Telephony: Query call forward status properly
-            if (mPhone != null &&  mPhone.isUtEnabled()) {
+            //[BUG]-Modify-Begin by shaopan.tang FPS-2210 Callforwarding should not via ims when in 2G
+            /*if (mPhone != null &&  mPhone.isUtEnabled()) {
                 if (mQtiImsExtConnector == null) {
                     createQtiImsExtConnector(mContext);
                     //Connect will get the QtiImsExtManager instance.
@@ -755,8 +756,34 @@ public class CallForwardEditPreference extends EditPhoneNumberPreference {
                 }
 // QTI_END: 2021-05-28: Telephony: Add CallForwarding and CallBarring expectMore support.
 // QTI_BEGIN: 2019-03-13: Telephony: Avoid to send 2 PUT requests to network when SS service is activated from UI
-            }
+            }*/
 // QTI_END: 2019-03-13: Telephony: Avoid to send 2 PUT requests to network when SS service is activated from UI
+
+            if (mPhone == null) {
+                Log.d(LOG_TAG, "CF query cannot be triggered due to phone is null");
+                return;
+            }
+            int voiceRadioTech = mPhone.getServiceState().getRilVoiceRadioTechnology();
+            Log.d(LOG_TAG, "init: voiceRadioTech = " + voiceRadioTech);
+            if ((voiceRadioTech == 16)//RIL_RADIO_TECHNOLOGY_GSM
+                           || (voiceRadioTech == 1)//RIL_RADIO_TECHNOLOGY_GPRS
+                           || (voiceRadioTech == 2)//RIL_RADIO_TECHNOLOGY_EDGE
+                           || (voiceRadioTech == 3)){//RIL_RADIO_TECHNOLOGY_UMTS
+                mPhone.getCallForwardingOption(reason, mServiceClass,
+                            mHandler.obtainMessage(MyHandler.MESSAGE_GET_CF,
+                            // unused in this case
+                            CommandsInterface.CF_ACTION_DISABLE,
+                            MyHandler.MESSAGE_GET_CF, null));
+            } else if (mPhone != null &&  mPhone.isUtEnabled()) {
+                if (mQtiImsExtConnector == null) {
+                    createQtiImsExtConnector(mContext);
+                    //Connect will get the QtiImsExtManager instance.
+                    mQtiImsExtConnector.connect();
+                } else {
+                    queryImsCallForwardStatus();
+                }
+            }
+            //[BUG]-Modify-End by shaopan.tang
         } else {
             mHandler.sendMessage(mHandler.obtainMessage(mHandler.MESSAGE_GET_CF_USSD,
                     // unused in this case
