@@ -953,7 +953,7 @@
     <string name="satellite_config_size_of_sats2_dat_label" msgid="671746449054349967">"Größe von sats2.dat:"</string>
     <string name="satellite_config_json_label" msgid="4577292884014824105">"JSON-Konfiguration für Satellitenzugriff:"</string>
     <string name="call_forward_option">"Anrufweiterleitung Optionen"</string>
-    <string name="labelCFVoice">"Stimme"</string>
+    <string name="labelCFVoice">"Sprachanrufe"</string>
     <string name="vibrating_for_outgoing_call_accepted_title">Vibration für Annahme von ausgehendem Anruf.</string>
     <string name="vibrating_for_outgoing_call_accepted_summary">Vibration für Annahme von ausgehendem Anruf deaktivieren</string>
     <!-- Smart Divert Settings -->
