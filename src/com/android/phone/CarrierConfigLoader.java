@@ -1636,7 +1636,6 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     }
 
     private void updateSettingsProvider(int phoneId, PersistableBundle config) {
-        ContentResolver resolver = mContext.getContentResolver();
         Phone phone = PhoneFactory.getPhone(phoneId);
         final ImsManager imsManager = ImsManager.getInstance(mContext, phoneId);
         int[] subIds = SubscriptionManager.getSubId(phoneId);
@@ -1644,16 +1643,11 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
         boolean data_roaming_enabled = config.getBoolean(CarrierConfigManager.KEY_CARRIER_DEFAULT_DATA_ROAMING_ENABLED_BOOL, false);
         int default_nwmode = config.getInt(CarrierConfigManager.KEY_DEFAULT_NETWORK_MODE, TelephonyProperties.default_network().get(phoneId));
-        String time_format = config.getString(CarrierConfigManager.KEY_TIME_FORMAT, "24");
-        boolean bluetooth_on = (m_dsd_locked && mConfigFromDSDLocked != null) ?
-                mConfigFromDSDLocked.getBoolean(CarrierConfigManager.KEY_BLUETOOTH_DEFAULT_ON, false) :
-                config.getBoolean(CarrierConfigManager.KEY_BLUETOOTH_DEFAULT_ON, false);
 
         logd("update settings[" + phoneId + "]"
                 + " data_roaming_enabled: " + data_roaming_enabled
                 + " default_nwmode: " + default_nwmode
-                + " time_format: " + time_format
-                + " bluetooth_on: " + bluetooth_on
+                + " m_reboot: " + m_reboot
         );
 
         if (subIds != null && subIds.length > 0) {
@@ -1679,6 +1673,23 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
         }
 
+        // modify by T2M.zhang renjie for FPS-2384 25-5-7 begin
+        if (m_reboot && getDsdLocked()) {
+            logd("only update bluetooth and timezone when first reboot time to do dsd lock");
+            updateTZ_BT(phoneId, config);
+        }
+
+    }
+
+    private void updateTZ_BT(int phoneId, PersistableBundle config) {
+        ContentResolver resolver = mContext.getContentResolver();
+        String time_format = config.getString(CarrierConfigManager.KEY_TIME_FORMAT, "24");
+        boolean bluetooth_on = config.getBoolean(CarrierConfigManager.KEY_BLUETOOTH_DEFAULT_ON, false);
+
+        logd("updateTZ BT[" + phoneId + "]"
+                        + " time_format: " + time_format
+                        + " bluetooth_on: " + bluetooth_on);
+
         Intent timeChanged = new Intent(Intent.ACTION_TIME_CHANGED);
         timeChanged.addFlags(Intent.FLAG_RECEIVER_INCLUDE_BACKGROUND);
         int timeFormatPreference = time_format.equals("24")
@@ -1695,6 +1706,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
             btAdapter.disable();
         }
     }
+    // modify by T2M.zhang renjie for FPS-2384 25-5-7 end
 
     private void updateModemSettings(int phoneId, PersistableBundle config) {
 
