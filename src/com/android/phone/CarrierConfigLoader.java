@@ -1684,7 +1684,9 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private void updateTZ_BT(int phoneId, PersistableBundle config) {
         ContentResolver resolver = mContext.getContentResolver();
         String time_format = config.getString(CarrierConfigManager.KEY_TIME_FORMAT, "24");
-        boolean bluetooth_on = config.getBoolean(CarrierConfigManager.KEY_BLUETOOTH_DEFAULT_ON, false);
+        boolean bluetooth_on = (m_dsd_locked && mConfigFromDSDLocked != null) ?
+                mConfigFromDSDLocked.getBoolean(CarrierConfigManager.KEY_BLUETOOTH_DEFAULT_ON, false) :
+                config.getBoolean(CarrierConfigManager.KEY_BLUETOOTH_DEFAULT_ON, false);
 
         logd("updateTZ BT[" + phoneId + "]"
                         + " time_format: " + time_format
