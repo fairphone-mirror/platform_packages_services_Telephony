@@ -52,6 +52,7 @@ import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyCallback;
 import android.telephony.TelephonyLocalConnection;
 import android.telephony.TelephonyManager;
+import android.telephony.PhysicalChannelConfig;
 import android.text.TextUtils;
 import android.util.ArraySet;
 import android.util.LocalLog;
@@ -277,7 +278,8 @@ public class PhoneGlobals extends ContextWrapper {
 
     private class PhoneAppCallback extends TelephonyCallback implements
             TelephonyCallback.ServiceStateListener,
-            TelephonyCallback.DataConnectionStateListener {
+            TelephonyCallback.DataConnectionStateListener,
+            TelephonyCallback.PhysicalChannelConfigListener {
         private final int mSubId;
 
         PhoneAppCallback(int subId) {
@@ -306,6 +308,12 @@ public class PhoneGlobals extends ContextWrapper {
                     }
                 });
             }
+        }
+
+        @Override
+        public void onPhysicalChannelConfigChanged(List<PhysicalChannelConfig> listConfigs) {
+            Log.d(LOG_TAG, "PhysicalChannelConfig listConfigs: " + listConfigs);
+            mSarReceiver.handlePhysicalChannelConfig(listConfigs);
         }
 
         public int getSubId() {
