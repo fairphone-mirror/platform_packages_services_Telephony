@@ -22,12 +22,24 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import java.util.List;
+import java.util.concurrent.Executor;
+
 import com.qualcomm.qcrilhook.QcRilHookCallback;
 import com.qualcomm.sysrilcmd.SysRilCmd;
+import com.qualcomm.sysrilcmd.ISysRilCmd;
 
 import android.net.wifi.WifiManager;
 import android.media.AudioManager;
 import android.os.SystemProperties;
+
+import android.os.Handler;
+import android.os.HandlerExecutor;
+import android.os.HandlerThread;
+
+import android.telephony.TelephonyManager;
+import android.telephony.TelephonyCallback;
+import android.telephony.PhysicalChannelConfig;
 
 import android.util.Log;
 
@@ -39,6 +51,11 @@ public class SetSarReceiver extends BroadcastReceiver {
     private boolean mRilHookReady = false;
     private boolean receiverOn = false;
     private boolean wifiSpotOn = false;
+    private boolean isPowerBand = false;
+    private int mLastMaxPowerState = 0;
+
+    private static final int SET_MAX_POWER_DEFAULT = 0;
+    private static final int SET_MAX_POWER_LIMITED = 1;
 
     private QcRilHookCallback mQcrilHookCb = new QcRilHookCallback() {
         public void onQcRilHookReady() {
@@ -74,6 +91,49 @@ public class SetSarReceiver extends BroadcastReceiver {
         }
     }
 
+    private void setDeviceState() {
+        Log.d(TAG, "is receiver on: " + receiverOn + ", is decrease power band: " + isPowerBand);
+        if(receiverOn && isPowerBand) {
+            setMaxPowerLimited(SET_MAX_POWER_LIMITED);
+            Log.d(TAG, "Send reduced max power");
+        } else {
+            setMaxPowerLimited(SET_MAX_POWER_DEFAULT);
+            Log.d(TAG, "Not send reduced max power");
+        }
+    }
+
+    private void setMaxPowerLimited(int command) {
+        if (!mRilHookReady) {
+            Log.d(TAG, "Unable to set max power. QcRilHookInterface is not ready.");
+            return;
+        }
+        if(mLastMaxPowerState != command) {
+            try {
+                mSysRil.setInt32Val(ISysRilCmd.RIL_SUB_CMD_INT32_MAX_POWER_STATE, command);
+            } catch (Exception e) {
+                Log.d(TAG, String.format("setMaxPowerLimited() Failed : %s", e.toString()));
+            }
+            mLastMaxPowerState = command;
+        }
+    }
+
+    public void handlePhysicalChannelConfig(List<PhysicalChannelConfig> listConfigs) {
+        Log.d(TAG, "PhysicalChannelConfig listConfigs: " + listConfigs);
+        int band = 0;
+        boolean old_state = isPowerBand;
+        for(int i = 0; i < listConfigs.size(); i++) {
+            PhysicalChannelConfig config = listConfigs.get(i);
+            Log.d(TAG, "physical channel config: " + config);
+            if(config.getNetworkType() == TelephonyManager.NETWORK_TYPE_NR) {
+                band = config.getBand();
+            }
+        }
+        isPowerBand = (band == 41 || band == 77 || band == 78) ? true : false;
+
+        if(old_state != isPowerBand) {
+            setDeviceState();
+        }
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -84,11 +144,9 @@ public class SetSarReceiver extends BroadcastReceiver {
         if (!ctrlSar) return;//debug
 
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-
         Log.d(TAG, "receive intent " + intent);
 
-
-         if (ACTION_BOOT_COMPLETED.equals(action)) {
+        if (ACTION_BOOT_COMPLETED.equals(action)) {
             try {
                 changeSar(0);
             } catch (Exception e) {}
@@ -121,7 +179,9 @@ public class SetSarReceiver extends BroadcastReceiver {
             }
         }
 
-
+        if(old_receiverOn != receiverOn) {
+            setDeviceState();
+        }
         if(old_receiverOn != receiverOn || old_wifiSpotOn != wifiSpotOn){
             processAction();
         }
