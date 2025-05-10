@@ -52,7 +52,7 @@ public class SetSarReceiver extends BroadcastReceiver {
     private boolean mRilHookReady = false;
     private boolean receiverOn = false;
     private boolean wifiSpotOn = false;
-    private boolean isPowerBand = false;
+    private boolean isHacPowerBand = false;
     private int mLastMaxPowerState = 0;
     private boolean wifiOn = false;
     private boolean btOn = false;
@@ -109,13 +109,13 @@ public class SetSarReceiver extends BroadcastReceiver {
     }
 
     private void setDeviceState() {
-        Log.d(TAG, "is receiver on: " + receiverOn + ", is decrease power band: " + isPowerBand);
-        if(receiverOn && isPowerBand) {
+        Log.d(TAG, "is receiver on: " + receiverOn + ", is decrease power band: " + isHacPowerBand);
+        if(receiverOn && isHacPowerBand) {
             setMaxPowerLimited(SET_MAX_POWER_LIMITED);
-            Log.d(TAG, "Send reduced max power");
+            Log.d(TAG, "Send reduced max power command");
         } else {
             setMaxPowerLimited(SET_MAX_POWER_DEFAULT);
-            Log.d(TAG, "Not send reduced max power");
+            Log.d(TAG, "Send default max power command");
         }
     }
 
@@ -137,17 +137,15 @@ public class SetSarReceiver extends BroadcastReceiver {
     public void handlePhysicalChannelConfig(List<PhysicalChannelConfig> listConfigs) {
         Log.d(TAG, "PhysicalChannelConfig listConfigs: " + listConfigs);
         int band = 0;
-        boolean old_state = isPowerBand;
         for(int i = 0; i < listConfigs.size(); i++) {
             PhysicalChannelConfig config = listConfigs.get(i);
-            Log.d(TAG, "physical channel config: " + config);
             if(config.getNetworkType() == TelephonyManager.NETWORK_TYPE_NR) {
                 band = config.getBand();
+                Log.d(TAG, "band info from physical channel config: " + band);
             }
         }
-        isPowerBand = (band == 41 || band == 77 || band == 78) ? true : false;
-
-        if(old_state != isPowerBand) {
+        isHacPowerBand = (band == 41 || band == 77 || band == 78) ? true : false;
+        if(isHacPowerBand) {
             setDeviceState();
         }
     }
