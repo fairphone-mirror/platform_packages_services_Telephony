@@ -18,6 +18,7 @@
 
 package com.android.phone;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -53,6 +54,9 @@ public class SetSarReceiver extends BroadcastReceiver {
     private boolean wifiSpotOn = false;
     private boolean isPowerBand = false;
     private int mLastMaxPowerState = 0;
+    private boolean wifiOn = false;
+    private boolean btOn = false;
+    private boolean wifiBtOn = false;
 
     private static final int SET_MAX_POWER_DEFAULT = 0;
     private static final int SET_MAX_POWER_LIMITED = 1;
@@ -77,8 +81,21 @@ public class SetSarReceiver extends BroadcastReceiver {
     }
 
     private void processAction() {
-        Log.d(TAG," receiverOn = " + receiverOn+",wifiSpotOn = "+wifiSpotOn);
+        Log.d(TAG," receiverOn = " + receiverOn+",wifiSpotOn = "+wifiSpotOn + ",wifiBtOn = " + wifiBtOn);
         int sarValue = (receiverOn ? (wifiSpotOn ? 3 : 2) : (wifiSpotOn ? 1 : 0));
+        if (wifiBtOn){
+            if (receiverOn){
+                sarValue = wifiSpotOn ? 7 : 6;
+            } else {
+                sarValue = wifiSpotOn ? 5 : 4;
+            }
+        } else {
+            if (receiverOn){
+                sarValue = wifiSpotOn ? 3 : 2;
+            } else {
+                sarValue = wifiSpotOn ? 1 : 0;
+            }
+        }
         changeSar(sarValue);
     }
 
@@ -144,17 +161,26 @@ public class SetSarReceiver extends BroadcastReceiver {
         if (!ctrlSar) return;//debug
 
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        Log.d(TAG, "receive intent " + intent);
+        WifiManager mWifiManager = (WifiManager) context.getSystemService(WifiManager.class);
+        BluetoothAdapter mAdapter = BluetoothAdapter.getDefaultAdapter();
 
+        Log.d(TAG, "receive intent " + intent);
         if (ACTION_BOOT_COMPLETED.equals(action)) {
+            boolean isWifiEnabled = mWifiManager.isWifiEnabled();
+            boolean isBTEnabled = mAdapter != null && mAdapter.isEnabled();
             try {
-                changeSar(0);
+                if (isWifiEnabled || isBTEnabled){
+                    changeSar(4);
+                } else {
+                    changeSar(0);
+                }
             } catch (Exception e) {}
             return;
         }
 
         boolean old_receiverOn = receiverOn;
         boolean old_wifiSpotOn = wifiSpotOn;
+        boolean old_wifiBtOn = wifiBtOn;
 
         if (action.equals(AudioManager.STREAM_DEVICES_CHANGED_ACTION)) {
             int newDevice = intent.getIntExtra(AudioManager.EXTRA_VOLUME_STREAM_DEVICES, -1);
@@ -177,12 +203,26 @@ public class SetSarReceiver extends BroadcastReceiver {
                     state == WifiManager.WIFI_AP_STATE_FAILED) {
                 wifiSpotOn = false;
             }
+        } else if (WifiManager.WIFI_STATE_CHANGED_ACTION.equals(action)){
+            int state = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE,
+                            WifiManager.WIFI_STATE_UNKNOWN);
+            if (state == WifiManager.WIFI_STATE_DISABLED) {
+                wifiOn = false;
+            }
+            if (state == WifiManager.WIFI_STATE_ENABLED) {
+                wifiOn = true;
+            }
+        } else if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)){
+            int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
+            if (state == BluetoothAdapter.STATE_OFF) {
+                btOn = false;
+            }else if(state == BluetoothAdapter.STATE_ON) {
+                btOn = true;
+            }
         }
+        wifiBtOn = wifiOn || btOn;
 
-        if(old_receiverOn != receiverOn) {
-            setDeviceState();
-        }
-        if(old_receiverOn != receiverOn || old_wifiSpotOn != wifiSpotOn){
+        if(old_receiverOn != receiverOn || old_wifiSpotOn != wifiSpotOn || old_wifiBtOn != wifiBtOn){
             processAction();
         }
 
