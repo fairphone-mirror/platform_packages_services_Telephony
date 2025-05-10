@@ -21,6 +21,7 @@ import android.annotation.Nullable;
 import android.app.Activity;
 import android.app.KeyguardManager;
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -759,6 +760,8 @@ public class PhoneGlobals extends ContextWrapper {
         IntentFilter sarIntentFilter = new IntentFilter(Intent.ACTION_BOOT_COMPLETED);
         sarIntentFilter.addAction(WifiManager.WIFI_AP_STATE_CHANGED_ACTION);
         sarIntentFilter.addAction(AudioManager.STREAM_DEVICES_CHANGED_ACTION);
+        sarIntentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        sarIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mSarReceiver, sarIntentFilter);
 
         PhoneUtils.connectExtTelephonyManager(this);
