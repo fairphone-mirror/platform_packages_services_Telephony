@@ -83,27 +83,14 @@ public class SetSarReceiver extends BroadcastReceiver {
     private void processAction() {
         Log.d(TAG," receiverOn = " + receiverOn+",wifiSpotOn = "+wifiSpotOn + ",wifiBtOn = " + wifiBtOn);
         int sarValue = (receiverOn ? (wifiSpotOn ? 3 : 2) : (wifiSpotOn ? 1 : 0));
-        if (wifiBtOn){
-            if (receiverOn){
-                sarValue = wifiSpotOn ? 7 : 6;
-            } else {
-                sarValue = wifiSpotOn ? 5 : 4;
-            }
-        } else {
-            if (receiverOn){
-                sarValue = wifiSpotOn ? 3 : 2;
-            } else {
-                sarValue = wifiSpotOn ? 1 : 0;
-            }
-        }
         changeSar(sarValue);
     }
 
     private void changeSar(int val) {
-        Log.d(TAG,"changeSar = "+val);
+        Log.d(TAG,"changeSar = " + val + ",wifiBtOn = " + wifiBtOn);
         if (mRilHookReady) {
             try {
-                mSysRil.setTransmitMaxPower(val, 0x80);
+                mSysRil.setTransmitMaxPower(val, (wifiBtOn ? 1 : 0));
             } catch (Exception e) {}
         }
     }
@@ -166,12 +153,9 @@ public class SetSarReceiver extends BroadcastReceiver {
         if (ACTION_BOOT_COMPLETED.equals(action)) {
             boolean isWifiEnabled = mWifiManager.isWifiEnabled();
             boolean isBTEnabled = mAdapter != null && mAdapter.isEnabled();
+            wifiBtOn = isWifiEnabled || isBTEnabled;
             try {
-                if (isWifiEnabled || isBTEnabled){
-                    changeSar(4);
-                } else {
-                    changeSar(0);
-                }
+                changeSar(0);
             } catch (Exception e) {}
             return;
         }
