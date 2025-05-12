@@ -204,6 +204,10 @@ public class SetSarReceiver extends BroadcastReceiver {
         }
         wifiBtOn = wifiOn || btOn;
 
+        if(old_receiverOn != receiverOn) {
+            setDeviceState();
+        }
+
         if(old_receiverOn != receiverOn || old_wifiSpotOn != wifiSpotOn || old_wifiBtOn != wifiBtOn){
             processAction();
         }
