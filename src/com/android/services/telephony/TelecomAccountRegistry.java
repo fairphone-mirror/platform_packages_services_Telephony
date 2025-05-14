@@ -1203,7 +1203,7 @@ public class TelecomAccountRegistry {
                         Predicate.isEqual(country))) || !(QtiImsUtils.isSimLessRttSupported(
 // QTI_END: 2023-02-28: Telephony: IMS : Fix the simless RTT Upgrade condition.
 // QTI_BEGIN: 2023-01-19: Telephony: IMS : Move RTT downgrade and upgrade logic completely to AOSP.
-                        mPhone.getPhoneId(), mPhone.getContext()))) {// && isUserRttSettingOn()
+                        mPhone.getPhoneId(), mPhone.getContext()) && isUserRttSettingOn())) {
 // QTI_END: 2023-01-19: Telephony: IMS : Move RTT downgrade and upgrade logic completely to AOSP.
                     Log.i(this, "isRttCurrentlySupported -- emergency acct and"
                             + " not supported in this country: " + country);
@@ -1220,7 +1220,7 @@ public class TelecomAccountRegistry {
             boolean isRttSupported = (phoneMgr != null) ?
                 phoneMgr.isRttEnabled(mPhone.getSubId()) : false;
 // QTI_BEGIN: 2021-04-12: Telephony: IMS: Remove RTT capability if RTT user setting is OFF.
-            // boolean isUserRttSettingOn = isUserRttSettingOn();
+            boolean isUserRttSettingOn = isUserRttSettingOn();
 // QTI_END: 2021-04-12: Telephony: IMS: Remove RTT capability if RTT user setting is OFF.
 
             boolean isRoaming = mTelephonyManager.isNetworkRoaming(mPhone.getSubId());
@@ -1239,7 +1239,7 @@ public class TelecomAccountRegistry {
                     + " hasVoiceAvailability: " + hasVoiceAvailability + "\n"
                     + " isRttSupported: " + isRttSupported + "\n"
 // QTI_BEGIN: 2021-04-12: Telephony: IMS: Remove RTT capability if RTT user setting is OFF.
-                    // + " isUserRttSettingOn: " + isUserRttSettingOn + "\n"
+                    + " isUserRttSettingOn: " + isUserRttSettingOn + "\n"
 // QTI_END: 2021-04-12: Telephony: IMS: Remove RTT capability if RTT user setting is OFF.
                     + " alwaysAllowWhileRoaming: " + alwaysAllowWhileRoaming + "\n"
                     + " isRoaming: " + isRoaming + "\n"
@@ -1247,17 +1247,17 @@ public class TelecomAccountRegistry {
 
 // QTI_BEGIN: 2021-04-12: Telephony: IMS: Remove RTT capability if RTT user setting is OFF.
             return hasVoiceAvailability && isRttSupported && !shouldDisableBecauseRoamingOffWfc
-                    // && isUserRttSettingOn;
+                    && isUserRttSettingOn;
         }
 
-        /*private boolean isUserRttSettingOn() {
+        private boolean isUserRttSettingOn() {
             int rttSetting = Settings.Secure.getInt(
                     mContext.getContentResolver(),
                     Settings.Secure.RTT_CALLING_MODE
                     + convertRttPhoneId(mPhone.getPhoneId()) , 0);
             return rttSetting != 0;
 // QTI_END: 2021-04-12: Telephony: IMS: Remove RTT capability if RTT user setting is OFF.
-        }*/
+        }
 
         /**
          * Indicates whether this account supports pausing video calls.
