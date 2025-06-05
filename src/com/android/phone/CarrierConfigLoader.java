@@ -287,6 +287,8 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private int highestPriority = 0;
     // add by T2M.dengxiangyu for FP4-61 2021-04-14 end
 
+    private static final String PROP_SIM_OTA_UPDATE = "persist.radio.sim.fota_update";//[BUG]-Modidy by shaopan.tang 2025-06-05 FP5V-1005 RTT UI issue after FOTA update
+
     // Handler to process various events.
     //
     // For each phoneId, the event sequence should be:
@@ -683,6 +685,15 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                         //modify by T2M yubin.ying for FP4-3655 20220421
                         //clearCachedConfigForPackage(null);
                         //modify by T2M yubin.ying for FP4-3655 20220421
+
+                        //[BUG]-Modidy-Begin by shaopan.tang 2025-06-05 FP5V-1005 RTT UI issue after FOTA update
+                        boolean hasRefresh = SystemProperties.getBoolean(PROP_SIM_OTA_UPDATE, false);
+                        if (!hasRefresh) {
+                              clearCachedConfigForPackage(1882);
+                              SystemProperties.set(PROP_SIM_OTA_UPDATE, "true");
+                        }
+                        //[BUG]-Modidy-End by shaopan.tang
+
                         sharedPrefs
                                 .edit()
                                 .putString(KEY_FINGERPRINT, Build.FINGERPRINT)
@@ -1516,6 +1527,37 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         }
         return true;
     }
+
+    //[BUG]-Modidy-Begin by shaopan.tang 2025-06-05 FP5V-1005 RTT UI issue after FOTA update
+    /**
+     * Clears cached carrier config.
+     * This deletes all saved XML files associated with the given carrier id. If carrierId is
+     * null, then it deletes all saved XML files.
+     *
+     * @param carrierId operator carrier id
+     *
+     * @return true iff one or more files were deleted.
+     */
+    private boolean clearCachedConfigForPackage(int carrierId) {
+        File dir = mContext.getFilesDir();
+        File[] packageFiles = dir.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String filename) {
+                logd("clearCachedConfigForPackage filename = " + filename);
+                if (carrierId != 0) {
+                    return filename.startsWith("carrierconfig-") && filename.contains("-" + String.valueOf(carrierId));
+                } else {
+                    return filename.startsWith("carrierconfig-");
+                }
+            }
+        });
+        if (packageFiles == null || packageFiles.length < 1) return false;
+        for (File f : packageFiles) {
+            logd("Deleting " + f.getName());
+            f.delete();
+        }
+        return true;
+    }
+    //[BUG]-Modidy-End by shaopan.tang
 
     private String getFilePathForLogging(String filePath) {
         if (!TextUtils.isEmpty(filePath)) {
