@@ -326,7 +326,7 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         @Override
         public void handleMessage(@NonNull Message msg) {
             final int phoneId = msg.arg1;
-            logdWithLocalLog("mHandler: " + eventToString(msg.what) + " phoneId: " + phoneId);
+            logl("mHandler: " + eventToString(msg.what) + " phoneId: " + phoneId);
             if (!SubscriptionManager.isValidPhoneId(phoneId)
                     && msg.what != EVENT_MULTI_SIM_CONFIG_CHANGED) {
                 return;
