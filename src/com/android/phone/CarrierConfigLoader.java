@@ -1684,12 +1684,14 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     private void updateTZ_BT(int phoneId, PersistableBundle config) {
         ContentResolver resolver = mContext.getContentResolver();
         String time_format = config.getString(CarrierConfigManager.KEY_TIME_FORMAT, "24");
+        boolean dtmf_enabled = config.getBoolean(CarrierConfigManager.KEY_CARRIER_DEFAULT_DTMF_ENABLED_BOOL, false);
         boolean bluetooth_on = (m_dsd_locked && mConfigFromDSDLocked != null) ?
                 mConfigFromDSDLocked.getBoolean(CarrierConfigManager.KEY_BLUETOOTH_DEFAULT_ON, false) :
                 config.getBoolean(CarrierConfigManager.KEY_BLUETOOTH_DEFAULT_ON, false);
 
         logd("updateTZ BT[" + phoneId + "]"
                         + " time_format: " + time_format
+                        + " dtmf_enabled: " + dtmf_enabled
                         + " bluetooth_on: " + bluetooth_on);
 
         Intent timeChanged = new Intent(Intent.ACTION_TIME_CHANGED);
@@ -1701,12 +1703,17 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         mContext.sendBroadcast(timeChanged);
         Settings.System.putString(resolver, Settings.System.TIME_12_24, time_format);
 
+        logd("update dtmf enabled for phone: " + phoneId );
+        Settings.System.putInt(resolver,Settings.System.DTMF_TONE_WHEN_DIALING,
+                dtmf_enabled ? 1 : 0);
+
         BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetooth_on) {
             btAdapter.enable();
         } else {
             btAdapter.disable();
         }
+
     }
     // modify by T2M.zhang renjie for FPS-2384 25-5-7 end
 
