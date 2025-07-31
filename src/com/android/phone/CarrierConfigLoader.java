@@ -1639,8 +1639,8 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         return false;
     }
 
+    // modify by T2M.zhang renjie for FP5V-1070 25-7-31 begin
     private void updateSettingsProvider(int phoneId, PersistableBundle config) {
-        ContentResolver resolver = mContext.getContentResolver();
         Phone phone = PhoneFactory.getPhone(phoneId);
         final ImsManager imsManager = ImsManager.getInstance(mContext, phoneId);
         int[] subIds = SubscriptionManager.getSubId(phoneId);
@@ -1648,16 +1648,11 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
         boolean data_roaming_enabled = config.getBoolean(CarrierConfigManager.KEY_CARRIER_DEFAULT_DATA_ROAMING_ENABLED_BOOL, false);
         int default_nwmode = config.getInt(CarrierConfigManager.KEY_DEFAULT_NETWORK_MODE, TelephonyProperties.default_network().get(phoneId));
-        String time_format = config.getString(CarrierConfigManager.KEY_TIME_FORMAT, "24");
-        boolean bluetooth_on = (m_dsd_locked && mConfigFromDSDLocked != null) ?
-                mConfigFromDSDLocked.getBoolean(CarrierConfigManager.KEY_BLUETOOTH_DEFAULT_ON, false) :
-                config.getBoolean(CarrierConfigManager.KEY_BLUETOOTH_DEFAULT_ON, false);
 
         logd("update settings[" + phoneId + "]"
                 + " data_roaming_enabled: " + data_roaming_enabled
                 + " default_nwmode: " + default_nwmode
-                + " time_format: " + time_format
-                + " bluetooth_on: " + bluetooth_on
+                + " m_reboot: " + m_reboot
         );
 
         if (subIds != null && subIds.length > 0) {
@@ -1679,9 +1674,28 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                 }
             }).start();
 
-            // modify by T2M.zhang renjie for FP4T-367 23-6-9 end
 
         }
+
+        if (m_reboot && getDsdLocked()) {
+            logd("only update bluetooth and timezone when first reboot time to do dsd lock");
+            updateTZ_BT(phoneId, config);
+        }
+
+    }
+
+    private void updateTZ_BT(int phoneId, PersistableBundle config) {
+        ContentResolver resolver = mContext.getContentResolver();
+        String time_format = config.getString(CarrierConfigManager.KEY_TIME_FORMAT, "24");
+        boolean dtmf_enabled = config.getBoolean(CarrierConfigManager.KEY_CARRIER_DEFAULT_DTMF_ENABLED_BOOL, false);
+        boolean bluetooth_on = (m_dsd_locked && mConfigFromDSDLocked != null) ?
+                mConfigFromDSDLocked.getBoolean(CarrierConfigManager.KEY_BLUETOOTH_DEFAULT_ON, false) :
+                config.getBoolean(CarrierConfigManager.KEY_BLUETOOTH_DEFAULT_ON, false);
+
+        logd("updateTZ BT[" + phoneId + "]"
+                + " time_format: " + time_format
+                + " dtmf_enabled: " + dtmf_enabled
+                + " bluetooth_on: " + bluetooth_on);
 
         Intent timeChanged = new Intent(Intent.ACTION_TIME_CHANGED);
         timeChanged.addFlags(Intent.FLAG_RECEIVER_INCLUDE_BACKGROUND);
@@ -1692,13 +1706,19 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         mContext.sendBroadcast(timeChanged);
         Settings.System.putString(resolver, Settings.System.TIME_12_24, time_format);
 
+        logd("update dtmf enabled for phone: " + phoneId );
+        Settings.System.putInt(resolver,Settings.System.DTMF_TONE_WHEN_DIALING,
+                dtmf_enabled ? 1 : 0);
+
         BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetooth_on) {
             btAdapter.enable();
         } else {
             btAdapter.disable();
         }
+
     }
+    // modify by T2M.zhang renjie for FP5V-1070 25-7-31 end
 
     private void updateModemSettings(int phoneId, PersistableBundle config) {
 
