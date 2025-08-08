@@ -513,10 +513,12 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
                 case EVENT_FETCH_DEFAULT_DONE: {
                     // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
-                    if (m_reboot) {
-                        m_reboot = false;
+                    if (m_reboot && !mHandler.hasMessages(EVENT_DSD_REBOOT)) {
+                        logd("Dsd reboot will be launched after 5s");
                         sendEmptyMessageDelayed(EVENT_DSD_REBOOT, 5000);
                         Toast.makeText(mContext,R.string.dsd_rebooting, Toast.LENGTH_SHORT).show();
+                    }else {
+                        logd("m_reboot = " + m_reboot + ", or aleady arranged DSD reboot.");
                     }
                     // add by T2M.dengxiangyu for FP4-61 2021-04-14 end
 
@@ -731,14 +733,6 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                 }
 
                 case EVENT_FETCH_DEFAULT_FOR_NO_SIM_CONFIG_DONE: {
-                    // add by T2M.dengxiangyu for FP4-61 2021-06-25 begin
-                    if (m_reboot) {
-                        m_reboot = false;
-                        sendEmptyMessageDelayed(EVENT_DSD_REBOOT, 5000);
-                        Toast.makeText(mContext, R.string.dsd_rebooting, Toast.LENGTH_SHORT).show();
-                    }
-                    // add by T2M.dengxiangyu for FP4-61 2021-06-25 end
-
                     broadcastConfigChangedIntent(phoneId, false);
                     break;
                 }
@@ -832,6 +826,8 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
                 // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
                 case EVENT_DSD_REBOOT:
+                    logd("start to dsd reboot");
+                    m_reboot = false;
                     SystemProperties.set(DSDLOCKED_REBOOT, "1");
                     PowerManager pm = (PowerManager)mContext.getSystemService(Context.POWER_SERVICE);
                     pm.reboot(null);
@@ -1615,19 +1611,17 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
 
         // modify by T2M.zhang renjie for FPS-2384 25-5-7 begin
         if (m_reboot && getDsdLocked()) {
-            logd("only update bluetooth and timezone when first reboot time to do dsd lock");
-            updateTZ_BT(phoneId, config);
+            logd("only update bluetooth , dtmf and time_format when first reboot time to do dsd lock");
+            updateTF_BT(phoneId, config);
         }
 
     }
 
-    private void updateTZ_BT(int phoneId, PersistableBundle config) {
+    private void updateTF_BT(int phoneId, PersistableBundle config) {
         ContentResolver resolver = mContext.getContentResolver();
         String time_format = config.getString(CarrierConfigManager.KEY_TIME_FORMAT, "24");
         boolean dtmf_enabled = config.getBoolean(CarrierConfigManager.KEY_CARRIER_DEFAULT_DTMF_ENABLED_BOOL, false);
-        boolean bluetooth_on = (m_dsd_locked && mConfigFromDSDLocked != null) ?
-                mConfigFromDSDLocked.getBoolean(CarrierConfigManager.KEY_BLUETOOTH_DEFAULT_ON, false) :
-                config.getBoolean(CarrierConfigManager.KEY_BLUETOOTH_DEFAULT_ON, false);
+        boolean bluetooth_on = config.getBoolean(CarrierConfigManager.KEY_BLUETOOTH_DEFAULT_ON, false);
 
         logd("updateTZ BT[" + phoneId + "]"
                         + " time_format: " + time_format
