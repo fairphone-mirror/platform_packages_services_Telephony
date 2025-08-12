@@ -226,10 +226,15 @@ public class GsmUmtsCallOptions extends PreferenceActivity {
             if (b != null && b.getBoolean(CarrierConfigManager.KEY_CALL_BARRING_VISIBILITY_BOOL) &&
                     (!Flags.ensureAccessToCallSettingsIsRestricted() ||
                             !mobileNetworkConfigsRestricted)) {
-                callBarringPref.setIntent(subInfoHelper.getIntent(GsmUmtsCallBarringOptions.class));
+                // add for FP5-2419 by T2M.dengxiangyu 2023-08-02
+                if (operator != null && !TextUtils.isEmpty(operator) && operator.equals("20408") && regTech == ImsRegistrationImplBase.REGISTRATION_TECH_IWLAN) {
+                    callBarringPref.setEnabled(false);
+                } else {
+                    callBarringPref.setIntent(subInfoHelper.getIntent(GsmUmtsCallBarringOptions.class));
 // QTI_BEGIN: 2024-11-06: Telephony: Fix the issues related to UT service in airplane mode am: e74f539a23 am: e74f539a23
-                mPreferences.add(callBarringPref);
+                    mPreferences.add(callBarringPref);
 // QTI_END: 2024-11-06: Telephony: Fix the issues related to UT service in airplane mode am: e74f539a23 am: e74f539a23
+                }
             } else {
                 prefScreen.removePreference(callBarringPref);
             }
