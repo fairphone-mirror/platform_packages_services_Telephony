@@ -583,7 +583,7 @@ public class NotificationMgr {
              * TelephonyCallback#onMessageWaitingIndicatorChanged occurs, we have to sent the
              * broadcast even if the count didn't actually change.
              */
-            if (!didCountChange && isRefresh) {
+            if (!didCountChange && isRefresh && !"com.android.cts.verifier".equals(intent.getPackage())) {//Modify by renjie.zhang, 09/09/2025, FPSW-207
                 Log.i(LOG_TAG, "maybeSendVoicemailNotificationUsingDefaultDialer: skip bcast to:"
                         + intent.getPackage() + ", user:" + userHandle);
                 // It's "technically" being sent through the dialer, but we just skipped that so
