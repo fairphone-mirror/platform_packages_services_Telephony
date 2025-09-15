@@ -105,6 +105,12 @@ import android.net.wifi.WifiManager;
 
 // QTI_BEGIN: 2022-03-04: Telephony: Update CarrierConfigs on essential records loaded
 import com.qti.extphone.ExtTelephonyManager;
+import com.qti.extphone.Client;
+import com.qti.extphone.ExtPhoneCallbackBase;
+import com.qti.extphone.NrConfig;
+import com.qti.extphone.ServiceCallback;
+import com.qti.extphone.Status;
+import com.qti.extphone.Token;
 
 // QTI_END: 2022-03-04: Telephony: Update CarrierConfigs on essential records loaded
 
@@ -192,6 +198,14 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     // Number of phone instances (active modem count)
     private int mNumPhones;
 
+    //[BUG]-Modify-Begin by shaopan.tang 2025-09-05 FPS-3353 5G SA switch for Elisa
+    private ExtTelephonyManager mExtTelephonyManager;
+    private SubscriptionManager mSubscriptionManager;
+    private String mPackageName;
+    private Client mClient;
+    private boolean mServiceConnected;
+    private boolean[] isSystemUpdated = new boolean[2];
+    //[BUG]-Modify-End by shaopan.tang
 
     // Message codes; see mHandler below.
     // Request from UiccController when SIM becomes absent or error.
@@ -703,6 +717,13 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
                         //modify by T2M yubin.ying for FP4-3655 20220421
                         //clearCachedConfigForPackage(null);
                         //modify by T2M yubin.ying for FP4-3655 20220421
+
+                        //[BUG]-Modify-Begin by shaopan.tang 2025-09-05 FPS-3353 5G SA switch for Elisa
+                        for (int i = 0; i < 2; i++){
+                            isSystemUpdated[i] = true;
+                        }
+                        //[BUG]-Modify-End by shaopan.tang
+
                         sharedPrefs
                                 .edit()
                                 .putString(KEY_FINGERPRINT, Build.FINGERPRINT)
@@ -870,6 +891,43 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
     @NonNull private final PackageManager mPackageManager;
     private final int mVendorApiLevel;
 
+    //[BUG]-Modify-Begin by shaopan.tang 2025-09-05 FPS-3353 5G SA switch for Elisa
+    private ServiceCallback mServiceCallback = new ServiceCallback() {
+        @Override
+        public void onConnected() {
+            logd("ExtTelephonyService connected");
+            mServiceConnected = true;
+            mClient = mExtTelephonyManager.registerCallback(mPackageName, mCallback);
+            logd("Client = " + mClient);
+        }
+
+        @Override
+        public void onDisconnected() {
+            logd("ExtTelephonyService disconnected...");
+            if (mServiceConnected) {
+                mServiceConnected = false;
+                mClient = null;
+            }
+        }
+    };
+
+    private ExtPhoneCallbackBase mCallback = new ExtPhoneCallbackBase() {
+        @Override
+        public void onSetNrConfig(int slotId, Token token, Status status) throws
+                RemoteException {
+            logd("onSetNrConfig: slotId = " + slotId + " token = " + token + " status = " +
+                    status);
+        }
+
+        @Override
+        public void onNrConfigStatus(int slotId, Token token, Status status, NrConfig nrConfig)
+                throws RemoteException {
+            logd("onNrConfigStatus: slotId = " + slotId + " token = " + token + " status = " +
+                    status + " nrConfig = " + nrConfig);
+        }
+    };
+    //[BUG]-Modify-Begin by shaopan.tang
+
     /**
      * Constructs a CarrierConfigLoader, registers it as a service, and registers a broadcast
      * receiver for relevant events.
@@ -919,6 +977,17 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         mVendorApiLevel = SystemProperties.getInt(
                 "ro.vendor.api_level", Build.VERSION.DEVICE_INITIAL_SDK_INT);
         logd("CarrierConfigLoader has started");
+
+        //[BUG]-Modify-Begin by shaopan.tang 2025-09-05 FPS-3353 5G SA switch for Elisa
+        mPackageName = mContext.getPackageName();
+        mSubscriptionManager = SubscriptionManager.from(mContext);
+        mExtTelephonyManager = ExtTelephonyManager.getInstance(mContext.getApplicationContext());
+        logd("Connect to ExtTelephony bound service...");
+        mExtTelephonyManager.connectService(mServiceCallback);
+        for (int i = 0; i < 2; i++){
+            isSystemUpdated[i] = false;
+        }
+        //[BUG]-Modify-End by shaopan.tang
 
         // add by T2M.dengxiangyu for FP4-61 2021-04-14 begin
         // get status of DSD locked and saved carrier id
@@ -1748,6 +1817,10 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
             }
         }
 
+        //[BUG]-Modify-Begin by shaopan.tang 2025-09-05 FPS-3353 5G SA switch for Elisa
+        update5GSASettings(phoneId);
+        //[BUG]-Modify-End by shaopan.tang
+
         if (wbAmr != 0xFF) {
             try {
                 mSysRil.setInt8Val(ISysRilCmd.RIL_SUB_CMD_INT8_WB_AMR, (byte)wbAmr);
@@ -1792,6 +1865,29 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
             }
         }
     }
+
+    //[BUG]-Modify-Begin by shaopan.tang 2025-09-05 FPS-3353 5G SA switch for Elisa
+    private void update5GSASettings(int phoneId) {
+        int carrierId = getSpecificCarrierIdForPhoneId(phoneId);
+        boolean isUpdate5GSASettingsNeeded = (carrierId == 1475);
+        logd("update5GSASettings phoneId：" + phoneId + " isUpdate5GSASettingsNeeded: " + isUpdate5GSASettingsNeeded);
+        int subId = SubscriptionManager.getSubscriptionId(phoneId);
+        int slotId = mSubscriptionManager.getSlotIndex(subId);
+
+        if (isUpdate5GSASettingsNeeded && (slotId >= 0 && slotId < 2)){
+            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+            int nrConfig = sharedPrefs.getInt("nr_mode_" + slotId, NrConfig.NR_CONFIG_SA);
+            logd("update5GSASettings from sharedprefs nrConfig: " + nrConfig);
+            nrConfig = GlobalSettingsHelper.getInt(mContext, "nr_mode", subId, NrConfig.NR_CONFIG_SA);
+            logd("update5GSASettings from settings nrConfig: " + nrConfig);
+            if (mServiceConnected && mClient != null) {
+                Token token = mExtTelephonyManager.setNrConfig(
+                            slotId, new NrConfig(nrConfig), mClient);
+                logd("update5GSASettings setNrConfig: " + token);
+            }
+        }
+    }
+    //[BUG]-Modify-End by shaopan.tang
 
     private QcRilHookCallback mQcrilHookCb = new QcRilHookCallback() {
         @Override
@@ -2192,6 +2288,19 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         }
 
         checkHasSkySim(simState);    /*modify for FPS-246 Different RATs are displayed when manual search of Networks target part */
+
+        //[BUG]-Modify-Begin by shaopan.tang 2025-09-05 FPS-3353 5G SA switch for Elisa
+        int subId = SubscriptionManager.getSubscriptionId(phoneId);
+        int slotId = mSubscriptionManager.getSlotIndex(subId);
+        logd("updateConfigForPhoneId slotId= " + slotId + " phoneId= " + phoneId);
+        if (slotId >= 0 && slotId < 2 && isSystemUpdated[slotId]
+                && (m_sim_status[phoneId].equalsIgnoreCase(IccCardConstants.INTENT_VALUE_ICC_LOADED)
+                    || m_sim_status[phoneId].equalsIgnoreCase(IccCardConstants.INTENT_VALUE_ICC_LOCKED)
+                    || m_sim_status[phoneId].equalsIgnoreCase(ExtTelephonyManager.SIM_STATE_ESSENTIAL_RECORDS_LOADED))){
+            update5GSASettings(phoneId);
+            isSystemUpdated[slotId] = false;
+        }
+        //[BUG]-Modify-End by shaopan.tang
 
         // if DSD is done then follow the original code
         if (isDynamicSimDetectDone() == true) {
