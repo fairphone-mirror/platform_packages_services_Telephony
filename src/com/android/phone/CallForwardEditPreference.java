@@ -223,6 +223,10 @@ public class CallForwardEditPreference extends EditPhoneNumberPreference {
                 mNumber = number;
 
                 mHandler.sendMessage(mHandler.obtainMessage(mHandler.MESSAGE_GET_CFUT));
+
+                if (mPhone.getCallForwardingIndicator()) {
+                    updateCallForwardingPreferenceForCfut(reason,false, number);
+                }
             }
 
             @Override
@@ -988,6 +992,14 @@ public class CallForwardEditPreference extends EditPhoneNumberPreference {
         } else {
             mPhone.setVoiceCallForwardingFlag(1, (cfInfo.status == 1), cfInfo.number);
         }
+    }
+
+    private void updateCallForwardingPreferenceForCfut(int reason, boolean enable, String number) {
+        if (!mIsCfutEnabled || reason != CommandsInterface.CF_REASON_UNCONDITIONAL) {
+            return;
+        }
+
+        mPhone.setVoiceCallForwardingFlag(1, enable, number);
     }
 
 // QTI_END: 2022-01-17: Telephony: Update call forward preference
