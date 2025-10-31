@@ -952,7 +952,7 @@
     <string name="satellite_config_country_code_label" msgid="1389520866423113166">"landekoder:"</string>
     <string name="satellite_config_size_of_sats2_dat_label" msgid="671746449054349967">"størrelse på sats2.dat:"</string>
     <string name="satellite_config_json_label" msgid="4577292884014824105">"JSON-fil til konfiguration af satellitadgang:"</string>
-    <string name="vibrating_for_outgoing_call_accepted_title">Vibreren for udgående opkald accepteret</string>
+    <string name="vibrating_for_outgoing_call_accepted_title">Vibration for udgående opkald accepteret</string>
     <string name="vibrating_for_outgoing_call_accepted_summary">Aktivering af vibration for udgående opkald accepteret</string>
     <!-- Smart Divert Settings -->
     <!-- Title for the Smart Divert Feature displayed in Call Settings -->
