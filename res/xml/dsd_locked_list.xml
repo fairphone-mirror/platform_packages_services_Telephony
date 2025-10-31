@@ -41,4 +41,5 @@
     <dsd_locked mcc="234" mnc="15" />
     <dsd_locked mcc="235" mnc="91" />
     <dsd_locked mcc="262" mnc="02" />
+    <dsd_locked mcc="262" mnc="23" />
 </dsd_locked_config_list>
