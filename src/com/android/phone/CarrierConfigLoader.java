@@ -1578,22 +1578,23 @@ public class CarrierConfigLoader extends ICarrierConfigLoader.Stub {
         int[] subIds = SubscriptionManager.getSubId(phoneId);
         final TelephonyManager telephonyManager = TelephonyManager.from(mContext).createForSubscriptionId(phone.getSubId());
 
-        boolean data_roaming_enabled = config.getBoolean(CarrierConfigManager.KEY_CARRIER_DEFAULT_DATA_ROAMING_ENABLED_BOOL, false);
+        //add by T2M.renjie,zhang for FPS-2485 2025-12-02 begin
+        //boolean data_roaming_enabled = config.getBoolean(CarrierConfigManager.KEY_CARRIER_DEFAULT_DATA_ROAMING_ENABLED_BOOL, false);
         int default_nwmode = config.getInt(CarrierConfigManager.KEY_DEFAULT_NETWORK_MODE, TelephonyProperties.default_network().get(phoneId));
 
         logd("update settings[" + phoneId + "]"
-                + " data_roaming_enabled: " + data_roaming_enabled
+                /*+ " data_roaming_enabled: " + data_roaming_enabled*/
                 + " default_nwmode: " + default_nwmode
                 + " m_reboot: " + m_reboot
         );
 
         if (subIds != null && subIds.length > 0) {
-            logd("update data roaming enabled for phone: " + phoneId + ", subId: " + subIds[0]);
+            /*logd("update data roaming enabled for phone: " + phoneId + ", subId: " + subIds[0]);
             GlobalSettingsHelper.setBoolean(mContext,
                     Settings.Global.DATA_ROAMING,
                     subIds[0],
-                    data_roaming_enabled);
-
+                    data_roaming_enabled);*/
+        //add by T2M.renjie,zhang for FPS-2485 2025-12-02 end
             logd("update default network mode for phone: " + phoneId + ", subId: " + subIds[0]);
             // modify by T2M.zhang renjie for FP4T-367 23-6-9 begin
             phone.loadAllowedNetworksFromSubscriptionDatabase();
