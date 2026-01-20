@@ -787,6 +787,16 @@ public class CallForwardEditPreference extends EditPhoneNumberPreference {
                     queryImsCallForwardStatus();
                 }
             }
+            //[BUG]-Modify-Begin by shaopan.tang FPSW-370 Callforwarding over UT not enable for OBE
+            // Though OBE have ims service,but UT not enable, in this case, ss should fallback to CS
+            else {
+                mPhone.getCallForwardingOption(reason, mServiceClass,
+                            mHandler.obtainMessage(MyHandler.MESSAGE_GET_CF,
+                            // unused in this case
+                            CommandsInterface.CF_ACTION_DISABLE,
+                            MyHandler.MESSAGE_GET_CF, null));
+            }
+            //[BUG]-Modify-End by shaopan.tang
             //[BUG]-Modify-End by shaopan.tang
         } else {
             mHandler.sendMessage(mHandler.obtainMessage(mHandler.MESSAGE_GET_CF_USSD,

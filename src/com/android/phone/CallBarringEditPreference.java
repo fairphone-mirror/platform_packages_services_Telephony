@@ -281,6 +281,14 @@ public class CallBarringEditPreference extends EditPinPreference {
                 mQtiImsExtConnector.connect();
             }
 // QTI_END: 2021-05-28: Telephony: Add CallForwarding and CallBarring expectMore support.
+            //[BUG]-Modify-Begin by shaopan.tang FPSW-370 Callforwarding over UT not enable for OBE
+            // Though OBE have ims service,but UT not enable, in this case, ss should fallback to CS
+            else {
+                mPhone.getCallBarring(mFacility, "", mHandler.obtainMessage(
+                            MyHandler.MESSAGE_GET_CALL_BARRING),
+                            getServiceClassForCallBarring(mPhone));
+            }
+            //[BUG]-Modify-End by shaopan.tang
             //[BUG]-Modify-End by shaopan.tang
             if (mTcpListener != null) {
                 mTcpListener.onStarted(this, true);
